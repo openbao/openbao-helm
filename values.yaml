@@ -3,187 +3,260 @@
 
 # Available parameters and their default values for the Vault chart.
 
+# These global values affect multiple components of the chart.
 global:
-  # enabled is the master enabled switch. Setting this to true or false
-  # will enable or disable all the components within this chart by default.
+  # The global enabled/disabled configuration. If this is true, most components
+  # will be installed by default. If this is false, no components will be
+  # installed by default and manually opting-in is required, such as by setting
+  # `server.enabled` to true.
   enabled: true
 
-  # Image pull secret to use for registry authentication.
-  # Alternatively, the value may be specified as an array of strings.
-  imagePullSecrets: []
+  # References secrets to be used when pulling images from private registries.
+  # See [Pull an Image from a Private Registry](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
+  # for more details. May be specified as an array of name map entries or just
+  # as an array of names:
+  # 
+  # ```yaml
   # imagePullSecrets:
   #   - name: image-pull-secret
+  # # or
+  # imagePullSecrets:
+  #   - image-pull-secret
+  # ```
+  imagePullSecrets: []
 
-  # TLS for end-to-end encrypted transport
+  # When set to `true`, changes URLs from `https` to `http` (such as the
+  # `VAULT_ADDR=http://127.0.0.1:8200` environment variable set on the
+  # Vault pods).
   tlsDisable: true
 
   # External vault server address for the injector and CSI provider to use.
-  # Setting this will disable deployment of a vault server.
+  # Setting this will disable deployment of a vault server. A service account
+  # with token review permissions is automatically created if
+  # `server.serviceAccount.create=true` is set for the external Vault server
+  # to use.
   externalVaultAddr: ""
 
-  # If deploying to OpenShift
+  # If `true`, enables configuration specific to OpenShift such as NetworkPolicy,
+  # SecurityContext, and Route.
   openshift: false
 
-  # Create PodSecurityPolicy for pods
+  # Values that configure Pod Security Policy.
   psp:
+    # When set to `true`, enables Pod Security Policies for Vault and Vault Agent Injector.
     enable: false
-    # Annotation for PodSecurityPolicy.
-    # This is a multi-line templated string map, and can also be set as YAML.
+    # This value defines additional annotations to add to the Pod Security
+    # Policies. This can either be YAML or a YAML-formatted multi-line templated
+    # string.
+    #
+    # ```yaml
+    # annotations:
+    #   seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default
+    #   apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
+    #   seccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default
+    #   apparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default
+    # # or
+    # annotations: |
+    #   seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default
+    #   apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
+    #   seccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default
+    #   apparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default
+    # ```
     annotations: |
       seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default
       apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
       seccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default
       apparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default
 
+  # Values that configure metrics and telemetry.
   serverTelemetry:
-    # Enable integration with the Prometheus Operator
-    # See the top level serverTelemetry section below before enabling this feature.
+    # When set to `true`, enables integration with the Prometheus Operator. Be
+    # sure to configure the top-level [`serverTelemetry`](https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration#servertelemetry-1)
+    # section for more details and required configuration values.
     prometheusOperator: false
 
+# Values that configure running a Vault Agent Injector Admission Webhook
+# Controller within Kubernetes.
 injector:
-  # True if you want to enable vault agent injection.
-  # @default: global.enabled
+  # When set to `true`, the Vault Agent Injector Admission Webhook controller
+  # will be created. When set to `"-"`, defaults to the value of `global.enabled`.
+  # @type: boolean or string
   enabled: "-"
-
-  replicas: 1
-
-  # Configures the port the injector should listen on
-  port: 8080
-
-  # If multiple replicas are specified, by default a leader will be determined
-  # so that only one injector attempts to create TLS certificates.
-  leaderElector:
-    enabled: true
-
-  # If true, will enable a node exporter metrics endpoint at /metrics.
-  metrics:
-    enabled: false
-
-  # Deprecated: Please use global.externalVaultAddr instead.
+  
+  # Deprecated: Please use [global.externalVaultAddr](https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration#externalvaultaddr)
+  # instead.
   externalVaultAddr: ""
 
-  # image sets the repo and tag of the vault-k8s image to use for the injector.
+  # The number of pods to deploy to create a highly available cluster of Vault
+  # Agent Injectors. Requires Vault K8s 0.7.0 to have more than 1 replica.
+  replicas: 1
+
+  # Values that configure the Vault Agent Injector leader election for HA
+  # deployments.
+  leaderElector:
+    # When set to `true`, enables leader election for Vault Agent Injector. This
+    # is required when using auto-tls and more than 1 replica.
+    enabled: true
+
+  # Values that configure the Vault Agent Injector Docker image.
   image:
+    # The name of the Docker image for Vault Agent Injector.
     repository: "hashicorp/vault-k8s"
+    # The tag of the Docker image for the Vault Agent Injector. **This should
+    # be pinned to a specific version when running in production.** Otherwise,
+    # other changes to the chart may inadvertently upgrade your admission controller.
     tag: "1.2.1"
+    # The pull policy for container images. The default pull policy is `IfNotPresent`
+    # which causes the Kubelet to skip pulling an image if it already exists.
     pullPolicy: IfNotPresent
 
-  # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
-  # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is
-  # required.
+  # Values that configure the Vault Agent sidecar image.
   agentImage:
+    # The name of the Docker image for the Vault Agent sidecar. This should be
+    # set to the official Vault Docker image.
     repository: "hashicorp/vault"
+    # The tag of the Vault Docker image to use for the Vault Agent Sidecar.
+    # **Vault 1.3.1+ is required by the admission controller**.
     tag: "1.13.1"
 
-  # The default values for the injected Vault Agent containers.
+  # Values that configure the injected Vault Agent containers default values.
+  # For more information on configuring resources, see the Kubernetes documentation:
+  # https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   agentDefaults:
-    # For more information on configuring resources, see the K8s documentation:
-    # https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+    # The default CPU limit for injected Vault Agent containers.
     cpuLimit: "500m"
+    # The default CPU request for injected Vault Agent containers.
     cpuRequest: "250m"
+    # The default memory limit for injected Vault Agent containers.
     memLimit: "128Mi"
+    # The default memory request for injected Vault Agent containers.
     memRequest: "64Mi"
 
-    # Default template type for secrets when no custom template is specified.
-    # Possible values include: "json" and "map".
+    # The default template type for rendered secrets if no custom templates are
+    # defined. Possible values include `map` and `json`.
     template: "map"
 
-    # Default values within Agent's template_config stanza.
+    # Default values within Agent's [`template_config` stanza](https://developer.hashicorp.com/vault/docs/agent/template).
     templateConfig:
+      # Controls whether Vault Agent exits after it has exhausted its number of
+      # template retry attempts due to failures.
       exitOnRetryFailure: true
+      # Configures how often Vault Agent Template should render non-leased secrets
+      # such as KV v2. See the [Vault Agent Templates documentation](/docs/agent/template#non-renewable-secrets)
+      # for more details.
       staticSecretRenderInterval: ""
 
-  # Used to define custom livenessProbe settings
-  livenessProbe:
-    # When a probe fails, Kubernetes will try failureThreshold times before giving up
-    failureThreshold: 2
-    # Number of seconds after the container has started before probe initiates
-    initialDelaySeconds: 5
-    # How often (in seconds) to perform the probe
-    periodSeconds: 2
-    # Minimum consecutive successes for the probe to be considered successful after having failed
-    successThreshold: 1
-    # Number of seconds after which the probe times out.
-    timeoutSeconds: 5
-  # Used to define custom readinessProbe settings
-  readinessProbe:
-    # When a probe fails, Kubernetes will try failureThreshold times before giving up
-    failureThreshold: 2
-    # Number of seconds after the container has started before probe initiates
-    initialDelaySeconds: 5
-    # How often (in seconds) to perform the probe
-    periodSeconds: 2
-    # Minimum consecutive successes for the probe to be considered successful after having failed
-    successThreshold: 1
-    # Number of seconds after which the probe times out.
-    timeoutSeconds: 5
-  # Used to define custom startupProbe settings
-  startupProbe:
-    # When a probe fails, Kubernetes will try failureThreshold times before giving up
-    failureThreshold: 12
-    # Number of seconds after the container has started before probe initiates
-    initialDelaySeconds: 5
-    # How often (in seconds) to perform the probe
-    periodSeconds: 5
-    # Minimum consecutive successes for the probe to be considered successful after having failed
-    successThreshold: 1
-    # Number of seconds after which the probe times out.
-    timeoutSeconds: 5
+  # Values that configure the Vault Agent Injector metric exporter.
+  metrics:
+    # When set to `true`, the Vault Agent Injector exports Prometheus metrics at
+    # the `/metrics` path.
+    enabled: false
 
-  # Mount Path of the Vault Kubernetes Auth Method.
+  # Mount path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 
-  # Configures the log verbosity of the injector.
-  # Supported log levels include: trace, debug, info, warn, error
+  # Configures the log verbosity of the injector. Supported log levels: trace,
+  # debug, error, warn, info.
   logLevel: "info"
 
-  # Configures the log format of the injector. Supported log formats: "standard", "json".
+  # Configures the log format of the injector. Supported log formats: "standard",
+  # "json".
   logFormat: "standard"
 
-  # Configures all Vault Agent sidecars to revoke their token when shutting down
+  # Configures all Vault Agent sidecars to revoke their token when shutting down.
   revokeOnShutdown: false
 
-  webhook:
-    # Configures failurePolicy of the webhook. The "unspecified" default behaviour depends on the
-    # API Version of the WebHook.
-    # To block pod creation while the webhook is unavailable, set the policy to `Fail` below.
-    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
+  # Security context for the pod template and the injector container.
+  securityContext:
+    # Defines the securityContext for the injector Pod, as YAML or a YAML-formatted
+    # multi-line templated string. Default if not specified:
     #
+    # ```yaml
+    # runAsNonRoot: true
+    # runAsGroup: {{ .Values.injector.gid | default 1000 }}
+    # runAsUser: {{ .Values.injector.uid | default 100 }}
+    # fsGroup: {{ .Values.injector.gid | default 1000 }}
+    # ```
+    # @type: dictionary
+    # @default: {}
+    pod: {}
+    # Defines the securityContext for the injector container, as YAML or a
+    # YAML-formatted multi-line templated string. Default if not specified:
+    #
+    # ```yaml
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+    # ```
+    # @type: dictionary
+    # @default: {}
+    container: {}
+
+  # The resource requests and limits (CPU, memory, etc.) for each container of
+  # the injector. This should be a YAML dictionary of a Kubernetes
+  # [ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#resourcerequirements-v1-core)
+  # object. If this isn't specified, then the pods won't request any specific
+  # amount of resources, which limits the ability for Kubernetes to make
+  # efficient use of compute resources.
+  #
+  # **Setting this is highly recommended.**
+  #
+  # ```yaml
+  # resources:
+  #   requests:
+  #     memory: '256Mi'
+  #     cpu: '250m'
+  #   limits:
+  #     memory: '256Mi'
+  #     cpu: '250m'
+  # ```
+  # @type: dictionary
+  # @default: {}
+  resources: {}
+
+  # Values that control the Mutating Webhook Configuration.
+  webhook:
+    # Configures failurePolicy of the webhook. To block pod creation while the
+    # webhook is unavailable, set the policy to `"Fail"`. See
+    # [Failure Policy](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy).
     failurePolicy: Ignore
 
-    # matchPolicy specifies the approach to accepting changes based on the rules of
-    # the MutatingWebhookConfiguration.
-    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-matchpolicy
-    # for more details.
-    #
+    # Specifies the approach to accepting changes based on the rules of the
+    # MutatingWebhookConfiguration. See
+    # [Match Policy](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-matchpolicy).
     matchPolicy: Exact
 
-    # timeoutSeconds is the amount of seconds before the webhook request will be ignored
-    # or fails.
-    # If it is ignored or fails depends on the failurePolicy
-    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#timeouts
-    # for more details.
-    #
+    # Specifies the number of seconds before the webhook request will be ignored
+    # or fails. If it is ignored or fails depends on the `failurePolicy`. See
+    # [timeouts](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#timeouts).
     timeoutSeconds: 30
 
-    # namespaceSelector is the selector for restricting the webhook to only
-    # specific namespaces.
-    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
-    # for more details.
-    # Example:
+    # The selector used by the admission webhook controller to limit what
+    # namespaces where injection can happen. If unset, all non-system namespaces
+    # are eligible for injection. See
+    # [Matching requests: namespace selector](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector).
+    #
+    # ```yaml
     # namespaceSelector:
-    #    matchLabels:
-    #      sidecar-injector: enabled
+    #   matchLabels:
+    #     sidecar-injector: enabled
+    # ```
+    # @type: object
+    # @default: {}
     namespaceSelector: {}
 
-    # objectSelector is the selector for restricting the webhook to only
-    # specific labels.
-    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector
-    # for more details.
-    # Example:
+    # The selector used by the admission webhook controller to limit what objects
+    # can be affected by mutation. See
+    # [Matching requests: object selector](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector).
+    #
+    # ```yaml
     # objectSelector:
-    #    matchLabels:
-    #      vault-sidecar-injector: enabled
+    #   matchLabels:
+    #     sidecar-injector: enabled
+    # ```
+    # @type: object
+    # @default: {}
     objectSelector: |
       matchExpressions:
       - key: app.kubernetes.io/name
@@ -191,95 +264,91 @@ injector:
         values:
         - {{ template "vault.name" . }}-agent-injector
 
-    # Extra annotations to attach to the webhook
+    # Defines additional annotations to attach to the webhook. This can either be
+    # YAML or a YAML-formatted multi-line templated string.
+    # @type: string or object
+    # @default: {}
     annotations: {}
 
-  # Deprecated: please use 'webhook.failurePolicy' instead
-  # Configures failurePolicy of the webhook. The "unspecified" default behaviour depends on the
-  # API Version of the WebHook.
-  # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
-  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
-  #
-  failurePolicy: Ignore
-
-  # Deprecated: please use 'webhook.namespaceSelector' instead
-  # namespaceSelector is the selector for restricting the webhook to only
-  # specific namespaces.
-  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
-  # for more details.
-  # Example:
-  # namespaceSelector:
-  #    matchLabels:
-  #      sidecar-injector: enabled
+  # Deprecated: please use
+  # [`webhook.namespaceSelector`](https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration#namespaceselector) instead.
+  # @type: dictionary
+  # @default: {}
   namespaceSelector: {}
 
-  # Deprecated: please use 'webhook.objectSelector' instead
-  # objectSelector is the selector for restricting the webhook to only
-  # specific labels.
-  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector
-  # for more details.
-  # Example:
-  # objectSelector:
-  #    matchLabels:
-  #      vault-sidecar-injector: enabled
+  # Deprecated: please use
+  # [`webhook.objectSelector`](https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration#objectselector) instead.
+  # @type: dictionary
+  # @default: {}
   objectSelector: {}
 
-  # Deprecated: please use 'webhook.annotations' instead
-  # Extra annotations to attach to the webhook
-  webhookAnnotations: {}
+  # This value defines additional labels for Vault Agent Injector pods.
+  #
+  # ```yaml
+  # extraLabels:
+  #   'sample/label1': 'foo'
+  #   'sample/label2': 'bar'
+  # ```
+  # @type: dictionary
+  # @default: {}
+  extraLabels: {}
 
+  # The certs section configures how the webhook TLS certs are configured. These
+  # are the TLS certs for the Kube apiserver communicating to the webhook. By
+  # default, the injector will generate and manage its own certs, but this
+  # requires the ability for the injector to update its own
+  # `MutatingWebhookConfiguration`. In a production environment, custom certs
+  # should probably be used. Configure the values below to enable this.
   certs:
-    # secretName is the name of the secret that has the TLS certificate and
-    # private key to serve the injector webhook. If this is null, then the
-    # injector will default to its automatic management mode that will assign
-    # a service account to the injector to generate its own certificates.
+    # secretName is the name of the Kubernetes secret that has the TLS certificate
+    # and private key to serve the injector webhook. If this is null, then the
+    # injector will default to its automatic management mode.
     secretName: null
 
-    # caBundle is a base64-encoded PEM-encoded certificate bundle for the CA
-    # that signed the TLS certificate that the webhook serves. This must be set
-    # if secretName is non-null unless an external service like cert-manager is
-    # keeping the caBundle updated.
+    # The PEM-encoded CA public certificate bundle for the TLS certificate served
+    # by the injector. This must be specified as a string and can't come from a
+    # secret because it must be statically configured on the Kubernetes
+    # `MutatingAdmissionWebhook` resource. This only needs to be specified if
+    # `secretName` is not null.
     caBundle: ""
 
-    # certName and keyName are the names of the files within the secret for
-    # the TLS cert and private key, respectively. These have reasonable
-    # defaults but can be customized if necessary.
+    # The name of the certificate file within the `secretName` secret.
     certName: tls.crt
+    # The name of the key file within the `secretName` secret.
     keyName: tls.key
 
-  # Security context for the pod template and the injector container
-  # The default pod securityContext is:
-  #   runAsNonRoot: true
-  #   runAsGroup: {{ .Values.injector.gid | default 1000 }}
-  #   runAsUser: {{ .Values.injector.uid | default 100 }}
-  #   fsGroup: {{ .Values.injector.gid | default 1000 }}
-  # and for container is
-  #    allowPrivilegeEscalation: false
-  #    capabilities:
-  #      drop:
-  #        - ALL
-  securityContext:
-    pod: {}
-    container: {}
-
-  resources: {}
-  # resources:
-  #   requests:
-  #     memory: 256Mi
-  #     cpu: 250m
-  #   limits:
-  #     memory: 256Mi
-  #     cpu: 250m
-
-  # extraEnvironmentVars is a list of extra environment variables to set in the
-  # injector deployment.
+  # Extra environment variables to set in the injector deployment.
+  #
+  # ```yaml
+  # # Example setting injector TLS options in a deployment:
+  # extraEnvironmentVars:
+  #   AGENT_INJECT_TLS_MIN_VERSION: tls13
+  #   AGENT_INJECT_TLS_CIPHER_SUITES: ...
+  # ```
+  # @type: dictionary
+  # @default: {}
   extraEnvironmentVars: {}
-    # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
-  # Affinity Settings for injector pods
-  # This can either be a multi-line string or YAML matching the PodSpec's affinity field.
-  # Commenting out or setting as empty the affinity variable, will allow
-  # deployment of multiple replicas to single node services such as Minikube.
+  # This value defines the [affinity](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+  # for Vault Agent Injector pods. This can either be multi-line string or YAML
+  # matching the PodSpec's affinity field. It defaults to allowing only a single
+  # pod on each node, which minimizes risk of the cluster becoming unusable if
+  # a node is lost. If you need to run more pods per node (for example, testing
+  # on Minikube), set this value to `null`.
+  #
+  # ```yaml
+  # # Recommended default server affinity:
+  # affinity: |
+  #   podAntiAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #     - labelSelector:
+  #         matchLabels:
+  #           app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+  #           app.kubernetes.io/instance: "{{ .Release.Name }}"
+  #           component: webhook
+  #       topologyKey: kubernetes.io/hostname
+  # ```
+  # @type: string or dictionary
   affinity: |
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -290,64 +359,164 @@ injector:
               component: webhook
           topologyKey: kubernetes.io/hostname
 
-  # Topology settings for injector pods
-  # ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
-  # This should be either a multi-line string or YAML matching the topologySpreadConstraints array
-  # in a PodSpec.
+  # [Topology settings](https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/)
+  # for injector pods. This can either be YAML or a YAML-formatted multi-line
+  # templated string.
   topologySpreadConstraints: []
 
-  # Toleration Settings for injector pods
-  # This should be either a multi-line string or YAML matching the Toleration array
-  # in a PodSpec.
+  # Toleration Settings for injector pods. This should be either a multi-line
+  # string or YAML matching the Toleration array.
   tolerations: []
 
-  # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
-  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-  # Example:
+  # The nodeSelector labels for injector pod assignment, formatted as a multi-line
+  # string or YAML map. See https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+  #
+  # ```yaml
   # nodeSelector:
   #   beta.kubernetes.io/arch: amd64
+  # ```
+  # @type: dictionary
+  # @default: {}
   nodeSelector: {}
 
-  # Priority class for injector pods
+  # Priority class for injector pods.
   priorityClassName: ""
 
-  # Extra annotations to attach to the injector pods
-  # This can either be YAML or a YAML-formatted multi-line templated string map
-  # of the annotations to apply to the injector pods
+  # This value defines additional annotations for injector pods. This can either
+  # be YAML or a YAML-formatted multi-line templated string.
+  #
+  # ```yaml
+  # annotations:
+  #   "sample/annotation1": "foo"
+  #   "sample/annotation2": "bar"
+  # # or
+  # annotations: |
+  #   "sample/annotation1": "foo"
+  #   "sample/annotation2": "bar"
+  # ```
+  # @type: dictionary
+  # @default: {}
   annotations: {}
 
-  # Extra labels to attach to the agent-injector
-  # This should be a YAML map of the labels to apply to the injector
-  extraLabels: {}
+  # Deprecated: please use [`webhook.failurePolicy`](https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration#failurepolicy) instead.
+  failurePolicy: Ignore
 
-  # Should the injector pods run on the host network (useful when using
-  # an alternate CNI in EKS)
+  # Deprecated: please use [`webhook.annotations`](https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration#annotations-1) instead.
+  # @type: dictionary
+  # @default: {}
+  webhookAnnotations: {}
+
+  # The service section configures the Kubernetes service for the Vault Agent
+  # Injector.
+  service:
+    # This value defines additional annotations to add to the Vault Agent Injector
+    # service. This can either be YAML or a YAML-formatted multi-line templated string.
+    #
+    # ```yaml
+    # annotations:
+    #   "sample/annotation1": "foo"
+    #   "sample/annotation2": "bar"
+    # # or
+    # annotations: |
+    #   "sample/annotation1": "foo"
+    #   "sample/annotation2": "bar"
+    # ```
+    # @type: dictionary
+    # @default: {}
+    annotations: {}
+
+  # Injector serviceAccount specific config.
+  serviceAccount:
+    # Extra annotations to attach to the injector serviceAccount. This can either
+    # be YAML or a YAML-formatted multi-line templated string.
+    # @type: dictionary
+    # @default: {}
+    annotations: {}
+
+  # When set to true, configures the Vault Agent Injector to run on the host
+  # network. This is useful when alternative cluster networking is used.
   hostNetwork: false
 
-  # Injector service specific config
-  service:
-    # Extra annotations to attach to the injector service
-    annotations: {}
-
-  # Injector serviceAccount specific config
-  serviceAccount:
-    # Extra annotations to attach to the injector serviceAccount
-    annotations: {}
+  # Configures the port the Vault Agent Injector listens on.
+  port: 8080
 
   # A disruption budget limits the number of pods of a replicated application
-  # that are down simultaneously from voluntary disruptions
-  podDisruptionBudget: {}
+  # that are down simultaneously from voluntary disruptions.
+  #
+  # ```yaml
   # podDisruptionBudget:
   #   maxUnavailable: 1
+  # ```
+  # @type: dictionary
+  # @default: {}
+  podDisruptionBudget: {}
 
-  # strategy for updating the deployment. This can be a multi-line string or a
+  # Strategy for updating the deployment. This can be a multi-line string or a
   # YAML map.
-  strategy: {}
+  #
+  # ```yaml
+  # strategy:
+  #   rollingUpdate:
+  #     maxSurge: 25%
+  #     maxUnavailable: 25%
+  #   type: RollingUpdate
+  # # or
   # strategy: |
   #   rollingUpdate:
   #     maxSurge: 25%
   #     maxUnavailable: 25%
   #   type: RollingUpdate
+  # ```
+  # @type: dictionary
+  # @default: {}
+  strategy: {}
+
+  # Values that configure the liveness probe for the injector.
+  livenessProbe:
+    # When set to a value, configures how many probe failures will be tolerated
+    # by Kubernetes.
+    failureThreshold: 2
+    # Sets the initial delay of the liveness probe when the container starts.
+    initialDelaySeconds: 5
+    # When set to a value, configures how often (in seconds) to perform the probe.
+    periodSeconds: 2
+    # When set to a value, configures the minimum consecutive successes for the
+    # probe to be considered successful after having failed.
+    successThreshold: 1
+    # When set to a value, configures the number of seconds after which the probe
+    # times out.
+    timeoutSeconds: 5
+  # Values that configure the readiness probe for the injector.
+  readinessProbe:
+    # When set to a value, configures how many probe failures will be tolerated
+    # by Kubernetes.
+    failureThreshold: 2
+    # Sets the initial delay of the readiness probe when the container starts.
+    initialDelaySeconds: 5
+    # When set to a value, configures how often (in seconds) to perform the probe.
+    periodSeconds: 2
+    # When set to a value, configures the minimum consecutive successes for the probe
+    # to be considered successful after having failed.
+    successThreshold: 1
+    # When set to a value, configures the number of seconds after which the probe
+    # times out.
+    timeoutSeconds: 5
+  # Values that configure the startup probe for the injector.
+  startupProbe:
+    # When set to a value, configures how many probe failures will be tolerated
+    # by Kubernetes.
+    failureThreshold: 12
+    # Sets the initial delay of the startup probe when the container starts.
+    initialDelaySeconds: 5
+    # When set to a value, configures how often (in seconds) to perform the probe.
+    periodSeconds: 5
+    # When set to a value, configures the minimum consecutive successes for the probe
+    # to be considered successful after having failed.
+    successThreshold: 1
+    # When set to a value, configures the number of seconds after which the probe
+    # times out.
+    timeoutSeconds: 5
+
 
 server:
   # If true, or "-" with global.enabled true, Vault server will be installed.

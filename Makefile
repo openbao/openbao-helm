@@ -99,3 +99,11 @@ delete-kind:
 	kind delete cluster --name ${KIND_CLUSTER_NAME} || :
 
 .PHONY: values-schema test-image test-unit test-bats test test-acceptance test-destroy test-provision acceptance provision-cluster destroy-cluster
+
+# Generate Helm reference docs from values.yaml and update Vault website.
+# Usage: make gen-helm-docs vault=<path-to-vault-repo>.
+# If no options are given, the local copy of docs/helm.mdx will be updated, which can
+# be used to submit a PR to vault docs.
+# Adapted from https://github.com/hashicorp/consul-k8s/tree/main/hack/helm-reference-gen
+gen-helm-docs:
+	@cd hack/helm-reference-gen; go run ./... --vault=$(vault)
