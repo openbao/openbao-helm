@@ -16,5 +16,5 @@ annotations:
   charts.openshift.io/name: Openbao
 
 maintainers:
-  - name: jessebot
-    url: https://github.com/jessebot
+- name: OpenBao
+  url: https://openbao.org
