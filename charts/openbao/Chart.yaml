@@ -8,7 +8,7 @@ appVersion: v2.0.0-alpha20240329
 kubeVersion: ">= 1.27.0-0"
 description: Official OpenBao Chart
 home: https://github.com/openbao/openbao-helm
-icon: https://avatars.githubusercontent.com/u/152585220?s=200&v=4
+icon: https://github.com/openbao/artwork/blob/main/color/openbao-color.svg
 keywords: ["vault", "security", "encryption", "secrets", "management", "automation", "infrastructure"]
 sources:
   - https://github.com/openbao/openbao-helm
