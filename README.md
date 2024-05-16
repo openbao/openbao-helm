@@ -2,15 +2,11 @@
 
 > :warning: **Please note**: We take OpenBao's security and our users' trust very seriously. If
 you believe you have found a security issue in OpenBao Helm, _please responsibly disclose_
-by contacting us at [](mailto:).
+by contacting us at [openbao-security@lists.lfedge.org](mailto:openbao-security@lists.lfedge.org).
 
 This repository contains the OpenBao Helm chart for installing
 and configuring OpenBao on Kubernetes. This chart supports multiple use
 cases of OpenBao on Kubernetes depending on the values provided.
-
-For full documentation on this Helm chart along with all the ways you can
-use Vault with Kubernetes, please see the
-[Vault and Kubernetes documentation](https://developer.hashicorp.com/vault/docs/platform/k8s).
 
 ## Prerequisites
 
