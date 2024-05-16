@@ -1,12 +1,12 @@
-# Vault Helm Chart
+# OpenBao Helm Chart
 
-> :warning: **Please note**: We take Vault's security and our users' trust very seriously. If 
-you believe you have found a security issue in Vault Helm, _please responsibly disclose_ 
-by contacting us at [security@hashicorp.com](mailto:security@hashicorp.com).
+> :warning: **Please note**: We take OpenBao's security and our users' trust very seriously. If
+you believe you have found a security issue in OpenBao Helm, _please responsibly disclose_
+by contacting us at [](mailto:).
 
-This repository contains the official HashiCorp Helm chart for installing
-and configuring Vault on Kubernetes. This chart supports multiple use
-cases of Vault on Kubernetes depending on the values provided.
+This repository contains the OpenBao Helm chart for installing
+and configuring OpenBao on Kubernetes. This chart supports multiple use
+cases of OpenBao on Kubernetes depending on the values provided.
 
 For full documentation on this Helm chart along with all the ways you can
 use Vault with Kubernetes, please see the
@@ -20,24 +20,19 @@ this README. Please refer to the Kubernetes and Helm documentation.
 
 The versions required are:
 
-  * **Helm 3.6+**
-  * **Kubernetes 1.22+** - This is the earliest version of Kubernetes tested.
+  * **Helm 3.12+** - Earliest verison tested
+  * **Kubernetes 1.28+** - This is the earliest version of Kubernetes tested.
     It is possible that this chart works with earlier versions but it is
     untested.
 
 ## Usage
 
-To install the latest version of this chart, add the Hashicorp helm repository
-and run `helm install`:
+To install the latest version of this chart, add the Hashicorp helm repository and run `helm install`:
 
 ```console
-$ helm repo add hashicorp https://helm.releases.hashicorp.com
-"hashicorp" has been added to your repositories
+helm repo add openbao https://openbao.github.io/openbao-helm
 
-$ helm install vault hashicorp/vault
+helm install openbao openbao/openbao
 ```
 
-Please see the many options supported in the `values.yaml` file. These are also
-fully documented directly on the [Vault
-website](https://developer.hashicorp.com/vault/docs/platform/k8s/helm) along with more
-detailed installation instructions.
+Please see the many options supported in the [`values.yaml`](./charts/openbao/values.yaml) file. These are also fully documented directly in the [openbao README](./charts/openbao/README.md) along with more detailed installation instructions.
