@@ -1,10 +1,10 @@
 
-Thank you for installing HashiCorp Vault!
+Thank you for installing OpenBao!
 
-Now that you have deployed Vault, you should look over the docs on using
+Now that you have deployed OpenBao, you should look over the docs on using
 Vault with Kubernetes available here:
 
-https://developer.hashicorp.com/vault/docs
+https://openbao.org/docs/
 
 
 Your release is named {{ .Release.Name }}. To learn more about the release, try:

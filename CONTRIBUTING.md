@@ -1,8 +1,8 @@
-# Contributing to Vault Helm
+# Contributing to OpenBao Helm
 
-**Please note:** We take Vault's security and our users' trust very seriously.
-If you believe you have found a security issue in Vault, please responsibly
-disclose by contacting us at security@hashicorp.com.
+**Please note:** We take OpenBao's security and our users' trust very seriously.
+If you believe you have found a security issue in OpenBao, please responsibly
+disclose by contacting us at openbao-security@lists.lfedge.org.
 
 **First:** if you're unsure or afraid of _anything_, just ask or submit the
 issue or pull request anyways. You won't be yelled at for giving it your best
@@ -12,14 +12,15 @@ rules to get in the way of that.
 
 That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
-won't clash or be obviated by Vault's normal direction. A great way to do this
-is via the [Vault Discussion Forum][1].
+won't clash or be obviated by OpenBao's normal direction. A great way to do this
+is via the [Linux Foundation Element chat server][1], or [mailing list][2].
 
 This document will cover what we're looking for in terms of reporting issues.
 By addressing all the points we're looking for, it raises the chances we can
 quickly merge or address your contributions.
 
-[1]: https://discuss.hashicorp.com/c/vault
+[1]: https://chat.lfx.linuxfoundation.org
+[2]: https://lists.lfedge.org/g/openbao
 
 ## Issues
 
@@ -33,14 +34,14 @@ quickly merge or address your contributions.
 * Provide steps to reproduce the issue, and if possible include the expected
   results as well as the actual results. Please provide text, not screen shots!
 
-* Respond as promptly as possible to any questions made by the Vault
+* Respond as promptly as possible to any questions made by the OpenBao
   team to your issue. Stale issues will be closed periodically.
 
 ### Issue Lifecycle
 
 1. The issue is reported.
 
-2. The issue is verified and categorized by a Vault Helm collaborator.
+2. The issue is verified and categorized by a OpenBao Helm collaborator.
    Categorization is done via tags. For example, bugs are marked as "bugs".
 
 3. Unless it is critical, the issue may be left for a period of time (sometimes
@@ -70,25 +71,25 @@ The following are the instructions for running bats tests using a Docker contain
 #### Prerequisites
 
 * Docker installed
-* `vault-helm` checked out locally
+* `openbao-helm` checked out locally
 
 #### Test
 
-**Note:** the following commands should be run from the `vault-helm` directory.
+**Note:** the following commands should be run from the `openbao-helm` directory.
 
 First, build the Docker image for running the tests:
 
 ```shell
-docker build -f ${PWD}/test/docker/Test.dockerfile ${PWD}/test/docker/ -t vault-helm-test
+docker build -f ${PWD}/test/docker/Test.dockerfile ${PWD}/test/docker/ -t openbao-helm-test
 ```
 Next, execute the tests with the following commands:
 ```shell
-docker run -it --rm -v "${PWD}:/test" vault-helm-test bats /test/test/unit
+docker run -it --rm -v "${PWD}:/test" openbao-helm-test bats /test/test/unit
 ```
 It's possible to only run specific bats tests using regular expressions. 
 For example, the following will run only tests with "injector" in the name:
 ```shell
-docker run -it --rm -v "${PWD}:/test" vault-helm-test bats /test/test/unit -f "injector"
+docker run -it --rm -v "${PWD}:/test" openbao-helm-test bats /test/test/unit -f "injector"
 ```
 
 ### Test Manually

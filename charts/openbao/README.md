@@ -8,9 +8,9 @@ Official OpenBao Chart
 
 ## Maintainers
 
-| Name | Email | Url |
-| ---- | ------ | --- |
-| OpenBao |  | <https://openbao.org> |
+| Name    | Email                              | Url                   |
+|---------|------------------------------------|-----------------------|
+| OpenBao | https://lists.lfedge.org/g/openbao | <https://openbao.org> |
 
 ## Source Code
 
@@ -171,8 +171,6 @@ Kubernetes: `>= 1.27.0-0`
 | server.dev.devRootToken | string | `"root"` |  |
 | server.dev.enabled | bool | `false` |  |
 | server.enabled | string | `"-"` |  |
-| server.enterpriseLicense.secretKey | string | `"license"` |  |
-| server.enterpriseLicense.secretName | string | `""` |  |
 | server.extraArgs | string | `""` |  |
 | server.extraContainers | string | `nil` |  |
 | server.extraEnvironmentVars | object | `{}` |  |

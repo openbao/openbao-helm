@@ -11,7 +11,7 @@ assignees: ''
 
 For questions, the best place to get answers is on our [discussion forum](https://discuss.hashicorp.com/c/vault), as they will get more visibility from experienced users than the issue tracker.
 
-Please note: We take Vault's security and our users' trust very seriously. If you believe you have found a security issue in Vault Helm, _please responsibly disclose_ by contacting us at [security@hashicorp.com](mailto:security@hashicorp.com).
+Please note: We take Vault's security and our users' trust very seriously. If you believe you have found a security issue in OpenBao Helm, _please responsibly disclose_ by contacting us at [openbao-security@lists.lfedge.org](mailto:openbao-security@lists.lfedge.org).
 
 -->
 

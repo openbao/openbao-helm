@@ -1,10 +1,8 @@
-# Vault Helm Tests
+# OpenBao Helm Tests
 
-## Running Vault Helm Acceptance tests
+## Running OpenBao Helm Acceptance tests
 
 The Makefile at the top level of this repo contains a few target that should help with running acceptance tests in your own GKE instance or in a kind cluster.
-
-Note that for the Vault Enterprise tests to pass, a `VAULT_LICENSE_CI` environment variable needs to be set to the contents of a valid Vault Enterprise license.
 
 ### Running in a GKE cluster
 
@@ -49,7 +47,7 @@ editing will be required, since several properties accept multiple data types.
 
 ## Helm test
 
-Vault Helm also contains a simple helm test under
+OpenBao Helm also contains a simple helm test under
 [templates/tests/](../templates/tests/) that may be run against a helm release:
 
     helm test <RELEASE_NAME>
