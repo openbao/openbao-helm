@@ -50,7 +50,7 @@ spec:
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
-          image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
+          image: "{{ .Values.injector.image.registry | default "docker.io" }}/{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
           {{- template "injector.securityContext.container" . }}
           env:
