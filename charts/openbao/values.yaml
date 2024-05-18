@@ -763,7 +763,7 @@ server:
     # When HA mode is enabled
     # If type is set to "NodePort", a specific nodePort value can be configured,
     # will be random if left blank.
-    #standbyNodePort: 30002
+    # standbyNodePort: 30002
 
     # Port on which Vault server is listening
     port: 8200
