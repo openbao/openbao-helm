@@ -723,7 +723,7 @@ server:
 
     # Configures the service type for the main Vault service.  Can be ClusterIP
     # or NodePort.
-    #type: ClusterIP
+    # type: ClusterIP
 
     # The IP family and IP families options are to set the behaviour in a dual-stack environment.
     # Omitting these values will let the service fall back to whatever the CNI dictates the defaults
@@ -753,12 +753,12 @@ server:
 
     # If type is set to "NodePort", a specific nodePort value can be configured,
     # will be random if left blank.
-    #nodePort: 30000
+    # nodePort: 30000
 
     # When HA mode is enabled
     # If type is set to "NodePort", a specific nodePort value can be configured,
     # will be random if left blank.
-    #activeNodePort: 30001
+    # activeNodePort: 30001
 
     # When HA mode is enabled
     # If type is set to "NodePort", a specific nodePort value can be configured,
@@ -1076,7 +1076,7 @@ ui:
   # ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-traffic-policy
   externalTrafficPolicy: Cluster
 
-  #loadBalancerSourceRanges:
+  # loadBalancerSourceRanges:
   #   - 10.0.0.0/16
   #   - 1.78.23.3/32
 
@@ -1309,32 +1309,32 @@ serverTelemetry:
     scrapeTimeout: 10s
 
   prometheusRules:
-      # The Prometheus operator *must* be installed before enabling this feature,
-      # if not the chart will fail to install due to missing CustomResourceDefinitions
-      # provided by the operator.
+    # The Prometheus operator *must* be installed before enabling this feature,
+    # if not the chart will fail to install due to missing CustomResourceDefinitions
+    # provided by the operator.
 
-      # Deploy the PrometheusRule custom resource for AlertManager based alerts.
-      # Requires that AlertManager is properly deployed.
-      enabled: false
+    # Deploy the PrometheusRule custom resource for AlertManager based alerts.
+    # Requires that AlertManager is properly deployed.
+    enabled: false
 
-      # Selector labels to add to the PrometheusRules.
-      # When empty, defaults to:
-      #  release: prometheus
-      selectors: {}
+    # Selector labels to add to the PrometheusRules.
+    # When empty, defaults to:
+    #  release: prometheus
+    selectors: {}
 
-      # Some example rules.
-      rules: []
-      #  - alert: vault-HighResponseTime
-      #    annotations:
-      #      message: The response time of Vault is over 500ms on average over the last 5 minutes.
-      #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 500
-      #    for: 5m
-      #    labels:
-      #      severity: warning
-      #  - alert: vault-HighResponseTime
-      #    annotations:
-      #      message: The response time of Vault is over 1s on average over the last 5 minutes.
-      #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 1000
-      #    for: 5m
-      #    labels:
-      #      severity: critical
+    # Some example rules.
+    rules: []
+    #  - alert: vault-HighResponseTime
+    #    annotations:
+    #      message: The response time of Vault is over 500ms on average over the last 5 minutes.
+    #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 500
+    #    for: 5m
+    #    labels:
+    #      severity: warning
+    #  - alert: vault-HighResponseTime
+    #    annotations:
+    #      message: The response time of Vault is over 1s on average over the last 5 minutes.
+    #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 1000
+    #    for: 5m
+    #    labels:
+    #      severity: critical
