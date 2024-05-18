@@ -1,8 +1,8 @@
 # openbao
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![AppVersion: v2.0.0-alpha20240329](https://img.shields.io/badge/AppVersion-v2.0.0--alpha20240329-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![AppVersion: v2.0.0-alpha20240329](https://img.shields.io/badge/AppVersion-v2.0.0--alpha20240329-informational?style=flat-square)
 
-Official openbao Chart
+Official OpenBao Chart
 
 **Homepage:** <https://github.com/openbao/openbao-helm>
 
@@ -10,7 +10,7 @@ Official openbao Chart
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| jessebot |  | <https://github.com/jessebot> |
+| OpenBao |  | <https://openbao.org> |
 
 ## Source Code
 
@@ -26,9 +26,10 @@ Kubernetes: `>= 1.27.0-0`
 |-----|------|---------|-------------|
 | csi.agent.enabled | bool | `true` |  |
 | csi.agent.extraArgs | list | `[]` |  |
-| csi.agent.image.pullPolicy | string | `"IfNotPresent"` |  |
-| csi.agent.image.repository | string | `"hashicorp/vault"` |  |
-| csi.agent.image.tag | string | `"1.15.2"` |  |
+| csi.agent.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for agent image. if tag is "latest", set to "Always" |
+| csi.agent.image.registry | string | `"quay.io"` | image registry to use for agent image |
+| csi.agent.image.repository | string | `"openbao/openbao"` | image repo to use for agent image |
+| csi.agent.image.tag | string | `"2.0.0-alpha20240329"` | image tag to use for agent image |
 | csi.agent.logFormat | string | `"standard"` |  |
 | csi.agent.logLevel | string | `"info"` |  |
 | csi.agent.resources | object | `{}` |  |
@@ -41,12 +42,13 @@ Kubernetes: `>= 1.27.0-0`
 | csi.daemonSet.updateStrategy.maxUnavailable | string | `""` |  |
 | csi.daemonSet.updateStrategy.type | string | `"RollingUpdate"` |  |
 | csi.debug | bool | `false` |  |
-| csi.enabled | bool | `false` |  |
+| csi.enabled | bool | `false` | True if you want to install a secrets-store-csi-driver-provider-vault daemonset.  Requires installing the secrets-store-csi-driver separately, see: https://github.com/kubernetes-sigs/secrets-store-csi-driver#install-the-secrets-store-csi-driver  With the driver and provider installed, you can mount Vault secrets into volumes similar to the Vault Agent injector, and you can also sync those secrets into Kubernetes secrets. |
 | csi.extraArgs | list | `[]` |  |
 | csi.hmacSecretName | string | `""` |  |
-| csi.image.pullPolicy | string | `"IfNotPresent"` |  |
-| csi.image.repository | string | `"hashicorp/vault-csi-provider"` |  |
-| csi.image.tag | string | `"1.4.1"` |  |
+| csi.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for csi image. if tag is "latest", set to "Always" |
+| csi.image.registry | string | `"docker.io"` | image registry to use for csi image |
+| csi.image.repository | string | `"hashicorp/vault-csi-provider"` | image repo to use for csi image |
+| csi.image.tag | string | `"1.4.1"` | image tag to use for csi image |
 | csi.livenessProbe.failureThreshold | int | `2` |  |
 | csi.livenessProbe.initialDelaySeconds | int | `5` |  |
 | csi.livenessProbe.periodSeconds | int | `5` |  |
@@ -66,17 +68,17 @@ Kubernetes: `>= 1.27.0-0`
 | csi.resources | object | `{}` |  |
 | csi.serviceAccount.annotations | object | `{}` |  |
 | csi.serviceAccount.extraLabels | object | `{}` |  |
-| csi.volumeMounts | string | `nil` |  |
-| csi.volumes | string | `nil` |  |
-| global.enabled | bool | `true` |  |
-| global.externalVaultAddr | string | `""` |  |
-| global.imagePullSecrets | list | `[]` |  |
-| global.namespace | string | `""` |  |
-| global.openshift | bool | `false` |  |
-| global.psp.annotations | string | `"seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default\napparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default\nseccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default\napparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default\n"` |  |
-| global.psp.enable | bool | `false` |  |
-| global.serverTelemetry.prometheusOperator | bool | `false` |  |
-| global.tlsDisable | bool | `true` |  |
+| csi.volumeMounts | string | `nil` | volumeMounts is a list of volumeMounts for the main server container. These are rendered via toYaml rather than pre-processed like the extraVolumes value. The purpose is to make it easy to share volumes between containers. |
+| csi.volumes | string | `nil` | volumes is a list of volumes made available to all containers. These are rendered via toYaml rather than pre-processed like the extraVolumes value. The purpose is to make it easy to share volumes between containers. |
+| global.enabled | bool | `true` | enabled is the master enabled switch. Setting this to true or false will enable or disable all the components within this chart by default. |
+| global.externalVaultAddr | string | `""` | External vault server address for the injector and CSI provider to use. Setting this will disable deployment of a vault server. |
+| global.imagePullSecrets | list | `[]` | Image pull secret to use for registry authentication. Alternatively, the value may be specified as an array of strings. |
+| global.namespace | string | `""` | The namespace to deploy to. Defaults to the `helm` installation namespace. |
+| global.openshift | bool | `false` | If deploying to OpenShift |
+| global.psp | object | `{"annotations":"seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default\napparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default\nseccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default\napparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default\n","enable":false}` | Create PodSecurityPolicy for pods |
+| global.psp.annotations | string | `"seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default\napparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default\nseccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default\napparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default\n"` | Annotation for PodSecurityPolicy. This is a multi-line templated string map, and can also be set as YAML. |
+| global.serverTelemetry.prometheusOperator | bool | `false` | Enable integration with the Prometheus Operator See the top level serverTelemetry section below before enabling this feature. |
+| global.tlsDisable | bool | `true` | TLS for end-to-end encrypted transport |
 | injector.affinity | string | `"podAntiAffinity:\n  requiredDuringSchedulingIgnoredDuringExecution:\n    - labelSelector:\n        matchLabels:\n          app.kubernetes.io/name: {{ template \"vault.name\" . }}-agent-injector\n          app.kubernetes.io/instance: \"{{ .Release.Name }}\"\n          component: webhook\n      topologyKey: kubernetes.io/hostname\n"` |  |
 | injector.agentDefaults.cpuLimit | string | `"500m"` |  |
 | injector.agentDefaults.cpuRequest | string | `"250m"` |  |
@@ -85,43 +87,47 @@ Kubernetes: `>= 1.27.0-0`
 | injector.agentDefaults.template | string | `"map"` |  |
 | injector.agentDefaults.templateConfig.exitOnRetryFailure | bool | `true` |  |
 | injector.agentDefaults.templateConfig.staticSecretRenderInterval | string | `""` |  |
-| injector.agentImage.repository | string | `"hashicorp/vault"` |  |
-| injector.agentImage.tag | string | `"1.15.2"` |  |
+| injector.agentImage | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"openbao/openbao","tag":"2.0.0-alpha20240329"}` | agentImage sets the repo and tag of the Vault image to use for the Vault Agent containers.  This should be set to the official Vault image.  Vault 1.3.1+ is required. |
+| injector.agentImage.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for agent image. if tag is "latest", set to "Always" |
+| injector.agentImage.registry | string | `"quay.io"` | image registry to use for agent image |
+| injector.agentImage.repository | string | `"openbao/openbao"` | image repo to use for agent image |
+| injector.agentImage.tag | string | `"2.0.0-alpha20240329"` | image tag to use for agent image |
 | injector.annotations | object | `{}` |  |
 | injector.authPath | string | `"auth/kubernetes"` |  |
 | injector.certs.caBundle | string | `""` |  |
 | injector.certs.certName | string | `"tls.crt"` |  |
 | injector.certs.keyName | string | `"tls.key"` |  |
 | injector.certs.secretName | string | `nil` |  |
-| injector.enabled | string | `"-"` |  |
-| injector.externalVaultAddr | string | `""` |  |
+| injector.enabled | string | `"-"` | True if you want to enable vault agent injection. @default: global.enabled |
+| injector.externalVaultAddr | string | `""` | Deprecated: Please use global.externalVaultAddr instead. |
 | injector.extraEnvironmentVars | object | `{}` |  |
 | injector.extraLabels | object | `{}` |  |
 | injector.failurePolicy | string | `"Ignore"` |  |
 | injector.hostNetwork | bool | `false` |  |
-| injector.image.pullPolicy | string | `"IfNotPresent"` |  |
-| injector.image.repository | string | `"hashicorp/vault-k8s"` |  |
-| injector.image.tag | string | `"1.3.1"` |  |
-| injector.leaderElector.enabled | bool | `true` |  |
-| injector.livenessProbe.failureThreshold | int | `2` |  |
-| injector.livenessProbe.initialDelaySeconds | int | `5` |  |
-| injector.livenessProbe.periodSeconds | int | `2` |  |
-| injector.livenessProbe.successThreshold | int | `1` |  |
-| injector.livenessProbe.timeoutSeconds | int | `5` |  |
-| injector.logFormat | string | `"standard"` |  |
-| injector.logLevel | string | `"info"` |  |
-| injector.metrics.enabled | bool | `false` |  |
+| injector.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for k8s image. if tag is "latest", set to "Always" |
+| injector.image.registry | string | `"docker.io"` | image registry to use for k8s image |
+| injector.image.repository | string | `"hashicorp/vault-k8s"` | image repo to use for k8s image |
+| injector.image.tag | string | `"1.3.1"` | image tag to use for k8s image |
+| injector.leaderElector | object | `{"enabled":true}` | If multiple replicas are specified, by default a leader will be determined so that only one injector attempts to create TLS certificates. |
+| injector.livenessProbe.failureThreshold | int | `2` | When a probe fails, Kubernetes will try failureThreshold times before giving up |
+| injector.livenessProbe.initialDelaySeconds | int | `5` | Number of seconds after the container has started before probe initiates |
+| injector.livenessProbe.periodSeconds | int | `2` | How often (in seconds) to perform the probe |
+| injector.livenessProbe.successThreshold | int | `1` | Minimum consecutive successes for the probe to be considered successful after having failed |
+| injector.livenessProbe.timeoutSeconds | int | `5` | Number of seconds after which the probe times out. |
+| injector.logFormat | string | `"standard"` | Configures the log format of the injector. Supported log formats: "standard", "json". |
+| injector.logLevel | string | `"info"` | Configures the log verbosity of the injector. Supported log levels include: trace, debug, info, warn, error |
+| injector.metrics | object | `{"enabled":false}` | If true, will enable a node exporter metrics endpoint at /metrics. |
 | injector.namespaceSelector | object | `{}` |  |
 | injector.nodeSelector | object | `{}` |  |
 | injector.objectSelector | object | `{}` |  |
 | injector.podDisruptionBudget | object | `{}` |  |
-| injector.port | int | `8080` |  |
+| injector.port | int | `8080` | Configures the port the injector should listen on |
 | injector.priorityClassName | string | `""` |  |
-| injector.readinessProbe.failureThreshold | int | `2` |  |
-| injector.readinessProbe.initialDelaySeconds | int | `5` |  |
-| injector.readinessProbe.periodSeconds | int | `2` |  |
-| injector.readinessProbe.successThreshold | int | `1` |  |
-| injector.readinessProbe.timeoutSeconds | int | `5` |  |
+| injector.readinessProbe.failureThreshold | int | `2` | When a probe fails, Kubernetes will try failureThreshold times before giving up |
+| injector.readinessProbe.initialDelaySeconds | int | `5` | Number of seconds after the container has started before probe initiates |
+| injector.readinessProbe.periodSeconds | int | `2` | How often (in seconds) to perform the probe |
+| injector.readinessProbe.successThreshold | int | `1` | Minimum consecutive successes for the probe to be considered successful after having failed |
+| injector.readinessProbe.timeoutSeconds | int | `5` | Number of seconds after which the probe times out. |
 | injector.replicas | int | `1` |  |
 | injector.resources | object | `{}` |  |
 | injector.revokeOnShutdown | bool | `false` |  |
@@ -129,11 +135,11 @@ Kubernetes: `>= 1.27.0-0`
 | injector.securityContext.pod | object | `{}` |  |
 | injector.service.annotations | object | `{}` |  |
 | injector.serviceAccount.annotations | object | `{}` |  |
-| injector.startupProbe.failureThreshold | int | `12` |  |
-| injector.startupProbe.initialDelaySeconds | int | `5` |  |
-| injector.startupProbe.periodSeconds | int | `5` |  |
-| injector.startupProbe.successThreshold | int | `1` |  |
-| injector.startupProbe.timeoutSeconds | int | `5` |  |
+| injector.startupProbe.failureThreshold | int | `12` | When a probe fails, Kubernetes will try failureThreshold times before giving up |
+| injector.startupProbe.initialDelaySeconds | int | `5` | Number of seconds after the container has started before probe initiates |
+| injector.startupProbe.periodSeconds | int | `5` | How often (in seconds) to perform the probe |
+| injector.startupProbe.successThreshold | int | `1` | Minimum consecutive successes for the probe to be considered successful after having failed |
+| injector.startupProbe.timeoutSeconds | int | `5` | Number of seconds after which the probe times out. |
 | injector.strategy | object | `{}` |  |
 | injector.tolerations | list | `[]` |  |
 | injector.topologySpreadConstraints | list | `[]` |  |
@@ -187,9 +193,10 @@ Kubernetes: `>= 1.27.0-0`
 | server.ha.replicas | int | `3` |  |
 | server.hostAliases | list | `[]` |  |
 | server.hostNetwork | bool | `false` |  |
-| server.image.pullPolicy | string | `"IfNotPresent"` |  |
-| server.image.repository | string | `"hashicorp/vault"` |  |
-| server.image.tag | string | `"1.15.2"` |  |
+| server.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for server image. if tag is "latest", set to "Always" |
+| server.image.registry | string | `"quay.io"` | image registry to use for server image |
+| server.image.repository | string | `"openbao/openbao"` | image repo to use for server image |
+| server.image.tag | string | `"2.0.0-alpha20240329"` | image tag to use for server image |
 | server.ingress.activeService | bool | `true` |  |
 | server.ingress.annotations | object | `{}` |  |
 | server.ingress.enabled | bool | `false` |  |
