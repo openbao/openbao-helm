@@ -10,7 +10,7 @@ Official OpenBao Chart
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| OpenBao |  | <https://openbao.org> |
+| OpenBao | <https://lists.lfedge.org/g/openbao> | <https://openbao.org> |
 
 ## Source Code
 
