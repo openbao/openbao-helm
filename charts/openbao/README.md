@@ -171,12 +171,12 @@ Kubernetes: `>= 1.27.0-0`
 | server.dev.devRootToken | string | `"root"` |  |
 | server.dev.enabled | bool | `false` |  |
 | server.enabled | string | `"-"` |  |
-| server.extraArgs | string | `""` |  |
+| server.extraArgs | string | `""` | extraArgs is a string containing additional Vault server arguments. |
 | server.extraContainers | string | `nil` |  |
 | server.extraEnvironmentVars | object | `{}` |  |
-| server.extraInitContainers | string | `nil` |  |
+| server.extraInitContainers | list | `[]` | extraInitContainers is a list of init containers. Specified as a YAML list. This is useful if you need to run a script to provision TLS certificates or write out configuration files in a dynamic way. |
 | server.extraLabels | object | `{}` |  |
-| server.extraPorts | string | `nil` |  |
+| server.extraPorts | list | `[]` | extraPorts is a list of extra ports. Specified as a YAML list. This is useful if you need to add additional ports to the statefulset in dynamic way. |
 | server.extraSecretEnvironmentVars | list | `[]` |  |
 | server.extraVolumes | list | `[]` |  |
 | server.ha.apiAddr | string | `nil` |  |
@@ -261,7 +261,7 @@ Kubernetes: `>= 1.27.0-0`
 | server.serviceAccount.extraLabels | object | `{}` |  |
 | server.serviceAccount.name | string | `""` |  |
 | server.serviceAccount.serviceDiscovery.enabled | bool | `true` |  |
-| server.shareProcessNamespace | bool | `false` |  |
+| server.shareProcessNamespace | bool | `false` | shareProcessNamespace enables process namespace sharing between Vault and the extraContainers This is useful if Vault must be signaled, e.g. to send a SIGHUP for a log rotation |
 | server.standalone.config | string | `"ui = true\n\nlistener \"tcp\" {\n  tls_disable = 1\n  address = \"[::]:8200\"\n  cluster_address = \"[::]:8201\"\n  # Enable unauthenticated metrics access (necessary for Prometheus Operator)\n  #telemetry {\n  #  unauthenticated_metrics_access = \"true\"\n  #}\n}\nstorage \"file\" {\n  path = \"/vault/data\"\n}\n\n# Example configuration for using auto-unseal, using Google Cloud KMS. The\n# GKMS keys must already exist, and the cluster must have a service account\n# that is authorized to access GCP KMS.\n#seal \"gcpckms\" {\n#   project     = \"vault-helm-dev\"\n#   region      = \"global\"\n#   key_ring    = \"vault-helm-unseal-kr\"\n#   crypto_key  = \"vault-helm-unseal-key\"\n#}\n\n# Example configuration for enabling Prometheus metrics in your config.\n#telemetry {\n#  prometheus_retention_time = \"30s\"\n#  disable_hostname = true\n#}\n"` |  |
 | server.standalone.enabled | string | `"-"` |  |
 | server.statefulSet.annotations | object | `{}` |  |

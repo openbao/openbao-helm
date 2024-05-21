@@ -477,10 +477,10 @@ server:
   authDelegator:
     enabled: true
 
-  # extraInitContainers is a list of init containers. Specified as a YAML list.
+  # -- extraInitContainers is a list of init containers. Specified as a YAML list.
   # This is useful if you need to run a script to provision TLS certificates or
   # write out configuration files in a dynamic way.
-  extraInitContainers: null
+  extraInitContainers: []
     # # This example installs a plugin pulled from github into the /usr/local/libexec/vault/oauthapp folder,
     # # which is defined in the volumes value.
     # - name: oauthapp
@@ -499,16 +499,16 @@ server:
   # extraContainers is a list of sidecar containers. Specified as a YAML list.
   extraContainers: null
 
-  # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
+  # -- shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
   # This is useful if Vault must be signaled, e.g. to send a SIGHUP for a log rotation
   shareProcessNamespace: false
 
-  # extraArgs is a string containing additional Vault server arguments.
+  # -- extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 
-  # extraPorts is a list of extra ports. Specified as a YAML list.
+  # -- extraPorts is a list of extra ports. Specified as a YAML list.
   # This is useful if you need to add additional ports to the statefulset in dynamic way.
-  extraPorts: null
+  extraPorts: []
     # - containerPort: 8300
     #   name: http-monitoring
 

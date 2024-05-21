@@ -211,14 +211,14 @@ for users looking to use this chart with Consul Helm.
 {{- define "vault.args" -}}
   {{ if or (eq .mode "standalone") (eq .mode "ha") }}
           - |
-            cp /vault/config/extraconfig-from-values.hcl /tmp/storageconfig.hcl;
+            cp /openbao/config/extraconfig-from-values.hcl /tmp/storageconfig.hcl;
             [ -n "${HOST_IP}" ] && sed -Ei "s|HOST_IP|${HOST_IP?}|g" /tmp/storageconfig.hcl;
             [ -n "${POD_IP}" ] && sed -Ei "s|POD_IP|${POD_IP?}|g" /tmp/storageconfig.hcl;
             [ -n "${HOSTNAME}" ] && sed -Ei "s|HOSTNAME|${HOSTNAME?}|g" /tmp/storageconfig.hcl;
             [ -n "${API_ADDR}" ] && sed -Ei "s|API_ADDR|${API_ADDR?}|g" /tmp/storageconfig.hcl;
             [ -n "${TRANSIT_ADDR}" ] && sed -Ei "s|TRANSIT_ADDR|${TRANSIT_ADDR?}|g" /tmp/storageconfig.hcl;
             [ -n "${RAFT_ADDR}" ] && sed -Ei "s|RAFT_ADDR|${RAFT_ADDR?}|g" /tmp/storageconfig.hcl;
-            /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl {{ .Values.server.extraArgs }}
+            /usr/local/bin/docker-entrypoint.sh bao server -config=/tmp/storageconfig.hcl {{ .Values.server.extraArgs }}
    {{ else if eq .mode "dev" }}
           - |
             /usr/local/bin/docker-entrypoint.sh vault server -dev {{ .Values.server.extraArgs }}
