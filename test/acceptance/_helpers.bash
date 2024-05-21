@@ -8,7 +8,7 @@ name_prefix() {
 
 # chart_dir returns the directory for the chart
 chart_dir() {
-    echo ${BATS_TEST_DIRNAME}/../..
+    echo ${BATS_TEST_DIRNAME}/../../charts/openbao
 }
 
 # helm_install installs the vault chart. This will source overridable
@@ -144,7 +144,7 @@ wait_for_complete_job() {
         # string length.
         kubectl get job $1 -o json | \
             jq -r 'select(
-                .status.succeeded == 1 
+                .status.succeeded == 1
             ) | .metadata.namespace + "/" + .metadata.name'
     }
 
