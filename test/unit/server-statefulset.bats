@@ -1240,7 +1240,7 @@ load _helpers
       --show-only templates/server-statefulset.yaml \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].readinessProbe.exec.command[2]' | tee /dev/stderr)
-  [ "${actual}" = "vault status -tls-skip-verify" ]
+  [ "${actual}" = "bao status -tls-skip-verify" ]
 }
 
 @test "server/standalone-StatefulSet: readinessProbe configurable" {

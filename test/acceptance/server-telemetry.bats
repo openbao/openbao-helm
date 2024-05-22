@@ -29,29 +29,29 @@ load _helpers
 
   # Vault Init
   local token=$(kubectl exec -ti "$(name_prefix)-0" -- \
-    vault operator init -format=json -n 1 -t 1 | \
+    bao operator init -format=json -n 1 -t 1 | \
     jq -r '.unseal_keys_b64[0]')
   [ "${token}" != "" ]
 
   # Vault Unseal
-  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
+  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=openbao' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do
-      kubectl exec -ti ${pod} -- vault operator unseal ${token}
+      kubectl exec -ti ${pod} -- bao operator unseal ${token}
   done
 
   wait_for_ready "$(name_prefix)-0"
 
   # Unsealed, initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.sealed' )
   [ "${sealed_status}" == "false" ]
 
-  local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local init_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.initialized')
   [ "${init_status}" == "true" ]
 
-  # unfortunately it can take up to 2 minutes for the vault prometheus job to appear
+  # unfortunately it can take up to 2 minutes for the openbao prometheus job to appear
   # TODO: investigate how reduce this.
   local job_labels
   local tries=0

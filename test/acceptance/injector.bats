@@ -4,7 +4,7 @@ load _helpers
 
 @test "injector: testing deployment" {
   cd `chart_dir`
-  
+
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
@@ -15,7 +15,7 @@ load _helpers
 
   kubectl create secret generic test \
     --from-file ./test/acceptance/injector-test/pgdump-policy.hcl \
-    --from-file ./test/acceptance/injector-test/bootstrap.sh 
+    --from-file ./test/acceptance/injector-test/bootstrap.sh
 
   kubectl label secret test app=vault-agent-demo
 
@@ -26,17 +26,17 @@ load _helpers
 
   wait_for_ready $(kubectl get pod -l component=webhook -o jsonpath="{.items[0].metadata.name}")
 
-  kubectl exec -ti "$(name_prefix)-0" -- /bin/sh -c "cp /vault/userconfig/test/bootstrap.sh /tmp/bootstrap.sh && chmod +x /tmp/bootstrap.sh && /tmp/bootstrap.sh"
+  kubectl exec -ti "$(name_prefix)-0" -- /bin/sh -c "cp /openbao/userconfig/test/bootstrap.sh /tmp/bootstrap.sh && chmod +x /tmp/bootstrap.sh && /tmp/bootstrap.sh"
   sleep 5
 
     # Sealed, not initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.sealed' )
   [ "${sealed_status}" == "false" ]
 
-  local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local init_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.initialized')
-  [ "${init_status}" == "true" ] 
+  [ "${init_status}" == "true" ]
 
 
   kubectl create -f ./test/acceptance/injector-test/job.yaml
@@ -48,9 +48,9 @@ teardown() {
   if [[ ${CLEANUP:-true} == "true" ]]
   then
       echo "helm/pvc teardown"
-      helm delete vault
+      helm delete openbao
       kubectl delete --all pvc
-      kubectl delete secret test 
+      kubectl delete secret test
       kubectl delete job pgdump
       kubectl delete deployment postgres
       kubectl delete namespace acceptance

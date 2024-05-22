@@ -13,7 +13,7 @@ load _helpers
   # Sealed, not initialized
   wait_for_sealed_vault $(name_prefix)-0
 
-  local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local init_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.initialized')
   [ "${init_status}" == "false" ]
 
@@ -59,43 +59,43 @@ load _helpers
 
   # Vault Init
   local init=$(kubectl exec -ti "$(name_prefix)-0" -- \
-    vault operator init -format=json -n 1 -t 1)
+    bao operator init -format=json -n 1 -t 1)
 
   local token=$(echo ${init} | jq -r '.unseal_keys_b64[0]')
   [ "${token}" != "" ]
-  
+
   local root=$(echo ${init} | jq -r '.root_token')
   [ "${root}" != "" ]
 
-  kubectl exec -ti vault-0 -- vault operator unseal ${token}
+  kubectl exec -ti openbao-0 -- bao operator unseal ${token}
   wait_for_ready "$(name_prefix)-0"
 
   sleep 5
 
   # Vault Unseal
-  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
+  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=openbao' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do
       if [[ ${pod?} != "$(name_prefix)-0" ]]
       then
-          kubectl exec -ti ${pod} -- vault operator raft join http://$(name_prefix)-0.$(name_prefix)-internal:8200
-          kubectl exec -ti ${pod} -- vault operator unseal ${token}
+          kubectl exec -ti ${pod} -- bao operator raft join http://$(name_prefix)-0.$(name_prefix)-internal:8200
+          kubectl exec -ti ${pod} -- bao operator unseal ${token}
           wait_for_ready "${pod}"
       fi
   done
 
   # Sealed, not initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.sealed' )
   [ "${sealed_status}" == "false" ]
 
-  local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local init_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.initialized')
   [ "${init_status}" == "true" ]
 
-  kubectl exec "$(name_prefix)-0" -- vault login ${root}
+  kubectl exec "$(name_prefix)-0" -- bao login ${root}
 
-  local raft_status=$(kubectl exec "$(name_prefix)-0" -- vault operator raft list-peers -format=json | 
+  local raft_status=$(kubectl exec "$(name_prefix)-0" -- bao operator raft list-peers -format=json |
     jq -r '.data.config.servers | length')
   [ "${raft_status}" == "3" ]
 }
@@ -112,9 +112,9 @@ teardown() {
   then
       # If the test failed, print some debug output
       if [[ "$BATS_ERROR_STATUS" -ne 0 ]]; then
-          kubectl logs -l app.kubernetes.io/name=vault
+          kubectl logs -l app.kubernetes.io/name=openbao
       fi
-      helm delete vault
+      helm delete openbao
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true
   fi

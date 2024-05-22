@@ -52,7 +52,7 @@ wait_for_sealed_vault() {
     POD_NAME=$1
 
     check() {
-        sealed_status=$(kubectl exec $1 -- vault status -format=json | jq -r '.sealed')
+        sealed_status=$(kubectl exec $1 -- bao status -format=json | jq -r '.sealed')
         if [ "$sealed_status" == "true" ]; then
             return 0
         fi

@@ -20,7 +20,7 @@ teardown() {
   if [[ ${CLEANUP:-true} == "true" ]]
   then
       echo "helm/pvc teardown"
-      helm delete vault
+      helm delete openbao
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true
   fi

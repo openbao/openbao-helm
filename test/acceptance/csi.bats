@@ -22,7 +22,7 @@ load _helpers
     --set enableSecretRotation=true \
     --set rotationPollInterval=5s
   # Install Vault and Vault provider
-  helm install vault \
+  helm install openbao \
     --wait --timeout=5m \
     --namespace=acceptance \
     --set="server.dev.enabled=true" \
@@ -31,20 +31,20 @@ load _helpers
     --set="csi.agent.logLevel=debug" \
     --set="injector.enabled=false" \
     .
-  kubectl --namespace=acceptance wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=vault
-  kubectl --namespace=acceptance wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=vault-csi-provider
+  kubectl --namespace=acceptance wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=openbao
+  kubectl --namespace=acceptance wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=openbao-csi-provider
 
   # Set up k8s auth and a kv secret.
-  cat ./test/acceptance/csi-test/vault-policy.hcl | kubectl --namespace=acceptance exec -i vault-0 -- vault policy write kv-policy -
-  kubectl --namespace=acceptance exec vault-0 -- vault auth enable kubernetes
-  kubectl --namespace=acceptance exec vault-0 -- sh -c 'vault write auth/kubernetes/config \
+  cat ./test/acceptance/csi-test/vault-policy.hcl | kubectl --namespace=acceptance exec -i openbao-0 -- openbao policy write kv-policy -
+  kubectl --namespace=acceptance exec openbao-0 -- bao auth enable kubernetes
+  kubectl --namespace=acceptance exec openbao-0 -- sh -c 'bao write auth/kubernetes/config \
     kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443"'
-  kubectl --namespace=acceptance exec vault-0 -- vault write auth/kubernetes/role/kv-role \
+  kubectl --namespace=acceptance exec openbao-0 -- bao write auth/kubernetes/role/kv-role \
     bound_service_account_names=nginx \
     bound_service_account_namespaces=acceptance \
     policies=kv-policy \
     ttl=20m
-  kubectl --namespace=acceptance exec vault-0 -- vault kv put secret/kv1 bar1=hello1
+  kubectl --namespace=acceptance exec openbao-0 -- bao kv put secret/kv1 bar1=hello1
 
   kubectl --namespace=acceptance apply -f ./test/acceptance/csi-test/vault-kv-secretproviderclass.yaml
   kubectl --namespace=acceptance apply -f ./test/acceptance/csi-test/nginx.yaml
@@ -75,7 +75,7 @@ teardown() {
   if [[ ${CLEANUP:-true} == "true" ]]
   then
       echo "helm/pvc teardown"
-      helm --namespace=acceptance delete vault
+      helm --namespace=acceptance delete openbao
       helm --namespace=acceptance delete secrets-store-csi-driver
       kubectl delete --all pvc
       kubectl delete namespace acceptance

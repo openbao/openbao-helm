@@ -12,7 +12,7 @@ load _helpers
   # Sealed, not initialized
   wait_for_sealed_vault $(name_prefix)-0
 
-  local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local init_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.initialized')
   [ "${init_status}" == "false" ]
 
@@ -58,7 +58,7 @@ load _helpers
 
   # Vault Init
   local token=$(kubectl exec -ti "$(name_prefix)-0" -- \
-    vault operator init -format=json -n 1 -t 1 | \
+    bao operator init -format=json -n 1 -t 1 | \
     jq -r '.unseal_keys_b64[0]')
   [ "${token}" != "" ]
 
@@ -66,17 +66,17 @@ load _helpers
   local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do
-      kubectl exec -ti ${pod} -- vault operator unseal ${token}
+      kubectl exec -ti ${pod} -- bao operator unseal ${token}
   done
 
   wait_for_ready "$(name_prefix)-0"
 
   # Sealed, not initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.sealed' )
   [ "${sealed_status}" == "false" ]
 
-  local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local init_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.initialized')
   [ "${init_status}" == "true" ]
 }
@@ -113,7 +113,7 @@ teardown() {
           kubectl logs -l app=consul
           kubectl logs -l app.kubernetes.io/name=vault
       fi
-      helm delete vault
+      helm delete openbao
       helm delete consul
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true

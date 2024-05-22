@@ -43,11 +43,11 @@ load _helpers
   [ "${ports}" == "8201" ]
 
   # Sealed, not initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.sealed' )
   [ "${sealed_status}" == "false" ]
 
-  local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
+  local init_status=$(kubectl exec "$(name_prefix)-0" -- bao status -format=json |
     jq -r '.initialized')
   [ "${init_status}" == "true" ]
 }
@@ -57,7 +57,7 @@ teardown() {
   if [[ ${CLEANUP:-true} == "true" ]]
   then
       echo "helm/pvc teardown"
-      helm delete vault
+      helm delete openbao
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true
   fi
