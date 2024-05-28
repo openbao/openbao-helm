@@ -123,7 +123,7 @@ load _helpers
       --show-only templates/server-disruptionbudget.yaml \
       --set 'server.ha.enabled=true' \
       --set 'server.ha.replicas=1' \
-      --kube-version 1.22.5 \
+      --kube-version 1.27.5 \
       . | tee /dev/stderr |
       yq '.apiVersion == "policy/v1"' | tee /dev/stderr)
   [ "${actual}" = "true" ]

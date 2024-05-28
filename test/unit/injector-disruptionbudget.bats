@@ -55,7 +55,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-disruptionbudget.yaml \
       --set 'injector.podDisruptionBudget.minAvailable=2' \
-      --kube-version 1.22.5 \
+      --kube-version 1.27.5 \
       . | tee /dev/stderr |
       yq '.apiVersion == "policy/v1"' | tee /dev/stderr)
   [ "${actual}" = "true" ]

@@ -228,7 +228,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -s templates/server-statefulset.yaml  \
-      --kube-version "1.22" \
+      --kube-version "1.27" \
       . | tee /dev/stderr |
       yq -r '.spec.persistentVolumeClaimRetentionPolicy' | tee /dev/stderr)
   [ "${actual}" = "null" ]
@@ -238,7 +238,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -s templates/server-statefulset.yaml  \
-      --kube-version "1.22" \
+      --kube-version "1.27" \
       --set 'server.persistentVolumeClaimRetentionPolicy.whenDeleted=Delete' \
       . | tee /dev/stderr |
       yq -r '.spec.persistentVolumeClaimRetentionPolicy.whenDeleted' | tee /dev/stderr)
@@ -249,7 +249,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -s templates/server-statefulset.yaml  \
-      --kube-version "1.22" \
+      --kube-version "1.27" \
       --set 'server.persistentVolumeClaimRetentionPolicy.whenScaled=Delete' \
       . | tee /dev/stderr |
       yq -r '.spec.persistentVolumeClaimRetentionPolicy.whenScaled' | tee /dev/stderr)

@@ -411,7 +411,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/ui-service.yaml \
-      --kube-version 1.22.0 \
+      --kube-version 1.27.0 \
       --set 'ui.enabled=true' \
       --set 'ui.serviceIPFamilyPolicy=PreferDualStack' \
       . | tee /dev/stderr |
@@ -423,7 +423,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/ui-service.yaml \
-      --kube-version 1.22.0 \
+      --kube-version 1.27.0 \
       --set 'ui.enabled=true' \
       --set 'ui.serviceIPFamilies={IPv4,IPv6}' \
       . | tee /dev/stderr |
