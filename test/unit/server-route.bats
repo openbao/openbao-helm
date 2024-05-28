@@ -18,7 +18,7 @@ load _helpers
       --show-only templates/server-route.yaml  \
       --set 'global.openshift=true' \
       --set 'server.route.enabled=true' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -57,7 +57,7 @@ load _helpers
   [ "${actual}" = 'test.com' ]
 }
 
-@test "server/route: OpenShift - vault backend should be added when I specify a path" {
+@test "server/route: OpenShift - openbao backend should be added when I specify a path" {
   cd `chart_dir`
 
   local actual=$(helm template \
@@ -120,7 +120,7 @@ load _helpers
       --set 'server.route.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.to.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault" ]
+  [ "${actual}" = "release-name-openbao" ]
 }
 
 @test "server/route: OpenShift - route points to main service when not ha and activeService is true" {
@@ -133,7 +133,7 @@ load _helpers
       --set 'server.route.activeService=true' \
       . | tee /dev/stderr |
       yq -r '.spec.to.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault" ]
+  [ "${actual}" = "release-name-openbao" ]
 }
 
 @test "server/route: OpenShift - route points to active service by when HA by default" {
@@ -146,7 +146,7 @@ load _helpers
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.to.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault-active" ]
+  [ "${actual}" = "release-name-openbao-active" ]
 }
 
 @test "server/route: OpenShift - route points to general service by when HA when configured" {
@@ -160,7 +160,7 @@ load _helpers
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.to.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault" ]
+  [ "${actual}" = "release-name-openbao" ]
 }
 
 @test "server/route: OpenShift - route termination mode set to default passthrough" {

@@ -4,12 +4,12 @@ SPDX-License-Identifier: MPL-2.0
 */}}
 
 {{- if not .Values.global.openshift }}
-{{ template "vault.mode" . }}
+{{ template "openbao.mode" . }}
 {{- if ne .mode "external" }}
 {{- if .Values.server.ingress.enabled -}}
 {{- $extraPaths := .Values.server.ingress.extraPaths -}}
-{{- $serviceName := include "vault.fullname" . -}}
-{{- template "vault.serverServiceEnabled" . -}}
+{{- $serviceName := include "openbao.fullname" . -}}
+{{- template "openbao.serverServiceEnabled" . -}}
 {{- if .serverServiceEnabled -}}
 {{- if and (eq .mode "ha" ) (eq (.Values.server.ingress.activeService | toString) "true") }}
 {{- $serviceName = printf "%s-%s" $serviceName "active" -}}
@@ -20,17 +20,17 @@ SPDX-License-Identifier: MPL-2.0
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ template "vault.fullname" . }}
-  namespace: {{ include "vault.namespace" . }}
+  name: {{ template "openbao.fullname" . }}
+  namespace: {{ include "openbao.namespace" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{- with .Values.server.ingress.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- template "vault.ingress.annotations" . }}
+  {{- template "openbao.ingress.annotations" . }}
 spec:
 {{- if .Values.server.ingress.tls }}
   tls:

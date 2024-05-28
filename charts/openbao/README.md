@@ -10,7 +10,7 @@ Official OpenBao Chart
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| OpenBao | <https://lists.lfedge.org/g/openbao> | <https://openbao.org> |
+| OpenBao | <openbao-security@lists.lfedge.org> | <https://openbao.org> |
 
 ## Source Code
 
@@ -42,7 +42,7 @@ Kubernetes: `>= 1.27.0-0`
 | csi.daemonSet.updateStrategy.maxUnavailable | string | `""` |  |
 | csi.daemonSet.updateStrategy.type | string | `"RollingUpdate"` |  |
 | csi.debug | bool | `false` |  |
-| csi.enabled | bool | `false` | True if you want to install a secrets-store-csi-driver-provider-vault daemonset.  Requires installing the secrets-store-csi-driver separately, see: https://github.com/kubernetes-sigs/secrets-store-csi-driver#install-the-secrets-store-csi-driver  With the driver and provider installed, you can mount Vault secrets into volumes similar to the Vault Agent injector, and you can also sync those secrets into Kubernetes secrets. |
+| csi.enabled | bool | `false` | True if you want to install a secrets-store-csi-driver-provider-vault daemonset.  Requires installing the secrets-store-csi-driver separately, see: https://github.com/kubernetes-sigs/secrets-store-csi-driver#install-the-secrets-store-csi-driver  With the driver and provider installed, you can mount OpenBao secrets into volumes similar to the OpenBao Agent injector, and you can also sync those secrets into Kubernetes secrets. |
 | csi.extraArgs | list | `[]` |  |
 | csi.hmacSecretName | string | `""` |  |
 | csi.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for csi image. if tag is "latest", set to "Always" |
@@ -68,10 +68,10 @@ Kubernetes: `>= 1.27.0-0`
 | csi.resources | object | `{}` |  |
 | csi.serviceAccount.annotations | object | `{}` |  |
 | csi.serviceAccount.extraLabels | object | `{}` |  |
-| csi.volumeMounts | string | `nil` | volumeMounts is a list of volumeMounts for the main server container. These are rendered via toYaml rather than pre-processed like the extraVolumes value. The purpose is to make it easy to share volumes between containers. |
-| csi.volumes | string | `nil` | volumes is a list of volumes made available to all containers. These are rendered via toYaml rather than pre-processed like the extraVolumes value. The purpose is to make it easy to share volumes between containers. |
+| csi.volumeMounts | list | `[]` | volumeMounts is a list of volumeMounts for the main server container. These are rendered via toYaml rather than pre-processed like the extraVolumes value. The purpose is to make it easy to share volumes between containers. |
+| csi.volumes | list | `[]` | volumes is a list of volumes made available to all containers. These are rendered via toYaml rather than pre-processed like the extraVolumes value. The purpose is to make it easy to share volumes between containers. |
 | global.enabled | bool | `true` | enabled is the master enabled switch. Setting this to true or false will enable or disable all the components within this chart by default. |
-| global.externalVaultAddr | string | `""` | External vault server address for the injector and CSI provider to use. Setting this will disable deployment of a vault server. |
+| global.externalVaultAddr | string | `""` | External openbao server address for the injector and CSI provider to use. Setting this will disable deployment of a openbao server. |
 | global.imagePullSecrets | list | `[]` | Image pull secret to use for registry authentication. Alternatively, the value may be specified as an array of strings. |
 | global.namespace | string | `""` | The namespace to deploy to. Defaults to the `helm` installation namespace. |
 | global.openshift | bool | `false` | If deploying to OpenShift |
@@ -79,7 +79,7 @@ Kubernetes: `>= 1.27.0-0`
 | global.psp.annotations | string | `"seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default\napparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default\nseccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default\napparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default\n"` | Annotation for PodSecurityPolicy. This is a multi-line templated string map, and can also be set as YAML. |
 | global.serverTelemetry.prometheusOperator | bool | `false` | Enable integration with the Prometheus Operator See the top level serverTelemetry section below before enabling this feature. |
 | global.tlsDisable | bool | `true` | TLS for end-to-end encrypted transport |
-| injector.affinity | string | `"podAntiAffinity:\n  requiredDuringSchedulingIgnoredDuringExecution:\n    - labelSelector:\n        matchLabels:\n          app.kubernetes.io/name: {{ template \"vault.name\" . }}-agent-injector\n          app.kubernetes.io/instance: \"{{ .Release.Name }}\"\n          component: webhook\n      topologyKey: kubernetes.io/hostname\n"` |  |
+| injector.affinity | string | `"podAntiAffinity:\n  requiredDuringSchedulingIgnoredDuringExecution:\n    - labelSelector:\n        matchLabels:\n          app.kubernetes.io/name: {{ template \"openbao.name\" . }}-agent-injector\n          app.kubernetes.io/instance: \"{{ .Release.Name }}\"\n          component: webhook\n      topologyKey: kubernetes.io/hostname\n"` |  |
 | injector.agentDefaults.cpuLimit | string | `"500m"` |  |
 | injector.agentDefaults.cpuRequest | string | `"250m"` |  |
 | injector.agentDefaults.memLimit | string | `"128Mi"` |  |
@@ -87,7 +87,7 @@ Kubernetes: `>= 1.27.0-0`
 | injector.agentDefaults.template | string | `"map"` |  |
 | injector.agentDefaults.templateConfig.exitOnRetryFailure | bool | `true` |  |
 | injector.agentDefaults.templateConfig.staticSecretRenderInterval | string | `""` |  |
-| injector.agentImage | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"openbao/openbao","tag":"2.0.0-alpha20240329"}` | agentImage sets the repo and tag of the Vault image to use for the Vault Agent containers.  This should be set to the official Vault image.  Vault 1.3.1+ is required. |
+| injector.agentImage | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"openbao/openbao","tag":"2.0.0-alpha20240329"}` | agentImage sets the repo and tag of the OpenBao image to use for the OpenBao Agent containers.  This should be set to the official OpenBao image.  OpenBao 1.3.1+ is required. |
 | injector.agentImage.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for agent image. if tag is "latest", set to "Always" |
 | injector.agentImage.registry | string | `"quay.io"` | image registry to use for agent image |
 | injector.agentImage.repository | string | `"openbao/openbao"` | image repo to use for agent image |
@@ -98,7 +98,7 @@ Kubernetes: `>= 1.27.0-0`
 | injector.certs.certName | string | `"tls.crt"` |  |
 | injector.certs.keyName | string | `"tls.key"` |  |
 | injector.certs.secretName | string | `nil` |  |
-| injector.enabled | string | `"-"` | True if you want to enable vault agent injection. @default: global.enabled |
+| injector.enabled | string | `"-"` | True if you want to enable openbao agent injection. @default: global.enabled |
 | injector.externalVaultAddr | string | `""` | Deprecated: Please use global.externalVaultAddr instead. |
 | injector.extraEnvironmentVars | object | `{}` |  |
 | injector.extraLabels | object | `{}` |  |
@@ -147,16 +147,16 @@ Kubernetes: `>= 1.27.0-0`
 | injector.webhook.failurePolicy | string | `"Ignore"` |  |
 | injector.webhook.matchPolicy | string | `"Exact"` |  |
 | injector.webhook.namespaceSelector | object | `{}` |  |
-| injector.webhook.objectSelector | string | `"matchExpressions:\n- key: app.kubernetes.io/name\n  operator: NotIn\n  values:\n  - {{ template \"vault.name\" . }}-agent-injector\n"` |  |
+| injector.webhook.objectSelector | string | `"matchExpressions:\n- key: app.kubernetes.io/name\n  operator: NotIn\n  values:\n  - {{ template \"openbao.name\" . }}-agent-injector\n"` |  |
 | injector.webhook.timeoutSeconds | int | `30` |  |
 | injector.webhookAnnotations | object | `{}` |  |
-| server.affinity | string | `"podAntiAffinity:\n  requiredDuringSchedulingIgnoredDuringExecution:\n    - labelSelector:\n        matchLabels:\n          app.kubernetes.io/name: {{ template \"vault.name\" . }}\n          app.kubernetes.io/instance: \"{{ .Release.Name }}\"\n          component: server\n      topologyKey: kubernetes.io/hostname\n"` |  |
+| server.affinity | string | `"podAntiAffinity:\n  requiredDuringSchedulingIgnoredDuringExecution:\n    - labelSelector:\n        matchLabels:\n          app.kubernetes.io/name: {{ template \"openbao.name\" . }}\n          app.kubernetes.io/instance: \"{{ .Release.Name }}\"\n          component: server\n      topologyKey: kubernetes.io/hostname\n"` |  |
 | server.annotations | object | `{}` |  |
 | server.auditStorage.accessMode | string | `"ReadWriteOnce"` |  |
 | server.auditStorage.annotations | object | `{}` |  |
 | server.auditStorage.enabled | bool | `false` |  |
 | server.auditStorage.labels | object | `{}` |  |
-| server.auditStorage.mountPath | string | `"/vault/audit"` |  |
+| server.auditStorage.mountPath | string | `"/openbao/audit"` |  |
 | server.auditStorage.size | string | `"10Gi"` |  |
 | server.auditStorage.storageClass | string | `nil` |  |
 | server.authDelegator.enabled | bool | `true` |  |
@@ -165,13 +165,13 @@ Kubernetes: `>= 1.27.0-0`
 | server.dataStorage.annotations | object | `{}` |  |
 | server.dataStorage.enabled | bool | `true` |  |
 | server.dataStorage.labels | object | `{}` |  |
-| server.dataStorage.mountPath | string | `"/vault/data"` |  |
+| server.dataStorage.mountPath | string | `"/openbao/data"` |  |
 | server.dataStorage.size | string | `"10Gi"` |  |
 | server.dataStorage.storageClass | string | `nil` |  |
 | server.dev.devRootToken | string | `"root"` |  |
 | server.dev.enabled | bool | `false` |  |
 | server.enabled | string | `"-"` |  |
-| server.extraArgs | string | `""` | extraArgs is a string containing additional Vault server arguments. |
+| server.extraArgs | string | `""` | extraArgs is a string containing additional OpenBao server arguments. |
 | server.extraContainers | string | `nil` |  |
 | server.extraEnvironmentVars | object | `{}` |  |
 | server.extraInitContainers | list | `[]` | extraInitContainers is a list of init containers. Specified as a YAML list. This is useful if you need to run a script to provision TLS certificates or write out configuration files in a dynamic way. |
@@ -181,11 +181,11 @@ Kubernetes: `>= 1.27.0-0`
 | server.extraVolumes | list | `[]` |  |
 | server.ha.apiAddr | string | `nil` |  |
 | server.ha.clusterAddr | string | `nil` |  |
-| server.ha.config | string | `"ui = true\n\nlistener \"tcp\" {\n  tls_disable = 1\n  address = \"[::]:8200\"\n  cluster_address = \"[::]:8201\"\n}\nstorage \"consul\" {\n  path = \"vault\"\n  address = \"HOST_IP:8500\"\n}\n\nservice_registration \"kubernetes\" {}\n\n# Example configuration for using auto-unseal, using Google Cloud KMS. The\n# GKMS keys must already exist, and the cluster must have a service account\n# that is authorized to access GCP KMS.\n#seal \"gcpckms\" {\n#   project     = \"vault-helm-dev-246514\"\n#   region      = \"global\"\n#   key_ring    = \"vault-helm-unseal-kr\"\n#   crypto_key  = \"vault-helm-unseal-key\"\n#}\n\n# Example configuration for enabling Prometheus metrics.\n# If you are using Prometheus Operator you can enable a ServiceMonitor resource below.\n# You may wish to enable unauthenticated metrics in the listener block above.\n#telemetry {\n#  prometheus_retention_time = \"30s\"\n#  disable_hostname = true\n#}\n"` |  |
+| server.ha.config | string | `"ui = true\n\nlistener \"tcp\" {\n  tls_disable = 1\n  address = \"[::]:8200\"\n  cluster_address = \"[::]:8201\"\n}\nstorage \"consul\" {\n  path = \"openbao\"\n  address = \"HOST_IP:8500\"\n}\n\nservice_registration \"kubernetes\" {}\n\n# Example configuration for using auto-unseal, using Google Cloud KMS. The\n# GKMS keys must already exist, and the cluster must have a service account\n# that is authorized to access GCP KMS.\n#seal \"gcpckms\" {\n#   project     = \"openbao-helm-dev-246514\"\n#   region      = \"global\"\n#   key_ring    = \"openbao-helm-unseal-kr\"\n#   crypto_key  = \"openbao-helm-unseal-key\"\n#}\n\n# Example configuration for enabling Prometheus metrics.\n# If you are using Prometheus Operator you can enable a ServiceMonitor resource below.\n# You may wish to enable unauthenticated metrics in the listener block above.\n#telemetry {\n#  prometheus_retention_time = \"30s\"\n#  disable_hostname = true\n#}\n"` |  |
 | server.ha.disruptionBudget.enabled | bool | `true` |  |
 | server.ha.disruptionBudget.maxUnavailable | string | `nil` |  |
 | server.ha.enabled | bool | `false` |  |
-| server.ha.raft.config | string | `"ui = true\n\nlistener \"tcp\" {\n  tls_disable = 1\n  address = \"[::]:8200\"\n  cluster_address = \"[::]:8201\"\n  # Enable unauthenticated metrics access (necessary for Prometheus Operator)\n  #telemetry {\n  #  unauthenticated_metrics_access = \"true\"\n  #}\n}\n\nstorage \"raft\" {\n  path = \"/vault/data\"\n}\n\nservice_registration \"kubernetes\" {}\n"` |  |
+| server.ha.raft.config | string | `"ui = true\n\nlistener \"tcp\" {\n  tls_disable = 1\n  address = \"[::]:8200\"\n  cluster_address = \"[::]:8201\"\n  # Enable unauthenticated metrics access (necessary for Prometheus Operator)\n  #telemetry {\n  #  unauthenticated_metrics_access = \"true\"\n  #}\n}\n\nstorage \"raft\" {\n  path = \"/openbao/data\"\n}\n\nservice_registration \"kubernetes\" {}\n"` |  |
 | server.ha.raft.enabled | bool | `false` |  |
 | server.ha.raft.setNodeId | bool | `false` |  |
 | server.ha.replicas | int | `3` |  |
@@ -261,8 +261,8 @@ Kubernetes: `>= 1.27.0-0`
 | server.serviceAccount.extraLabels | object | `{}` |  |
 | server.serviceAccount.name | string | `""` |  |
 | server.serviceAccount.serviceDiscovery.enabled | bool | `true` |  |
-| server.shareProcessNamespace | bool | `false` | shareProcessNamespace enables process namespace sharing between Vault and the extraContainers This is useful if Vault must be signaled, e.g. to send a SIGHUP for a log rotation |
-| server.standalone.config | string | `"ui = true\n\nlistener \"tcp\" {\n  tls_disable = 1\n  address = \"[::]:8200\"\n  cluster_address = \"[::]:8201\"\n  # Enable unauthenticated metrics access (necessary for Prometheus Operator)\n  #telemetry {\n  #  unauthenticated_metrics_access = \"true\"\n  #}\n}\nstorage \"file\" {\n  path = \"/vault/data\"\n}\n\n# Example configuration for using auto-unseal, using Google Cloud KMS. The\n# GKMS keys must already exist, and the cluster must have a service account\n# that is authorized to access GCP KMS.\n#seal \"gcpckms\" {\n#   project     = \"vault-helm-dev\"\n#   region      = \"global\"\n#   key_ring    = \"vault-helm-unseal-kr\"\n#   crypto_key  = \"vault-helm-unseal-key\"\n#}\n\n# Example configuration for enabling Prometheus metrics in your config.\n#telemetry {\n#  prometheus_retention_time = \"30s\"\n#  disable_hostname = true\n#}\n"` |  |
+| server.shareProcessNamespace | bool | `false` | shareProcessNamespace enables process namespace sharing between OpenBao and the extraContainers This is useful if OpenBao must be signaled, e.g. to send a SIGHUP for a log rotation |
+| server.standalone.config | string | `"ui = true\n\nlistener \"tcp\" {\n  tls_disable = 1\n  address = \"[::]:8200\"\n  cluster_address = \"[::]:8201\"\n  # Enable unauthenticated metrics access (necessary for Prometheus Operator)\n  #telemetry {\n  #  unauthenticated_metrics_access = \"true\"\n  #}\n}\nstorage \"file\" {\n  path = \"/openbao/data\"\n}\n\n# Example configuration for using auto-unseal, using Google Cloud KMS. The\n# GKMS keys must already exist, and the cluster must have a service account\n# that is authorized to access GCP KMS.\n#seal \"gcpckms\" {\n#   project     = \"openbao-helm-dev\"\n#   region      = \"global\"\n#   key_ring    = \"openbao-helm-unseal-kr\"\n#   crypto_key  = \"openbao-helm-unseal-key\"\n#}\n\n# Example configuration for enabling Prometheus metrics in your config.\n#telemetry {\n#  prometheus_retention_time = \"30s\"\n#  disable_hostname = true\n#}\n"` |  |
 | server.standalone.enabled | string | `"-"` |  |
 | server.statefulSet.annotations | object | `{}` |  |
 | server.statefulSet.securityContext.container | object | `{}` |  |
@@ -280,7 +280,7 @@ Kubernetes: `>= 1.27.0-0`
 | serverTelemetry.serviceMonitor.interval | string | `"30s"` |  |
 | serverTelemetry.serviceMonitor.scrapeTimeout | string | `"10s"` |  |
 | serverTelemetry.serviceMonitor.selectors | object | `{}` |  |
-| ui.activeVaultPodOnly | bool | `false` |  |
+| ui.activeOpenbaoPodOnly | bool | `false` |  |
 | ui.annotations | object | `{}` |  |
 | ui.enabled | bool | `false` |  |
 | ui.externalPort | int | `8200` |  |

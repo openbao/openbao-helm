@@ -3,7 +3,7 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{ template "vault.mode" . }}
+{{ template "openbao.mode" . }}
 {{- if ne .mode "external" }}
 {{- if .serverEnabled -}}
 {{- if ne .mode "dev" -}}
@@ -11,20 +11,20 @@ SPDX-License-Identifier: MPL-2.0
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "vault.fullname" . }}-config
-  namespace: {{ include "vault.namespace" . }}
+  name: {{ template "openbao.fullname" . }}-config
+  namespace: {{ include "openbao.namespace" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- if .Values.server.includeConfigAnnotation }}
   annotations:
-    vault.hashicorp.com/config-checksum: {{ include "vault.config" . | sha256sum }}
+    vault.hashicorp.com/config-checksum: {{ include "openbao.config" . | sha256sum }}
 {{- end }}
 data:
   extraconfig-from-values.hcl: |-
-    {{ template "vault.config" . }}
+    {{ template "openbao.config" . }}
 {{- end }}
 {{- end }}
 {{- end }}

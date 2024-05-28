@@ -42,8 +42,8 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-serviceaccount.yaml \
-      --set 'injector.serviceAccount.annotations=vaultIsAwesome: true' \
+      --set 'injector.serviceAccount.annotations=openBaoIsAwesome: true' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }

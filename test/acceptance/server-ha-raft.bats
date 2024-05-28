@@ -57,7 +57,7 @@ load _helpers
     jq -r '.spec.ports[1].port')
   [ "${ports}" == "8201" ]
 
-  # Vault Init
+  # OpenBao Init
   local init=$(kubectl exec -ti "$(name_prefix)-0" -- \
     bao operator init -format=json -n 1 -t 1)
 
@@ -72,7 +72,7 @@ load _helpers
 
   sleep 5
 
-  # Vault Unseal
+  # OpenBao Unseal
   local pods=($(kubectl get pods --selector='app.kubernetes.io/name=openbao' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do

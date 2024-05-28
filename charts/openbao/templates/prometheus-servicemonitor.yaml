@@ -3,16 +3,16 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{ template "vault.mode" . }}
+{{ template "openbao.mode" . }}
 {{ if or (.Values.global.serverTelemetry.prometheusOperator) (.Values.serverTelemetry.serviceMonitor.enabled) }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ template "vault.fullname" . }}
+  name: {{ template "openbao.fullname" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{- /* update the selectors docs in values.yaml whenever the defaults below change. */ -}}
@@ -25,18 +25,18 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ template "vault.name" . }}
+      app.kubernetes.io/name: {{ template "openbao.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
       {{- if eq .mode "ha" }}
-      vault-active: "true"
+      openbao-active: "true"
       {{- else }}
-      vault-internal: "true"
+      openbao-internal: "true"
       {{- end }}
   endpoints:
-  - port: {{ include "vault.scheme" . }}
+  - port: {{ include "openbao.scheme" . }}
     interval: {{ .Values.serverTelemetry.serviceMonitor.interval }}
     scrapeTimeout: {{ .Values.serverTelemetry.serviceMonitor.scrapeTimeout }}
-    scheme: {{ include "vault.scheme" . | lower }}
+    scheme: {{ include "openbao.scheme" . | lower }}
     path: /v1/sys/metrics
     params:
       format:
@@ -45,5 +45,5 @@ spec:
       insecureSkipVerify: true
   namespaceSelector:
     matchNames:
-      - {{ include "vault.namespace" . }}
+      - {{ include "openbao.namespace" . }}
 {{ end }}

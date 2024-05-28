@@ -43,12 +43,12 @@ load _helpers
       --show-only templates/tests/server-test.yaml  \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault-server-test" ]
+  [ "${actual}" = "release-name-openbao-server-test" ]
 }
 
 @test "server/standalone-server-test-Pod: release metadata.name vault" {
   cd `chart_dir`
-  local actual=$(helm template vault \
+  local actual=$(helm template openbao \
       --show-only templates/tests/server-test.yaml  \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
@@ -119,7 +119,7 @@ load _helpers
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/tests/server-test.yaml  \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       --set 'server.standalone.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)

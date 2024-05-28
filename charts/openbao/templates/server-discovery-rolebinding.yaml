@@ -3,7 +3,7 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{ template "vault.mode" . }}
+{{ template "openbao.mode" . }}
 {{- if .serverEnabled -}}
 {{- if eq .mode "ha" }}
 {{- if eq (.Values.server.serviceAccount.serviceDiscovery.enabled | toString) "true" }}
@@ -14,21 +14,21 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 {{- end }}
 kind: RoleBinding
 metadata:
-  name: {{ template "vault.fullname" . }}-discovery-rolebinding
-  namespace: {{ include "vault.namespace" . }}
+  name: {{ template "openbao.fullname" . }}-discovery-rolebinding
+  namespace: {{ include "openbao.namespace" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ template "vault.fullname" . }}-discovery-role
+  name: {{ template "openbao.fullname" . }}-discovery-role
 subjects:
 - kind: ServiceAccount
-  name: {{ template "vault.serviceAccount.name" . }}
-  namespace: {{ include "vault.namespace" . }}
+  name: {{ template "openbao.serviceAccount.name" . }}
+  namespace: {{ include "openbao.namespace" . }}
 {{ end }}
 {{ end }}
 {{ end }}

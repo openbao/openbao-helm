@@ -66,7 +66,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-clusterrolebinding.yaml  \
       --set 'server.enabled=false' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]

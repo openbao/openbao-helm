@@ -38,5 +38,5 @@ spec:
           - "/bin/sh"
           - "-ec"
         args:
-          - "/usr/bin/pg_dump $(cat /vault/secrets/db-creds) --no-owner > /dev/stdout"
+          - "/usr/bin/pg_dump $(cat /openbao/secrets/db-creds) --no-owner > /dev/stdout"
       restartPolicy: Never

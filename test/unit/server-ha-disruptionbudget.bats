@@ -47,7 +47,7 @@ load _helpers
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-disruptionbudget.yaml  \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]

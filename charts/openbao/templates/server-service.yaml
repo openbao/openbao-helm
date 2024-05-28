@@ -3,23 +3,23 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{ template "vault.mode" . }}
+{{ template "openbao.mode" . }}
 {{- if ne .mode "external" }}
-{{- template "vault.serverServiceEnabled" . -}}
+{{- template "openbao.serverServiceEnabled" . -}}
 {{- if .serverServiceEnabled -}}
-# Service for Vault cluster
+# Service for OpenBao cluster
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "vault.fullname" . }}
-  namespace: {{ include "vault.namespace" . }}
+  name: {{ template "openbao.fullname" . }}
+  namespace: {{ include "openbao.namespace" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-{{ template "vault.service.annotations" .}}
+{{ template "openbao.service.annotations" .}}
 spec:
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}
@@ -40,7 +40,7 @@ spec:
   # since this DNS is also used for join operations.
   publishNotReadyAddresses: {{ .Values.server.service.publishNotReadyAddresses }}
   ports:
-    - name: {{ include "vault.scheme" . }}
+    - name: {{ include "openbao.scheme" . }}
       port: {{ .Values.server.service.port }}
       targetPort: {{ .Values.server.service.targetPort }}
       {{- if and (.Values.server.service.nodePort) (eq (.Values.server.service.type | toString) "NodePort") }}
@@ -50,7 +50,7 @@ spec:
       port: 8201
       targetPort: 8201
   selector:
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     {{- if eq (.Values.server.service.instanceSelector.enabled | toString) "true" }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     {{- end }}

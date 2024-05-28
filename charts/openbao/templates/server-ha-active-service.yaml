@@ -3,27 +3,27 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{ template "vault.mode" . }}
+{{ template "openbao.mode" . }}
 {{- if ne .mode "external" }}
-{{- template "vault.serverServiceEnabled" . -}}
+{{- template "openbao.serverServiceEnabled" . -}}
 {{- if .serverServiceEnabled -}}
 {{- if eq .mode "ha" }}
 {{- if eq (.Values.server.service.active.enabled | toString) "true" }}
-# Service for active Vault pod
+# Service for active OpenBao pod
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "vault.fullname" . }}-active
-  namespace: {{ include "vault.namespace" . }}
+  name: {{ template "openbao.fullname" . }}-active
+  namespace: {{ include "openbao.namespace" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    vault-active: "true"
+    openbao-active: "true"
   annotations:
-{{- template "vault.service.active.annotations" . }}
-{{- template "vault.service.annotations" . }}
+{{- template "openbao.service.active.annotations" . }}
+{{- template "openbao.service.annotations" . }}
 spec:
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}
@@ -42,7 +42,7 @@ spec:
   {{- include "service.externalTrafficPolicy" .Values.server.service }}
   publishNotReadyAddresses: {{ .Values.server.service.publishNotReadyAddresses }}
   ports:
-    - name: {{ include "vault.scheme" . }}
+    - name: {{ include "openbao.scheme" . }}
       port: {{ .Values.server.service.port }}
       targetPort: {{ .Values.server.service.targetPort }}
       {{- if and (.Values.server.service.activeNodePort) (eq (.Values.server.service.type | toString) "NodePort") }}
@@ -52,12 +52,12 @@ spec:
       port: 8201
       targetPort: 8201
   selector:
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     {{- if eq (.Values.server.service.instanceSelector.enabled | toString) "true" }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     {{- end }}
     component: server
-    vault-active: "true"
+    openbao-active: "true"
 {{- end }}
 {{- end }}
 {{- end }}

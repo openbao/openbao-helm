@@ -71,7 +71,7 @@ load _helpers
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-statefulset.yaml  \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       --set 'server.standalone.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -421,7 +421,7 @@ load _helpers
 
   local actual=$(echo $object |
       yq -r '.mountPath' | tee /dev/stderr)
-  [ "${actual}" = "/vault/userconfig/foo" ]
+  [ "${actual}" = "/openbao/userconfig/foo" ]
 
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -437,7 +437,7 @@ load _helpers
 
   local actual=$(echo $object |
       yq -r '.mountPath' | tee /dev/stderr)
-  [ "${actual}" = "/vault/userconfig/foo" ]
+  [ "${actual}" = "/openbao/userconfig/foo" ]
 }
 
 @test "server/standalone-StatefulSet: server.extraVolumes adds extra secret volume" {
@@ -489,7 +489,7 @@ load _helpers
 
   local actual=$(echo $object |
       yq -r '.mountPath' | tee /dev/stderr)
-  [ "${actual}" = "/vault/userconfig/foo" ]
+  [ "${actual}" = "/openbao/userconfig/foo" ]
 
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -505,7 +505,7 @@ load _helpers
 
   local actual=$(echo $object |
       yq -r '.mountPath' | tee /dev/stderr)
-  [ "${actual}" = "/vault/userconfig/foo" ]
+  [ "${actual}" = "/openbao/userconfig/foo" ]
 }
 
 @test "server/standalone-StatefulSet: can mount audit" {
@@ -1571,7 +1571,7 @@ load _helpers
   [[ "${actual}" = "sleep 10 &&"* ]]
 }
 
-@test "server/standalone-StatefulSet: vault port name is http, when tlsDisable is true" {
+@test "server/standalone-StatefulSet: openbao port name is http, when tlsDisable is true" {
   cd `chart_dir`
 
   local actual=$(helm template \
@@ -1582,7 +1582,7 @@ load _helpers
   [ "${actual}" = "http" ]
 }
 
-@test "server/standalone-StatefulSet: vault replication port name is http-rep, when tlsDisable is true" {
+@test "server/standalone-StatefulSet: openbao replication port name is http-rep, when tlsDisable is true" {
   cd `chart_dir`
 
   local actual=$(helm template \
@@ -1593,7 +1593,7 @@ load _helpers
   [ "${actual}" = "http-rep" ]
 }
 
-@test "server/standalone-StatefulSet: vault port name is https, when tlsDisable is false" {
+@test "server/standalone-StatefulSet: openbao port name is https, when tlsDisable is false" {
   cd `chart_dir`
 
   local actual=$(helm template \
@@ -1604,7 +1604,7 @@ load _helpers
   [ "${actual}" = "https" ]
 }
 
-@test "server/standalone-StatefulSet: vault replication port name is https-rep, when tlsDisable is false" {
+@test "server/standalone-StatefulSet: openbao replication port name is https-rep, when tlsDisable is false" {
   cd `chart_dir`
 
   local actual=$(helm template \
@@ -1621,9 +1621,9 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
-      --set 'server.annotations=vaultIsAwesome: true' \
+      --set 'server.annotations=openBaoIsAwesome: true' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.spec.template.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -1632,9 +1632,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.auditStorage.enabled=true' \
-      --set 'server.auditStorage.annotations=vaultIsAwesome: true' \
+      --set 'server.auditStorage.annotations=openBaoIsAwesome: true' \
       . | tee /dev/stderr |
-      yq -r '.spec.volumeClaimTemplates[1].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.spec.volumeClaimTemplates[1].metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -1643,9 +1643,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.dataStorage.enabled=true' \
-      --set 'server.dataStorage.annotations=vaultIsAwesome: true' \
+      --set 'server.dataStorage.annotations=openBaoIsAwesome: true' \
       . | tee /dev/stderr |
-      yq -r '.spec.volumeClaimTemplates[0].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.spec.volumeClaimTemplates[0].metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -1654,9 +1654,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.auditStorage.enabled=true' \
-      --set 'server.auditStorage.annotations.vaultIsAwesome=true' \
+      --set 'server.auditStorage.annotations.openBaoIsAwesome=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.volumeClaimTemplates[1].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.spec.volumeClaimTemplates[1].metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -1665,9 +1665,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.dataStorage.enabled=true' \
-      --set 'server.dataStorage.annotations.vaultIsAwesome=true' \
+      --set 'server.dataStorage.annotations.openBaoIsAwesome=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.volumeClaimTemplates[0].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.spec.volumeClaimTemplates[0].metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -1675,9 +1675,9 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
-      --set 'server.annotations.vaultIsAwesome=true' \
+      --set 'server.annotations.openBaoIsAwesome=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.spec.template.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -1812,65 +1812,9 @@ load _helpers
       --set 'server.serviceAccount.create=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault" ]
+  [ "${actual}" = "release-name-openbao" ]
 
 
-}
-
-#--------------------------------------------------------------------
-# enterprise license autoload support
-@test "server/StatefulSet: adds volume for license secret when enterprise license secret name and key are provided" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      -s templates/server-statefulset.yaml  \
-      --set 'server.enterpriseLicense.secretName=foo' \
-      --set 'server.enterpriseLicense.secretKey=bar' \
-      . | tee /dev/stderr |
-      yq -r -c '.spec.template.spec.volumes[] | select(.name == "vault-license")' | tee /dev/stderr)
-      [ "${actual}" = '{"name":"vault-license","secret":{"secretName":"foo","defaultMode":288}}' ]
-}
-
-@test "server/StatefulSet: adds volume mount for license secret when enterprise license secret name and key are provided" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      -s templates/server-statefulset.yaml  \
-      --set 'server.enterpriseLicense.secretName=foo' \
-      --set 'server.enterpriseLicense.secretKey=bar' \
-      . | tee /dev/stderr |
-      yq -r -c '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "vault-license")' | tee /dev/stderr)
-      [ "${actual}" = '{"name":"vault-license","mountPath":"/vault/license","readOnly":true}' ]
-}
-
-@test "server/StatefulSet: adds env var for license path when enterprise license secret name and key are provided" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      -s templates/server-statefulset.yaml  \
-      --set 'server.enterpriseLicense.secretName=foo' \
-      --set 'server.enterpriseLicense.secretKey=bar' \
-      . | tee /dev/stderr |
-      yq -r -c '.spec.template.spec.containers[0].env[] | select(.name == "VAULT_LICENSE_PATH")' | tee /dev/stderr)
-      [ "${actual}" = '{"name":"VAULT_LICENSE_PATH","value":"/vault/license/bar"}' ]
-}
-
-@test "server/StatefulSet: blank secretName does not set env var" {
-  cd `chart_dir`
-
-  # setting secretName=null
-  local actual=$(helm template \
-      -s templates/server-statefulset.yaml  \
-      --set 'server.enterpriseLicense.secretName=null' \
-      --set 'server.enterpriseLicense.secretKey=bar' \
-      . | tee /dev/stderr |
-      yq -r -c '.spec.template.spec.containers[0].env[] | select(.name == "VAULT_LICENSE_PATH")' | tee /dev/stderr)
-      [ "${actual}" = '' ]
-
-  # omitting secretName
-  local actual=$(helm template \
-      -s templates/server-statefulset.yaml  \
-      --set 'server.enterpriseLicense.secretKey=bar' \
-      . | tee /dev/stderr |
-      yq -r -c '.spec.template.spec.containers[0].env[] | select(.name == "VAULT_LICENSE_PATH")' | tee /dev/stderr)
-      [ "${actual}" = '' ]
 }
 
 #--------------------------------------------------------------------
@@ -2036,9 +1980,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.auditStorage.enabled=true' \
-      --set 'server.auditStorage.labels=vaultIsAwesome: true' \
+      --set 'server.auditStorage.labels=openBaoIsAwesome: true' \
       . | tee /dev/stderr |
-      yq -r '.spec.volumeClaimTemplates[1].metadata.labels["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.spec.volumeClaimTemplates[1].metadata.labels["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -2047,9 +1991,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.dataStorage.enabled=true' \
-      --set 'server.dataStorage.labels=vaultIsAwesome: true' \
+      --set 'server.dataStorage.labels=openBaoIsAwesome: true' \
       . | tee /dev/stderr |
-      yq -r '.spec.volumeClaimTemplates[0].metadata.labels["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.spec.volumeClaimTemplates[0].metadata.labels["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -2058,9 +2002,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.auditStorage.enabled=true' \
-      --set 'server.auditStorage.labels.vaultIsAwesome=true' \
+      --set 'server.auditStorage.labels.openBaoIsAwesome=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.volumeClaimTemplates[1].metadata.labels["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.spec.volumeClaimTemplates[1].metadata.labels["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -2069,8 +2013,8 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.dataStorage.enabled=true' \
-      --set 'server.dataStorage.labels.vaultIsAwesome=true' \
+      --set 'server.dataStorage.labels.openBaoIsAwesome=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.volumeClaimTemplates[0].metadata.labels["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.spec.volumeClaimTemplates[0].metadata.labels["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }

@@ -1,7 +1,7 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
-# Available parameters and their default values for the Vault chart.
+# Available parameters and their default values for the OpenBao chart.
 
 global:
   # -- enabled is the master enabled switch. Setting this to true or false
@@ -20,8 +20,8 @@ global:
   # -- TLS for end-to-end encrypted transport
   tlsDisable: true
 
-  # -- External vault server address for the injector and CSI provider to use.
-  # Setting this will disable deployment of a vault server.
+  # -- External openbao server address for the injector and CSI provider to use.
+  # Setting this will disable deployment of a openbao server.
   externalVaultAddr: ""
 
   # -- If deploying to OpenShift
@@ -44,7 +44,7 @@ global:
     prometheusOperator: false
 
 injector:
-  # -- True if you want to enable vault agent injection. @default: global.enabled
+  # -- True if you want to enable openbao agent injection. @default: global.enabled
   enabled: "-"
 
   replicas: 1
@@ -75,8 +75,8 @@ injector:
     # -- image pull policy to use for k8s image. if tag is "latest", set to "Always"
     pullPolicy: IfNotPresent
 
-  # -- agentImage sets the repo and tag of the Vault image to use for the Vault Agent
-  # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is
+  # -- agentImage sets the repo and tag of the OpenBao image to use for the OpenBao Agent
+  # containers.  This should be set to the official OpenBao image.  OpenBao 1.3.1+ is
   # required.
   agentImage:
     # -- image registry to use for agent image
@@ -88,7 +88,7 @@ injector:
     # -- image pull policy to use for agent image. if tag is "latest", set to "Always"
     pullPolicy: IfNotPresent
 
-  # The default values for the injected Vault Agent containers.
+  # The default values for the injected OpenBao Agent containers.
   agentDefaults:
     # For more information on configuring resources, see the K8s documentation:
     # https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
@@ -145,7 +145,7 @@ injector:
     # -- Number of seconds after which the probe times out.
     timeoutSeconds: 5
 
-  # Mount Path of the Vault Kubernetes Auth Method.
+  # Mount Path of the OpenBao Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 
   # -- Configures the log verbosity of the injector.
@@ -155,7 +155,7 @@ injector:
   # -- Configures the log format of the injector. Supported log formats: "standard", "json".
   logFormat: "standard"
 
-  # Configures all Vault Agent sidecars to revoke their token when shutting down
+  # Configures all OpenBao Agent sidecars to revoke their token when shutting down
   revokeOnShutdown: false
 
   webhook:
@@ -204,7 +204,7 @@ injector:
       - key: app.kubernetes.io/name
         operator: NotIn
         values:
-        - {{ template "vault.name" . }}-agent-injector
+        - {{ template "openbao.name" . }}-agent-injector
 
     # Extra annotations to attach to the webhook
     annotations: {}
@@ -300,7 +300,7 @@ injector:
       requiredDuringSchedulingIgnoredDuringExecution:
         - labelSelector:
             matchLabels:
-              app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+              app.kubernetes.io/name: {{ template "openbao.name" . }}-agent-injector
               app.kubernetes.io/instance: "{{ .Release.Name }}"
               component: webhook
           topologyKey: kubernetes.io/hostname
@@ -365,8 +365,8 @@ injector:
   #   type: RollingUpdate
 
 server:
-  # If true, or "-" with global.enabled true, Vault server will be installed.
-  # See vault.mode in _helpers.tpl for implementation details.
+  # If true, or "-" with global.enabled true, OpenBao server will be installed.
+  # See openbao.mode in _helpers.tpl for implementation details.
   enabled: "-"
 
   # Resource requests, limits, etc. for the server cluster placement. This
@@ -387,11 +387,11 @@ server:
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
 
-  # Configure the logging verbosity for the Vault server.
+  # Configure the logging verbosity for the OpenBao server.
   # Supported log levels include: trace, debug, info, warn, error
   logLevel: ""
 
-  # Configure the logging format for the Vault server.
+  # Configure the logging format for the OpenBao server.
   # Supported log formats include: standard, json
   logFormat: ""
 
@@ -405,7 +405,7 @@ server:
   #     cpu: 250m
 
   # Ingress allows ingress services to be created to allow external access
-  # from Kubernetes to access Vault pods.
+  # from Kubernetes to access OpenBao pods.
   # If deployment is on OpenShift, the following block is ignored.
   # In order to expose the service, use the route section below
   ingress:
@@ -429,7 +429,7 @@ server:
     pathType: Prefix
 
     # When HA mode is enabled and K8s service registration is being used,
-    # configure the ingress to point to the Vault active service.
+    # configure the ingress to point to the OpenBao active service.
     activeService: true
     hosts:
       - host: chart-example.local
@@ -459,7 +459,7 @@ server:
     enabled: false
 
     # When HA mode is enabled and K8s service registration is being used,
-    # configure the route to point to the Vault active service.
+    # configure the route to point to the OpenBao active service.
     activeService: true
 
     labels: {}
@@ -499,11 +499,11 @@ server:
   # extraContainers is a list of sidecar containers. Specified as a YAML list.
   extraContainers: null
 
-  # -- shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
-  # This is useful if Vault must be signaled, e.g. to send a SIGHUP for a log rotation
+  # -- shareProcessNamespace enables process namespace sharing between OpenBao and the extraContainers
+  # This is useful if OpenBao must be signaled, e.g. to send a SIGHUP for a log rotation
   shareProcessNamespace: false
 
-  # -- extraArgs is a string containing additional Vault server arguments.
+  # -- extraArgs is a string containing additional OpenBao server arguments.
   extraArgs: ""
 
   # -- extraPorts is a list of extra ports. Specified as a YAML list.
@@ -537,7 +537,7 @@ server:
     execCommand: []
     # - /bin/sh
     # - -c
-    # - /vault/userconfig/mylivenessscript/run.sh
+    # - /openbao/userconfig/mylivenessscript/run.sh
     # Path for the livenessProbe to use httpGet as the livenessProbe handler
     path: "/v1/sys/health?standbyok=true"
     # Port number on which livenessProbe will be checked if httpGet is used as the livenessProbe handler
@@ -566,30 +566,30 @@ server:
   postStart: []
   # - /bin/sh
   # - -c
-  # - /vault/userconfig/myscript/run.sh
+  # - /openbao/userconfig/myscript/run.sh
 
   # extraEnvironmentVars is a list of extra environment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
   extraEnvironmentVars: {}
     # GOOGLE_REGION: global
     # GOOGLE_PROJECT: myproject
-    # GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json
+    # GOOGLE_APPLICATION_CREDENTIALS: /openbao/userconfig/myproject/myproject-creds.json
 
   # extraSecretEnvironmentVars is a list of extra environment variables to set with the stateful set.
   # These variables take value from existing Secret objects.
   extraSecretEnvironmentVars: []
     # - envName: AWS_SECRET_ACCESS_KEY
-    #   secretName: vault
+    #   secretName: openbao
     #   secretKey: AWS_SECRET_ACCESS_KEY
 
   # Deprecated: please use 'volumes' instead.
   # extraVolumes is a list of extra volumes to mount. These will be exposed
-  # to Vault in the path `/vault/userconfig/<name>/`. The value below is
+  # to OpenBao in the path `/openbao/userconfig/<name>/`. The value below is
   # an array of objects, examples are shown below.
   extraVolumes: []
     # - type: secret (or "configMap")
     #   name: my-secret
-    #   path: null # default is `/vault/userconfig`
+    #   path: null # default is `/openbao/userconfig`
 
   # volumes is a list of volumes made available to all containers. These are rendered
   # via toYaml rather than pre-processed like the extraVolumes value.
@@ -615,7 +615,7 @@ server:
       requiredDuringSchedulingIgnoredDuringExecution:
         - labelSelector:
             matchLabels:
-              app.kubernetes.io/name: {{ template "vault.name" . }}
+              app.kubernetes.io/name: {{ template "openbao.name" . }}
               app.kubernetes.io/instance: "{{ .Release.Name }}"
               component: server
           topologyKey: kubernetes.io/hostname
@@ -671,25 +671,25 @@ server:
   annotations: {}
 
   # Add an annotation to the server configmap and the statefulset pods,
-  # vaultproject.io/config-checksum, that is a hash of the Vault configuration.
+  # vaultproject.io/config-checksum, that is a hash of the OpenBao configuration.
   # This can be used together with an OnDelete deployment strategy to help
   # identify which pods still need to be deleted during a deployment to pick up
   # any configuration changes.
   configAnnotation: false
 
-  # Enables a headless service to be used by the Vault Statefulset
+  # Enables a headless service to be used by the OpenBao Statefulset
   service:
     enabled: true
-    # Enable or disable the vault-active service, which selects Vault pods that
-    # have labeled themselves as the cluster leader with `vault-active: "true"`.
+    # Enable or disable the openbao-active service, which selects OpenBao pods that
+    # have labeled themselves as the cluster leader with `openbao-active: "true"`.
     active:
       enabled: true
       # Extra annotations for the service definition. This can either be YAML or a
       # YAML-formatted multi-line templated string map of the annotations to apply
       # to the active service.
       annotations: {}
-    # Enable or disable the vault-standby service, which selects Vault pods that
-    # have labeled themselves as a cluster follower with `vault-active: "false"`.
+    # Enable or disable the openbao-standby service, which selects OpenBao pods that
+    # have labeled themselves as a cluster follower with `openbao-active: "false"`.
     standby:
       enabled: true
       # Extra annotations for the service definition. This can either be YAML or a
@@ -697,19 +697,19 @@ server:
       # to the standby service.
       annotations: {}
     # If enabled, the service selectors will include `app.kubernetes.io/instance: {{ .Release.Name }}`
-    # When disabled, services may select Vault pods not deployed from the chart.
-    # Does not affect the headless vault-internal service with `ClusterIP: None`
+    # When disabled, services may select OpenBao pods not deployed from the chart.
+    # Does not affect the headless openbao-internal service with `ClusterIP: None`
     instanceSelector:
       enabled: true
     # clusterIP controls whether a Cluster IP address is attached to the
-    # Vault service within Kubernetes.  By default, the Vault service will
+    # OpenBao service within Kubernetes.  By default, the OpenBao service will
     # be given a Cluster IP address, set to None to disable.  When disabled
     # Kubernetes will create a "headless" service.  Headless services can be
     # used to communicate with pods directly through DNS instead of a round-robin
     # load balancer.
     # clusterIP: None
 
-    # Configures the service type for the main Vault service.  Can be ClusterIP
+    # Configures the service type for the main OpenBao service.  Can be ClusterIP
     # or NodePort.
     # type: ClusterIP
 
@@ -753,7 +753,7 @@ server:
     # will be random if left blank.
     # standbyNodePort: 30002
 
-    # Port on which Vault server is listening
+    # Port on which OpenBao server is listening
     port: 8200
     # Target port to which the service should be mapped to
     targetPort: 8200
@@ -762,7 +762,7 @@ server:
     # to the service.
     annotations: {}
 
-  # This configures the Vault Statefulset to create a PVC for data
+  # This configures the OpenBao Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.
   # See https://developer.hashicorp.com/vault/docs/configuration/storage to know more
   dataStorage:
@@ -770,7 +770,7 @@ server:
     # Size of the PVC created
     size: 10Gi
     # Location where the PVC will be mounted.
-    mountPath: "/vault/data"
+    mountPath: "/openbao/data"
     # Name of the storage class to use.  If null it will use the
     # configured default Storage Class.
     storageClass: null
@@ -789,17 +789,17 @@ server:
   #   whenScaled: Retain
   persistentVolumeClaimRetentionPolicy: {}
 
-  # This configures the Vault Statefulset to create a PVC for audit
-  # logs.  Once Vault is deployed, initialized, and unsealed, Vault must
+  # This configures the OpenBao Statefulset to create a PVC for audit
+  # logs.  Once OpenBao is deployed, initialized, and unsealed, OpenBao must
   # be configured to use this for audit logs.  This will be mounted to
-  # /vault/audit
+  # /openbao/audit
   # See https://developer.hashicorp.com/vault/docs/audit to know more
   auditStorage:
     enabled: false
     # Size of the PVC created
     size: 10Gi
     # Location where the PVC will be mounted.
-    mountPath: "/vault/audit"
+    mountPath: "/openbao/audit"
     # Name of the storage class to use.  If null it will use the
     # configured default Storage Class.
     storageClass: null
@@ -810,8 +810,8 @@ server:
     # Labels to apply to the PVC
     labels: {}
 
-  # Run Vault in "dev" mode. This requires no further setup, no state management,
-  # and no initialization. This is useful for experimenting with Vault without
+  # Run OpenBao in "dev" mode. This requires no further setup, no state management,
+  # and no initialization. This is useful for experimenting with OpenBao without
   # needing to unseal, store keys, et. al. All data is lost on restart - do not
   # use dev mode for anything other than experimenting.
   # See https://developer.hashicorp.com/vault/docs/concepts/dev-server to know more
@@ -821,7 +821,7 @@ server:
     # Set VAULT_DEV_ROOT_TOKEN_ID value
     devRootToken: "root"
 
-  # Run Vault in "standalone" mode. This is the default mode that will deploy if
+  # Run OpenBao in "standalone" mode. This is the default mode that will deploy if
   # no arguments are given to helm. This requires a PVC for data storage to use
   # the "file" backend.  This mode is not highly available and should not be scaled
   # past a single replica.
@@ -829,7 +829,7 @@ server:
     enabled: "-"
 
     # config is a raw string of default configuration when using a Stateful
-    # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
+    # deployment. Default is to use a PersistentVolumeClaim mounted at /openbao/data
     # and store data there. This is only used when using a Replica count of 1, and
     # using a stateful set. This should be HCL.
 
@@ -850,17 +850,17 @@ server:
         #}
       }
       storage "file" {
-        path = "/vault/data"
+        path = "/openbao/data"
       }
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
       # GKMS keys must already exist, and the cluster must have a service account
       # that is authorized to access GCP KMS.
       #seal "gcpckms" {
-      #   project     = "vault-helm-dev"
+      #   project     = "openbao-helm-dev"
       #   region      = "global"
-      #   key_ring    = "vault-helm-unseal-kr"
-      #   crypto_key  = "vault-helm-unseal-key"
+      #   key_ring    = "openbao-helm-unseal-kr"
+      #   crypto_key  = "openbao-helm-unseal-key"
       #}
 
       # Example configuration for enabling Prometheus metrics in your config.
@@ -869,29 +869,29 @@ server:
       #  disable_hostname = true
       #}
 
-  # Run Vault in "HA" mode. There are no storage requirements unless the audit log
-  # persistence is required.  In HA mode Vault will configure itself to use Consul
+  # Run OpenBao in "HA" mode. There are no storage requirements unless the audit log
+  # persistence is required.  In HA mode OpenBao will configure itself to use Consul
   # for its storage backend.  The default configuration provided will work the Consul
-  # Helm project by default.  It is possible to manually configure Vault to use a
+  # Helm project by default.  It is possible to manually configure OpenBao to use a
   # different HA backend.
   ha:
     enabled: false
     replicas: 3
 
-    # Set the api_addr configuration for Vault HA
+    # Set the api_addr configuration for OpenBao HA
     # See https://developer.hashicorp.com/vault/docs/configuration#api_addr
     # If set to null, this will be set to the Pod IP Address
     apiAddr: null
 
-    # Set the cluster_addr confuguration for Vault HA
+    # Set the cluster_addr confuguration for OpenBao HA
     # See https://developer.hashicorp.com/vault/docs/configuration#cluster_addr
-    # If set to null, this will be set to https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201
+    # If set to null, this will be set to https://$(HOSTNAME).{{ template "openbao.fullname" . }}-internal:8201
     clusterAddr: null
 
-    # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where
-    # Vault's persistence is external (such as Consul), enabling Raft mode will create
-    # persistent volumes for Vault to store data according to the configuration under server.dataStorage.
-    # The Vault cluster will coordinate leader elections and failovers internally.
+    # Enables OpenBao's integrated Raft storage.  Unlike the typical HA modes where
+    # OpenBao's persistence is external (such as Consul), enabling Raft mode will create
+    # persistent volumes for OpenBao to store data according to the configuration under server.dataStorage.
+    # The OpenBao cluster will coordinate leader elections and failovers internally.
     raft:
 
       # Enables Raft integrated storage
@@ -917,7 +917,7 @@ server:
         }
 
         storage "raft" {
-          path = "/vault/data"
+          path = "/openbao/data"
         }
 
         service_registration "kubernetes" {}
@@ -939,7 +939,7 @@ server:
         cluster_address = "[::]:8201"
       }
       storage "consul" {
-        path = "vault"
+        path = "openbao"
         address = "HOST_IP:8500"
       }
 
@@ -949,10 +949,10 @@ server:
       # GKMS keys must already exist, and the cluster must have a service account
       # that is authorized to access GCP KMS.
       #seal "gcpckms" {
-      #   project     = "vault-helm-dev-246514"
+      #   project     = "openbao-helm-dev-246514"
       #   region      = "global"
-      #   key_ring    = "vault-helm-unseal-kr"
-      #   crypto_key  = "vault-helm-unseal-key"
+      #   key_ring    = "openbao-helm-unseal-kr"
+      #   crypto_key  = "openbao-helm-unseal-key"
       #}
 
       # Example configuration for enabling Prometheus metrics.
@@ -973,7 +973,7 @@ server:
       maxUnavailable: null
 
   # Definition of the serviceAccount used to run Vault.
-  # These options are also used when using an external Vault server to validate
+  # These options are also used when using an external OpenBao server to validate
   # Kubernetes tokens.
   serviceAccount:
     # Specifies whether a service account should be created
@@ -995,12 +995,12 @@ server:
     # This should be a YAML map of the labels to apply to the serviceAccount
     extraLabels: {}
     # Enable or disable a service account role binding with the permissions required for
-    # Vault's Kubernetes service_registration config option.
+    # OpenBao's Kubernetes service_registration config option.
     # See https://developer.hashicorp.com/vault/docs/configuration/service-registration/kubernetes
     serviceDiscovery:
       enabled: true
 
-  # Settings for the statefulSet used to run Vault.
+  # Settings for the statefulSet used to run OpenBao.
   statefulSet:
     # Extra annotations for the statefulSet. This can either be YAML or a
     # YAML-formatted multi-line templated string map of the annotations to apply
@@ -1027,17 +1027,17 @@ server:
   # Should the server pods run on the host network
   hostNetwork: false
 
-# Vault UI
+# OpenBao UI
 ui:
-  # True if you want to create a Service entry for the Vault UI.
+  # True if you want to create a Service entry for the OpenBao UI.
   #
   # serviceType can be used to control the type of service created. For
   # example, setting this to "LoadBalancer" will create an external load
   # balancer (for supported K8S installations) to access the UI.
   enabled: false
   publishNotReadyAddresses: true
-  # The service should only contain selectors for active Vault pod
-  activeVaultPodOnly: false
+  # The service should only contain selectors for active OpenBao pod
+  activeOpenbaoPodOnly: false
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
@@ -1082,8 +1082,8 @@ csi:
   # Requires installing the secrets-store-csi-driver separately, see:
   # https://github.com/kubernetes-sigs/secrets-store-csi-driver#install-the-secrets-store-csi-driver
   #
-  # With the driver and provider installed, you can mount Vault secrets into volumes
-  # similar to the Vault Agent injector, and you can also sync those secrets into
+  # With the driver and provider installed, you can mount OpenBao secrets into volumes
+  # similar to the OpenBao Agent injector, and you can also sync those secrets into
   # Kubernetes secrets.
   enabled: false
 
@@ -1100,17 +1100,17 @@ csi:
   # -- volumes is a list of volumes made available to all containers. These are rendered
   # via toYaml rather than pre-processed like the extraVolumes value.
   # The purpose is to make it easy to share volumes between containers.
-  volumes: null
+  volumes: []
   # - name: tls
   #   secret:
-  #     secretName: vault-tls
+  #     secretName: openbao-tls
 
   # -- volumeMounts is a list of volumeMounts for the main server container. These are rendered
   # via toYaml rather than pre-processed like the extraVolumes value.
   # The purpose is to make it easy to share volumes between containers.
-  volumeMounts: null
+  volumeMounts: []
   # - name: tls
-  #   mountPath: "/vault/tls"
+  #   mountPath: "/openbao/tls"
   #   readOnly: true
 
   resources: {}
@@ -1245,16 +1245,16 @@ csi:
   # for the available command line flags.
   extraArgs: []
 
-# Vault is able to collect and publish various runtime metrics.
+# OpenBao is able to collect and publish various runtime metrics.
 # Enabling this feature requires setting adding `telemetry{}` stanza to
-# the Vault configuration. There are a few examples included in the `config` sections above.
+# the OpenBao configuration. There are a few examples included in the `config` sections above.
 #
 # For more information see:
 # https://developer.hashicorp.com/vault/docs/configuration/telemetry
 # https://developer.hashicorp.com/vault/docs/internals/telemetry
 serverTelemetry:
   # Enable support for the Prometheus Operator. Currently, this chart does not support
-  # authenticating to Vault's metrics endpoint, so the following `telemetry{}` must be included
+  # authenticating to OpenBao's metrics endpoint, so the following `telemetry{}` must be included
   # in the `listener "tcp"{}` stanza
   #  telemetry {
   #    unauthenticated_metrics_access = "true"
@@ -1262,7 +1262,7 @@ serverTelemetry:
   #
   # See the `standalone.config` for a more complete example of this.
   #
-  # In addition, a top level `telemetry{}` stanza must also be included in the Vault configuration:
+  # In addition, a top level `telemetry{}` stanza must also be included in the OpenBao configuration:
   #
   # example:
   #  telemetry {
@@ -1270,7 +1270,7 @@ serverTelemetry:
   #    disable_hostname = true
   #  }
   #
-  # Configuration for monitoring the Vault server.
+  # Configuration for monitoring the OpenBao server.
   serviceMonitor:
     # The Prometheus operator *must* be installed before enabling this feature,
     # if not the chart will fail to install due to missing CustomResourceDefinitions
@@ -1282,7 +1282,7 @@ serverTelemetry:
     #  https://github.com/prometheus-operator/prometheus-operator
     #  https://github.com/prometheus-operator/kube-prometheus
 
-    # Enable deployment of the Vault Server ServiceMonitor CustomResource.
+    # Enable deployment of the OpenBao Server ServiceMonitor CustomResource.
     enabled: false
 
     # Selector labels to add to the ServiceMonitor.
@@ -1314,14 +1314,14 @@ serverTelemetry:
     rules: []
     #  - alert: vault-HighResponseTime
     #    annotations:
-    #      message: The response time of Vault is over 500ms on average over the last 5 minutes.
+    #      message: The response time of OpenBao is over 500ms on average over the last 5 minutes.
     #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 500
     #    for: 5m
     #    labels:
     #      severity: warning
     #  - alert: vault-HighResponseTime
     #    annotations:
-    #      message: The response time of Vault is over 1s on average over the last 5 minutes.
+    #      message: The response time of OpenBao is over 1s on average over the last 5 minutes.
     #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 1000
     #    for: 5m
     #    labels:

@@ -18,7 +18,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault-csi-provider-agent-config" ]
+  [ "${actual}" = "release-name-openbao-csi-provider-agent-config" ]
 }
 
 @test "csi/Agent-ConfigMap: namespace" {
@@ -40,25 +40,25 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
-@test "csi/Agent-ConfigMap: Vault addr not affected by injector setting" {
+@test "csi/Agent-ConfigMap: OpenBao addr not affected by injector setting" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/csi-agent-configmap.yaml \
       --set "csi.enabled=true" \
       --release-name not-external-test \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . | tee /dev/stderr |
       yq -r '.data["config.hcl"]' | tee /dev/stderr)
-  echo "${actual}" | grep "http://not-external-test-vault.default.svc:8200"
+  echo "${actual}" | grep "http://not-external-test-openbao.default.svc:8200"
 }
 
-@test "csi/Agent-ConfigMap: Vault addr correctly set for externalVaultAddr" {
+@test "csi/Agent-ConfigMap: OpenBao addr correctly set for externalVaultAddr" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/csi-agent-configmap.yaml \
       --set "csi.enabled=true" \
-      --set 'global.externalVaultAddr=http://vault-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       . | tee /dev/stderr |
       yq -r '.data["config.hcl"]' | tee /dev/stderr)
-  echo "${actual}" | grep "http://vault-outside"
+  echo "${actual}" | grep "http://openbao-outside"
 }

@@ -230,7 +230,7 @@
                 },
                 "namespace": {
                     "type": "string"
-                },        
+                },
                 "externalVaultAddr": {
                     "type": "string"
                 },
@@ -658,17 +658,6 @@
                         "boolean",
                         "string"
                     ]
-                },
-                "enterpriseLicense": {
-                    "type": "object",
-                    "properties": {
-                        "secretKey": {
-                            "type": "string"
-                        },
-                        "secretName": {
-                            "type": "string"
-                        }
-                    }
                 },
                 "extraArgs": {
                     "type": "string"
@@ -1163,7 +1152,7 @@
         "ui": {
             "type": "object",
             "properties": {
-                "activeVaultPodOnly": {
+                "activeOpenbaoPodOnly": {
                     "type": "boolean"
                 },
                 "annotations": {

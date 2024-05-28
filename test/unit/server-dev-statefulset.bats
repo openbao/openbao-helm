@@ -27,7 +27,7 @@ load _helpers
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-statefulset.yaml  \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       --set 'server.dev.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -184,7 +184,7 @@ load _helpers
 
   local actual=$(echo $object |
       yq -r '.mountPath' | tee /dev/stderr)
-  [ "${actual}" = "/vault/userconfig/foo" ]
+  [ "${actual}" = "/openbao/userconfig/foo" ]
 }
 
 @test "server/dev-StatefulSet: adds extra secret volume" {
@@ -222,7 +222,7 @@ load _helpers
 
   local actual=$(echo $object |
       yq -r '.mountPath' | tee /dev/stderr)
-  [ "${actual}" = "/vault/userconfig/foo" ]
+  [ "${actual}" = "/openbao/userconfig/foo" ]
 }
 
 @test "server/dev-StatefulSet: no storageClass on claim by default" {

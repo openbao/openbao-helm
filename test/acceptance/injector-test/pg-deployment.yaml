@@ -38,7 +38,7 @@ spec:
             - containerPort: 5432
           env:
             - name: POSTGRES_DB
-              value: mydb 
+              value: mydb
             - name: POSTGRES_USER
               value: postgres
             - name: POSTGRES_PASSWORD
@@ -52,7 +52,7 @@ spec:
         - name: pgdata
           emptyDir: {}
         - name: pgconf
-          configMap: 
+          configMap:
             name: "pg-init"
 ---
 apiVersion: v1
@@ -63,10 +63,10 @@ metadata:
     app: postgres
 data:
   setup.sql: |
-    CREATE ROLE vault;
-    ALTER ROLE vault WITH SUPERUSER LOGIN PASSWORD 'vault';
-    
-    \c mydb 
+    CREATE ROLE openbao;
+    ALTER ROLE openbao WITH SUPERUSER LOGIN PASSWORD 'openbao';
+
+    \c mydb
     CREATE SCHEMA app;
     CREATE TABLE app.inventory(id int);
     INSERT INTO app.inventory(id) VALUES (0);

@@ -56,14 +56,14 @@ load _helpers
     jq -r '.spec.ports[1].port')
   [ "${ports}" == "8201" ]
 
-  # Vault Init
+  # OpenBao Init
   local token=$(kubectl exec -ti "$(name_prefix)-0" -- \
     bao operator init -format=json -n 1 -t 1 | \
     jq -r '.unseal_keys_b64[0]')
   [ "${token}" != "" ]
 
-  # Vault Unseal
-  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
+  # OpenBao Unseal
+  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=openbao' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do
       kubectl exec -ti ${pod} -- bao operator unseal ${token}
@@ -111,7 +111,7 @@ teardown() {
       # If the test failed, print some debug output
       if [[ "$BATS_ERROR_STATUS" -ne 0 ]]; then
           kubectl logs -l app=consul
-          kubectl logs -l app.kubernetes.io/name=vault
+          kubectl logs -l app.kubernetes.io/name=openbao
       fi
       helm delete openbao
       helm delete consul

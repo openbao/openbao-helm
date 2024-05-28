@@ -1,6 +1,6 @@
-TEST_IMAGE?=vault-helm-test
-GOOGLE_CREDENTIALS?=vault-helm-test.json
-CLOUDSDK_CORE_PROJECT?=vault-helm-dev-246514
+TEST_IMAGE?=openbao-helm-test
+GOOGLE_CREDENTIALS?=openbao-helm-test.json
+CLOUDSDK_CORE_PROJECT?=openbao-helm-dev-246514
 # set to run a single test - e.g acceptance/server-ha-enterprise-dr.bats
 ACCEPTANCE_TESTS?=acceptance
 
@@ -11,7 +11,7 @@ UNIT_TESTS_FILTER?='.*'
 LOCAL_ACCEPTANCE_TESTS?=false
 
 # kind cluster name
-KIND_CLUSTER_NAME?=vault-helm
+KIND_CLUSTER_NAME?=openbao-helm
 
 # kind k8s version
 KIND_K8S_VERSION?=v1.29.2
@@ -40,7 +40,6 @@ else
 	-e GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS} \
 	-e CLOUDSDK_CORE_PROJECT=${CLOUDSDK_CORE_PROJECT} \
 	-e KUBECONFIG=/helm-test/.kube/config \
-	-e VAULT_LICENSE_CI=${VAULT_LICENSE_CI} \
 	-w /helm-test \
 	$(TEST_IMAGE) \
 	make acceptance

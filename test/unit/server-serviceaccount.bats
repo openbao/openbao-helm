@@ -26,7 +26,7 @@ load _helpers
       --set 'server.dev.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault" ]
+  [ "${actual}" = "release-name-openbao" ]
 
 }
 
@@ -115,7 +115,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-service.yaml  \
       --set 'server.dev.enabled=true' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -123,7 +123,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-service.yaml  \
       --set 'server.ha.enabled=true' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -131,7 +131,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-service.yaml  \
       --set 'server.standalone.enabled=true' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]

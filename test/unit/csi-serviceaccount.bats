@@ -29,7 +29,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault-csi-provider" ]
+  [ "${actual}" = "release-name-openbao-csi-provider" ]
 }
 
 # serviceAccountNamespace namespace

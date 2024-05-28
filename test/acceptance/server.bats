@@ -78,7 +78,7 @@ load _helpers
     jq -r '.unseal_keys_b64[0]')
   [ "${token}" != "" ]
 
-  # Vault Unseal
+  # OpenBao Unseal
   local pods=($(kubectl get pods --selector='app.kubernetes.io/name=openbao' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do

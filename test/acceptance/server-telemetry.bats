@@ -27,13 +27,13 @@ load _helpers
   # Sealed, not initialized
   wait_for_sealed_vault $(name_prefix)-0
 
-  # Vault Init
+  # OpenBao Init
   local token=$(kubectl exec -ti "$(name_prefix)-0" -- \
     bao operator init -format=json -n 1 -t 1 | \
     jq -r '.unseal_keys_b64[0]')
   [ "${token}" != "" ]
 
-  # Vault Unseal
+  # OpenBao Unseal
   local pods=($(kubectl get pods --selector='app.kubernetes.io/name=openbao' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do
@@ -62,7 +62,7 @@ load _helpers
         -- wget -q -O - http://127.0.0.1:9090/api/v1/label/job/values) | tee /dev/stderr )
 
       # Ensure the expected job label was picked up by Prometheus
-      [ "$(echo "${job_labels}" | jq 'any(.data[]; . == "vault-internal")')" = "true" ] && break
+      [ "$(echo "${job_labels}" | jq 'any(.data[]; . == "openbao-internal")')" = "true" ] && break
 
       ((++tries))
       sleep .5
@@ -72,7 +72,7 @@ load _helpers
   # Ensure the expected job is "up"
   local job_up=$( ( kubectl exec -n acceptance svc/prometheus-kube-prometheus-prometheus \
     -c prometheus \
-    -- wget -q -O - 'http://127.0.0.1:9090/api/v1/query?query=up{job="vault-internal"}' ) | \
+    -- wget -q -O - 'http://127.0.0.1:9090/api/v1/query?query=up{job="openbao-internal"}' ) | \
     tee /dev/stderr )
   [ "$(echo "${job_up}" | jq '.data.result[0].value[1]')" = \"1\" ]
 }

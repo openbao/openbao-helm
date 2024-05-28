@@ -18,10 +18,10 @@ load _helpers
     --wait --timeout=5m \
     --namespace=acceptance \
     --set linux.image.pullPolicy="IfNotPresent" \
-    --set tokenRequests[0].audience="vault" \
+    --set tokenRequests[0].audience="openbao" \
     --set enableSecretRotation=true \
     --set rotationPollInterval=5s
-  # Install Vault and Vault provider
+  # Install OpenBao and OpenBao provider
   helm install openbao \
     --wait --timeout=5m \
     --namespace=acceptance \
@@ -35,7 +35,7 @@ load _helpers
   kubectl --namespace=acceptance wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=openbao-csi-provider
 
   # Set up k8s auth and a kv secret.
-  cat ./test/acceptance/csi-test/vault-policy.hcl | kubectl --namespace=acceptance exec -i openbao-0 -- openbao policy write kv-policy -
+  cat ./test/acceptance/csi-test/openbao-policy.hcl | kubectl --namespace=acceptance exec -i openbao-0 -- openbao policy write kv-policy -
   kubectl --namespace=acceptance exec openbao-0 -- bao auth enable kubernetes
   kubectl --namespace=acceptance exec openbao-0 -- sh -c 'bao write auth/kubernetes/config \
     kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443"'
@@ -46,7 +46,7 @@ load _helpers
     ttl=20m
   kubectl --namespace=acceptance exec openbao-0 -- bao kv put secret/kv1 bar1=hello1
 
-  kubectl --namespace=acceptance apply -f ./test/acceptance/csi-test/vault-kv-secretproviderclass.yaml
+  kubectl --namespace=acceptance apply -f ./test/acceptance/csi-test/openbao-kv-secretproviderclass.yaml
   kubectl --namespace=acceptance apply -f ./test/acceptance/csi-test/nginx.yaml
   kubectl --namespace=acceptance wait --for=condition=Ready --timeout=5m pod nginx
 
@@ -55,7 +55,7 @@ load _helpers
 
   for i in $(seq 10); do
     sleep 2
-    if [ "$(kubectl --namespace=acceptance logs --tail=-1 -l "app.kubernetes.io/name=vault-csi-provider" -c vault-agent | grep "secret renewed: path=/v1/auth/kubernetes/login")" ]; then
+    if [ "$(kubectl --namespace=acceptance logs --tail=-1 -l "app.kubernetes.io/name=openbao-csi-provider" -c openbao-agent | grep "secret renewed: path=/v1/auth/kubernetes/login")" ]; then
         echo "Agent returned a cached login response"
         return
     fi
@@ -65,8 +65,8 @@ load _helpers
 
   # Print the logs and fail the test
   echo "Failed to find a log for the Agent renewing CSI's auth token"
-  kubectl --namespace=acceptance logs --tail=-1 -l "app.kubernetes.io/name=vault-csi-provider" -c vault-agent
-  kubectl --namespace=acceptance logs --tail=-1 -l "app.kubernetes.io/name=vault-csi-provider" -c vault-csi-provider
+  kubectl --namespace=acceptance logs --tail=-1 -l "app.kubernetes.io/name=openbao-csi-provider" -c openbao-agent
+  kubectl --namespace=acceptance logs --tail=-1 -l "app.kubernetes.io/name=openbao-csi-provider" -c openbao-csi-provider
   exit 1
 }
 

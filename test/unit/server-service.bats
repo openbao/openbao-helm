@@ -137,7 +137,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-service.yaml  \
       --set 'server.dev.enabled=true' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       --set 'server.service.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -146,7 +146,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-service.yaml  \
       --set 'server.ha.enabled=true' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       --set 'server.service.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -155,7 +155,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-service.yaml  \
       --set 'server.standalone.enabled=true' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       --set 'server.service.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -166,9 +166,9 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-service.yaml \
-      --set 'server.service.annotations=vaultIsAwesome: true' \
+      --set 'server.service.annotations=openBaoIsAwesome: true' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -389,7 +389,7 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "server/Service: vault port name is http, when tlsDisable is true" {
+@test "server/Service: openbao port name is http, when tlsDisable is true" {
   cd `chart_dir`
 
   local actual=$(helm template \
@@ -400,7 +400,7 @@ load _helpers
   [ "${actual}" = "http" ]
 }
 
-@test "server/Service: vault port name is https, when tlsDisable is false" {
+@test "server/Service: openbao port name is https, when tlsDisable is false" {
   cd `chart_dir`
 
   local actual=$(helm template \

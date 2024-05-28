@@ -3,16 +3,16 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{- template "vault.csiEnabled" . -}}
+{{- template "openbao.csiEnabled" . -}}
 {{- if and (.csiEnabled) (eq (.Values.csi.agent.enabled | toString) "true") -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "vault.fullname" . }}-csi-provider-agent-config
-  namespace: {{ include "vault.namespace" . }}
+  name: {{ template "openbao.fullname" . }}-csi-provider-agent-config
+  namespace: {{ include "openbao.namespace" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
@@ -21,7 +21,7 @@ data:
         {{- if .Values.global.externalVaultAddr }}
         "address" = "{{ .Values.global.externalVaultAddr }}"
         {{- else }}
-        "address" = "{{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ include "vault.namespace" . }}.svc:{{ .Values.server.service.port }}"
+        "address" = "{{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}"
         {{- end }}
     }
 

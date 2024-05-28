@@ -9,7 +9,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to
 this (by the DNS naming spec). If release name contains chart name it will
 be used as a full name.
 */}}
-{{- define "vault.fullname" -}}
+{{- define "openbao.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -25,28 +25,28 @@ be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "vault.chart" -}}
+{{- define "openbao.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "vault.name" -}}
+{{- define "openbao.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Allow the release namespace to be overridden
 */}}
-{{- define "vault.namespace" -}}
+{{- define "openbao.namespace" -}}
 {{- default .Release.Namespace .Values.global.namespace -}}
 {{- end -}}
 
 {{/*
 Compute if the csi driver is enabled.
 */}}
-{{- define "vault.csiEnabled" -}}
+{{- define "openbao.csiEnabled" -}}
 {{- $_ := set . "csiEnabled" (or
   (eq (.Values.csi.enabled | toString) "true")
   (and (eq (.Values.csi.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
@@ -55,7 +55,7 @@ Compute if the csi driver is enabled.
 {{/*
 Compute if the injector is enabled.
 */}}
-{{- define "vault.injectorEnabled" -}}
+{{- define "openbao.injectorEnabled" -}}
 {{- $_ := set . "injectorEnabled" (or
   (eq (.Values.injector.enabled | toString) "true")
   (and (eq (.Values.injector.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
@@ -64,7 +64,7 @@ Compute if the injector is enabled.
 {{/*
 Compute if the server is enabled.
 */}}
-{{- define "vault.serverEnabled" -}}
+{{- define "openbao.serverEnabled" -}}
 {{- $_ := set . "serverEnabled" (or
   (eq (.Values.server.enabled | toString) "true")
   (and (eq (.Values.server.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
@@ -73,7 +73,7 @@ Compute if the server is enabled.
 {{/*
 Compute if the server serviceaccount is enabled.
 */}}
-{{- define "vault.serverServiceAccountEnabled" -}}
+{{- define "openbao.serverServiceAccountEnabled" -}}
 {{- $_ := set . "serverServiceAccountEnabled"
   (and
     (eq (.Values.server.serviceAccount.create | toString) "true" )
@@ -85,7 +85,7 @@ Compute if the server serviceaccount is enabled.
 {{/*
 Compute if the server serviceaccount should have a token created and mounted to the serviceaccount.
 */}}
-{{- define "vault.serverServiceAccountSecretCreationEnabled" -}}
+{{- define "openbao.serverServiceAccountSecretCreationEnabled" -}}
 {{- $_ := set . "serverServiceAccountSecretCreationEnabled"
   (and
     (eq (.Values.server.serviceAccount.create | toString) "true")
@@ -96,7 +96,7 @@ Compute if the server serviceaccount should have a token created and mounted to 
 {{/*
 Compute if the server auth delegator serviceaccount is enabled.
 */}}
-{{- define "vault.serverAuthDelegator" -}}
+{{- define "openbao.serverAuthDelegator" -}}
 {{- $_ := set . "serverAuthDelegator"
   (and
     (eq (.Values.server.authDelegator.enabled | toString) "true" )
@@ -110,15 +110,15 @@ Compute if the server auth delegator serviceaccount is enabled.
 {{/*
 Compute if the server service is enabled.
 */}}
-{{- define "vault.serverServiceEnabled" -}}
-{{- template "vault.serverEnabled" . -}}
+{{- define "openbao.serverServiceEnabled" -}}
+{{- template "openbao.serverEnabled" . -}}
 {{- $_ := set . "serverServiceEnabled" (and .serverEnabled (eq (.Values.server.service.enabled | toString) "true")) -}}
 {{- end -}}
 
 {{/*
 Compute if the ui is enabled.
 */}}
-{{- define "vault.uiEnabled" -}}
+{{- define "openbao.uiEnabled" -}}
 {{- $_ := set . "uiEnabled" (or
   (eq (.Values.ui.enabled | toString) "true")
   (and (eq (.Values.ui.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
@@ -129,7 +129,7 @@ Compute the maximum number of unavailable replicas for the PodDisruptionBudget.
 This defaults to (n/2)-1 where n is the number of members of the server cluster.
 Add a special case for replicas=1, where it should default to 0 as well.
 */}}
-{{- define "vault.pdb.maxUnavailable" -}}
+{{- define "openbao.pdb.maxUnavailable" -}}
 {{- if eq (int .Values.server.ha.replicas) 1 -}}
 {{ 0 }}
 {{- else if .Values.server.ha.disruptionBudget.maxUnavailable -}}
@@ -143,8 +143,8 @@ Add a special case for replicas=1, where it should default to 0 as well.
 Set the variable 'mode' to the server mode requested by the user to simplify
 template logic.
 */}}
-{{- define "vault.mode" -}}
-  {{- template "vault.serverEnabled" . -}}
+{{- define "openbao.mode" -}}
+  {{- template "openbao.serverEnabled" . -}}
   {{- if or (.Values.injector.externalVaultAddr) (.Values.global.externalVaultAddr) -}}
     {{- $_ := set . "mode" "external" -}}
   {{- else if not .serverEnabled -}}
@@ -163,7 +163,7 @@ template logic.
 {{/*
 Set's the replica count based on the different modes configured by user
 */}}
-{{- define "vault.replicas" -}}
+{{- define "openbao.replicas" -}}
   {{ if eq .mode "standalone" }}
     {{- default 1 -}}
   {{ else if eq .mode "ha" }}
@@ -182,11 +182,11 @@ Set's up configmap mounts if this isn't a dev deployment and the user
 defined a custom configuration.  Additionally iterates over any
 extra volumes the user may have specified (such as a secret with TLS).
 */}}
-{{- define "vault.volumes" -}}
+{{- define "openbao.volumes" -}}
   {{- if and (ne .mode "dev") (or (.Values.server.standalone.config) (.Values.server.ha.config)) }}
         - name: config
           configMap:
-            name: {{ template "vault.fullname" . }}-config
+            name: {{ template "openbao.fullname" . }}-config
   {{ end }}
   {{- range .Values.server.extraVolumes }}
         - name: userconfig-{{ .name }}
@@ -204,11 +204,11 @@ extra volumes the user may have specified (such as a secret with TLS).
 {{- end -}}
 
 {{/*
-Set's the args for custom command to render the Vault configuration
+Set's the args for custom command to render the OpenBao configuration
 file with IP addresses to make the out of box experience easier
 for users looking to use this chart with Consul Helm.
 */}}
-{{- define "vault.args" -}}
+{{- define "openbao.args" -}}
   {{ if or (eq .mode "standalone") (eq .mode "ha") }}
           - |
             cp /openbao/config/extraconfig-from-values.hcl /tmp/storageconfig.hcl;
@@ -221,14 +221,14 @@ for users looking to use this chart with Consul Helm.
             /usr/local/bin/docker-entrypoint.sh bao server -config=/tmp/storageconfig.hcl {{ .Values.server.extraArgs }}
    {{ else if eq .mode "dev" }}
           - |
-            /usr/local/bin/docker-entrypoint.sh vault server -dev {{ .Values.server.extraArgs }}
+            /usr/local/bin/docker-entrypoint.sh bao server -dev {{ .Values.server.extraArgs }}
   {{ end }}
 {{- end -}}
 
 {{/*
 Set's additional environment variables based on the mode.
 */}}
-{{- define "vault.envs" -}}
+{{- define "openbao.envs" -}}
   {{ if eq .mode "dev" }}
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: {{ .Values.server.dev.devRootToken }}
@@ -241,7 +241,7 @@ Set's additional environment variables based on the mode.
 Set's which additional volumes should be mounted to the container
 based on the mode configured.
 */}}
-{{- define "vault.mounts" -}}
+{{- define "openbao.mounts" -}}
   {{ if eq (.Values.server.auditStorage.enabled | toString) "true" }}
             - name: audit
               mountPath: {{ .Values.server.auditStorage.mountPath }}
@@ -254,12 +254,12 @@ based on the mode configured.
   {{ end }}
   {{ if and (ne .mode "dev") (or (.Values.server.standalone.config)  (.Values.server.ha.config)) }}
             - name: config
-              mountPath: /vault/config
+              mountPath: /openbao/config
   {{ end }}
   {{- range .Values.server.extraVolumes }}
             - name: userconfig-{{ .name }}
               readOnly: true
-              mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
+              mountPath: {{ .path | default "/openbao/userconfig" }}/{{ .name }}
   {{- end }}
   {{- if .Values.server.volumeMounts }}
     {{- toYaml .Values.server.volumeMounts | nindent 12}}
@@ -271,14 +271,14 @@ Set's up the volumeClaimTemplates when data or audit storage is required.  HA
 might not use data storage since Consul is likely it's backend, however, audit
 storage might be desired by the user.
 */}}
-{{- define "vault.volumeclaims" -}}
+{{- define "openbao.volumeclaims" -}}
   {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled) }}
   volumeClaimTemplates:
       {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (eq (.Values.server.ha.raft.enabled | toString ) "true" )) }}
     - metadata:
         name: data
-        {{- include "vault.dataVolumeClaim.annotations" . | nindent 6 }}
-        {{- include "vault.dataVolumeClaim.labels" . | nindent 6 }}
+        {{- include "openbao.dataVolumeClaim.annotations" . | nindent 6 }}
+        {{- include "openbao.dataVolumeClaim.labels" . | nindent 6 }}
       spec:
         accessModes:
           - {{ .Values.server.dataStorage.accessMode | default "ReadWriteOnce" }}
@@ -292,8 +292,8 @@ storage might be desired by the user.
       {{- if eq (.Values.server.auditStorage.enabled | toString) "true" }}
     - metadata:
         name: audit
-        {{- include "vault.auditVolumeClaim.annotations" . | nindent 6 }}
-        {{- include "vault.auditVolumeClaim.labels" . | nindent 6 }}
+        {{- include "openbao.auditVolumeClaim.annotations" . | nindent 6 }}
+        {{- include "openbao.auditVolumeClaim.labels" . | nindent 6 }}
       spec:
         accessModes:
           - {{ .Values.server.auditStorage.accessMode | default "ReadWriteOnce" }}
@@ -310,7 +310,7 @@ storage might be desired by the user.
 {{/*
 Set's the affinity for pod placement when running in standalone and HA modes.
 */}}
-{{- define "vault.affinity" -}}
+{{- define "openbao.affinity" -}}
   {{- if and (ne .mode "dev") .Values.server.affinity }}
       affinity:
         {{ $tp := typeOf .Values.server.affinity }}
@@ -340,7 +340,7 @@ Sets the injector affinity for pod placement
 {{/*
 Sets the topologySpreadConstraints when running in standalone and HA modes.
 */}}
-{{- define "vault.topologySpreadConstraints" -}}
+{{- define "openbao.topologySpreadConstraints" -}}
   {{- if and (ne .mode "dev") .Values.server.topologySpreadConstraints }}
       topologySpreadConstraints:
         {{ $tp := typeOf .Values.server.topologySpreadConstraints }}
@@ -371,7 +371,7 @@ Sets the injector topologySpreadConstraints for pod placement
 {{/*
 Sets the toleration for pod placement when running in standalone and HA modes.
 */}}
-{{- define "vault.tolerations" -}}
+{{- define "openbao.tolerations" -}}
   {{- if and (ne .mode "dev") .Values.server.tolerations }}
       tolerations:
       {{- $tp := typeOf .Values.server.tolerations }}
@@ -401,7 +401,7 @@ Sets the injector toleration for pod placement
 {{/*
 Set's the node selector for pod placement when running in standalone and HA modes.
 */}}
-{{- define "vault.nodeselector" -}}
+{{- define "openbao.nodeselector" -}}
   {{- if and (ne .mode "dev") .Values.server.nodeSelector }}
       nodeSelector:
       {{- $tp := typeOf .Values.server.nodeSelector }}
@@ -446,10 +446,10 @@ Sets the injector deployment update strategy
 {{/*
 Sets extra pod annotations
 */}}
-{{- define "vault.annotations" }}
+{{- define "openbao.annotations" }}
       annotations:
   {{- if .Values.server.includeConfigAnnotation }}
-        vault.hashicorp.com/config-checksum: {{ include "vault.config" . | sha256sum }}
+        openbao.hashicorp.com/config-checksum: {{ include "openbao.config" . | sha256sum }}
   {{- end }}
   {{- if .Values.server.annotations }}
         {{- $tp := typeOf .Values.server.annotations }}
@@ -555,7 +555,7 @@ securityContext for the statefulset pod template.
 {{- end -}}
 
 {{/*
-securityContext for the statefulset vault container
+securityContext for the statefulset openbao container
 */}}
 {{- define "server.statefulSet.securityContext.container" -}}
   {{- if .Values.server.statefulSet.securityContext.container }}
@@ -622,7 +622,7 @@ Set's the injector webhook objectSelector
 {{/*
 Sets extra ui service annotations
 */}}
-{{- define "vault.ui.annotations" -}}
+{{- define "openbao.ui.annotations" -}}
   {{- if .Values.ui.annotations }}
   annotations:
     {{- $tp := typeOf .Values.ui.annotations }}
@@ -637,9 +637,9 @@ Sets extra ui service annotations
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "vault.serviceAccount.name" -}}
+{{- define "openbao.serviceAccount.name" -}}
 {{- if .Values.server.serviceAccount.create -}}
-    {{ default (include "vault.fullname" .) .Values.server.serviceAccount.name }}
+    {{ default (include "openbao.fullname" .) .Values.server.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.server.serviceAccount.name }}
 {{- end -}}
@@ -648,7 +648,7 @@ Create the name of the service account to use
 {{/*
 Sets extra service account annotations
 */}}
-{{- define "vault.serviceAccount.annotations" -}}
+{{- define "openbao.serviceAccount.annotations" -}}
   {{- if and (ne .mode "dev") .Values.server.serviceAccount.annotations }}
   annotations:
     {{- $tp := typeOf .Values.server.serviceAccount.annotations }}
@@ -663,7 +663,7 @@ Sets extra service account annotations
 {{/*
 Sets extra ingress annotations
 */}}
-{{- define "vault.ingress.annotations" -}}
+{{- define "openbao.ingress.annotations" -}}
   {{- if .Values.server.ingress.annotations }}
   annotations:
     {{- $tp := typeOf .Values.server.ingress.annotations }}
@@ -678,7 +678,7 @@ Sets extra ingress annotations
 {{/*
 Sets extra route annotations
 */}}
-{{- define "vault.route.annotations" -}}
+{{- define "openbao.route.annotations" -}}
   {{- if .Values.server.route.annotations }}
   annotations:
     {{- $tp := typeOf .Values.server.route.annotations }}
@@ -691,9 +691,9 @@ Sets extra route annotations
 {{- end -}}
 
 {{/*
-Sets extra vault server Service annotations
+Sets extra openbao server Service annotations
 */}}
-{{- define "vault.service.annotations" -}}
+{{- define "openbao.service.annotations" -}}
   {{- if .Values.server.service.annotations }}
     {{- $tp := typeOf .Values.server.service.annotations }}
     {{- if eq $tp "string" }}
@@ -705,9 +705,9 @@ Sets extra vault server Service annotations
 {{- end -}}
 
 {{/*
-Sets extra vault server Service (active) annotations
+Sets extra openbao server Service (active) annotations
 */}}
-{{- define "vault.service.active.annotations" -}}
+{{- define "openbao.service.active.annotations" -}}
   {{- if .Values.server.service.active.annotations }}
     {{- $tp := typeOf .Values.server.service.active.annotations }}
     {{- if eq $tp "string" }}
@@ -718,9 +718,9 @@ Sets extra vault server Service (active) annotations
   {{- end }}
 {{- end -}}
 {{/*
-Sets extra vault server Service annotations
+Sets extra openbao server Service annotations
 */}}
-{{- define "vault.service.standby.annotations" -}}
+{{- define "openbao.service.standby.annotations" -}}
   {{- if .Values.server.service.standby.annotations }}
     {{- $tp := typeOf .Values.server.service.standby.annotations }}
     {{- if eq $tp "string" }}
@@ -734,7 +734,7 @@ Sets extra vault server Service annotations
 {{/*
 Sets PodSecurityPolicy annotations
 */}}
-{{- define "vault.psp.annotations" -}}
+{{- define "openbao.psp.annotations" -}}
   {{- if .Values.global.psp.annotations }}
   annotations:
     {{- $tp := typeOf .Values.global.psp.annotations }}
@@ -749,7 +749,7 @@ Sets PodSecurityPolicy annotations
 {{/*
 Sets extra statefulset annotations
 */}}
-{{- define "vault.statefulSet.annotations" -}}
+{{- define "openbao.statefulSet.annotations" -}}
   {{- if .Values.server.statefulSet.annotations }}
   annotations:
     {{- $tp := typeOf .Values.server.statefulSet.annotations }}
@@ -764,7 +764,7 @@ Sets extra statefulset annotations
 {{/*
 Sets VolumeClaim annotations for data volume
 */}}
-{{- define "vault.dataVolumeClaim.annotations" -}}
+{{- define "openbao.dataVolumeClaim.annotations" -}}
   {{- if and (ne .mode "dev") (.Values.server.dataStorage.enabled) (.Values.server.dataStorage.annotations) }}
   annotations:
     {{- $tp := typeOf .Values.server.dataStorage.annotations }}
@@ -779,7 +779,7 @@ Sets VolumeClaim annotations for data volume
 {{/*
 Sets VolumeClaim labels for data volume
 */}}
-{{- define "vault.dataVolumeClaim.labels" -}}
+{{- define "openbao.dataVolumeClaim.labels" -}}
   {{- if and (ne .mode "dev") (.Values.server.dataStorage.enabled) (.Values.server.dataStorage.labels) }}
   labels:
     {{- $tp := typeOf .Values.server.dataStorage.labels }}
@@ -794,7 +794,7 @@ Sets VolumeClaim labels for data volume
 {{/*
 Sets VolumeClaim annotations for audit volume
 */}}
-{{- define "vault.auditVolumeClaim.annotations" -}}
+{{- define "openbao.auditVolumeClaim.annotations" -}}
   {{- if and (ne .mode "dev") (.Values.server.auditStorage.enabled) (.Values.server.auditStorage.annotations) }}
   annotations:
     {{- $tp := typeOf .Values.server.auditStorage.annotations }}
@@ -809,7 +809,7 @@ Sets VolumeClaim annotations for audit volume
 {{/*
 Sets VolumeClaim labels for audit volume
 */}}
-{{- define "vault.auditVolumeClaim.labels" -}}
+{{- define "openbao.auditVolumeClaim.labels" -}}
   {{- if and (ne .mode "dev") (.Values.server.auditStorage.enabled) (.Values.server.auditStorage.labels) }}
   labels:
     {{- $tp := typeOf .Values.server.auditStorage.labels }}
@@ -824,7 +824,7 @@ Sets VolumeClaim labels for audit volume
 {{/*
 Set's the container resources if the user has set any.
 */}}
-{{- define "vault.resources" -}}
+{{- define "openbao.resources" -}}
   {{- if .Values.server.resources -}}
           resources:
 {{ toYaml .Values.server.resources | indent 12}}
@@ -983,7 +983,7 @@ Sets extra CSI service account annotations
 {{/*
 Inject extra environment vars in the format key:value, if populated
 */}}
-{{- define "vault.extraEnvironmentVars" -}}
+{{- define "openbao.extraEnvironmentVars" -}}
 {{- if .extraEnvironmentVars -}}
 {{- range $key, $value := .extraEnvironmentVars }}
 - name: {{ printf "%s" $key | replace "." "_" | upper | quote }}
@@ -995,7 +995,7 @@ Inject extra environment vars in the format key:value, if populated
 {{/*
 Inject extra environment populated by secrets, if populated
 */}}
-{{- define "vault.extraSecretEnvironmentVars" -}}
+{{- define "openbao.extraSecretEnvironmentVars" -}}
 {{- if .extraSecretEnvironmentVars -}}
 {{- range .extraSecretEnvironmentVars }}
 - name: {{ .envName }}
@@ -1008,7 +1008,7 @@ Inject extra environment populated by secrets, if populated
 {{- end -}}
 
 {{/* Scheme for health check and local endpoint */}}
-{{- define "vault.scheme" -}}
+{{- define "openbao.scheme" -}}
 {{- if .Values.global.tlsDisable -}}
 {{ "http" }}
 {{- else -}}
@@ -1071,7 +1071,7 @@ Supported inputs are Values.ui
 {{/*
 config file from values
 */}}
-{{- define "vault.config" -}}
+{{- define "openbao.config" -}}
   {{- if or (eq .mode "ha") (eq .mode "standalone") }}
   {{- $type := typeOf (index .Values.server .mode).config }}
   {{- if eq $type "string" }}

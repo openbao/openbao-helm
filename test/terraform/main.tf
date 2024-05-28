@@ -19,7 +19,7 @@ data "google_service_account" "gcpapi" {
 }
 
 resource "google_container_cluster" "cluster" {
-  name               = "vault-helm-dev-${random_id.suffix.dec}"
+  name               = "openbao-helm-dev-${random_id.suffix.dec}"
   project            = "${var.project}"
   enable_legacy_abac = true
   initial_node_count = 3

@@ -3,16 +3,16 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{- template "vault.injectorEnabled" . -}}
+{{- template "openbao.injectorEnabled" . -}}
 {{- if .injectorEnabled -}}
 # Deployment for the injector
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "vault.fullname" . }}-agent-injector
-  namespace: {{ include "vault.namespace" . }}
+  name: {{ template "openbao.fullname" . }}-agent-injector
+  namespace: {{ include "openbao.namespace" . }}
   labels:
-    app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
+    app.kubernetes.io/name: {{ include "openbao.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     component: webhook
@@ -20,14 +20,14 @@ spec:
   replicas: {{ .Values.injector.replicas }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+      app.kubernetes.io/name: {{ template "openbao.name" . }}-agent-injector
       app.kubernetes.io/instance: {{ .Release.Name }}
       component: webhook
   {{ template "injector.strategy" . }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+        app.kubernetes.io/name: {{ template "openbao.name" . }}-agent-injector
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: webhook
         {{- if  .Values.injector.extraLabels -}}
@@ -42,7 +42,7 @@ spec:
       {{- if .Values.injector.priorityClassName }}
       priorityClassName: {{ .Values.injector.priorityClassName }}
       {{- end }}
-      serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
+      serviceAccountName: "{{ template "openbao.fullname" . }}-agent-injector"
       {{ template "injector.securityContext.pod" . -}}
       {{- if not .Values.global.openshift }}
       hostNetwork: {{ .Values.injector.hostNetwork }}
@@ -64,7 +64,7 @@ spec:
             {{- else if .Values.injector.externalVaultAddr }}
               value: "{{ .Values.injector.externalVaultAddr }}"
             {{- else }}
-              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ include "vault.namespace" . }}.svc:{{ .Values.server.service.port }}
+              value: {{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}
             {{- end }}
             - name: AGENT_INJECT_VAULT_AUTH_PATH
               value: {{ .Values.injector.authPath }}
@@ -77,9 +77,9 @@ spec:
               value: "/etc/webhook/certs/{{ .Values.injector.certs.keyName }}"
             {{- else }}
             - name: AGENT_INJECT_TLS_AUTO
-              value: {{ template "vault.fullname" . }}-agent-injector-cfg
+              value: {{ template "openbao.fullname" . }}-agent-injector-cfg
             - name: AGENT_INJECT_TLS_AUTO_HOSTS
-              value: {{ template "vault.fullname" . }}-agent-injector-svc,{{ template "vault.fullname" . }}-agent-injector-svc.{{ include "vault.namespace" . }},{{ template "vault.fullname" . }}-agent-injector-svc.{{ include "vault.namespace" . }}.svc
+              value: {{ template "openbao.fullname" . }}-agent-injector-svc,{{ template "openbao.fullname" . }}-agent-injector-svc.{{ include "openbao.namespace" . }},{{ template "openbao.fullname" . }}-agent-injector-svc.{{ include "openbao.namespace" . }}.svc
             {{- end }}
             - name: AGENT_INJECT_LOG_FORMAT
               value: {{ .Values.injector.logFormat | default "standard" }}
@@ -125,7 +125,7 @@ spec:
             - name: AGENT_INJECT_TEMPLATE_STATIC_SECRET_RENDER_INTERVAL
               value: "{{ .Values.injector.agentDefaults.templateConfig.staticSecretRenderInterval }}"
             {{- end }}
-            {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
+            {{- include "openbao.extraEnvironmentVars" .Values.injector | nindent 12 }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:

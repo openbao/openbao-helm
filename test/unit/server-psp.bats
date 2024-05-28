@@ -86,27 +86,27 @@ load _helpers
       --show-only templates/server-psp.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'global.psp.enable=true' \
-      --set 'global.psp.annotations=vault-is: amazing' \
+      --set 'global.psp.annotations=openbao-is: amazing' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openbao-is"]' | tee /dev/stderr)
   [ "${actual}" = "amazing" ]
 
   local actual=$(helm template \
       --show-only templates/server-psp.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'global.psp.enable=true' \
-      --set 'global.psp.annotations=vault-is: amazing' \
+      --set 'global.psp.annotations=openbao-is: amazing' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openbao-is"]' | tee /dev/stderr)
   [ "${actual}" = "amazing" ]
 
   local actual=$(helm template \
       --show-only templates/server-psp.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'global.psp.enable=true' \
-      --set 'global.psp.annotations=vault-is: amazing' \
+      --set 'global.psp.annotations=openbao-is: amazing' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openbao-is"]' | tee /dev/stderr)
   [ "${actual}" = "amazing" ]
 }
 
@@ -116,27 +116,27 @@ load _helpers
       --show-only templates/server-psp.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'global.psp.enable=true' \
-      --set 'global.psp.annotations.vault-is=amazing' \
+      --set 'global.psp.annotations.openbao-is=amazing' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openbao-is"]' | tee /dev/stderr)
   [ "${actual}" = "amazing" ]
 
   local actual=$(helm template \
       --show-only templates/server-psp.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'global.psp.enable=true' \
-      --set 'global.psp.annotations.vault-is=amazing' \
+      --set 'global.psp.annotations.openbao-is=amazing' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openbao-is"]' | tee /dev/stderr)
   [ "${actual}" = "amazing" ]
 
   local actual=$(helm template \
       --show-only templates/server-psp.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'global.psp.enable=true' \
-      --set 'global.psp.annotations.vault-is=amazing' \
+      --set 'global.psp.annotations.openbao-is=amazing' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openbao-is"]' | tee /dev/stderr)
   [ "${actual}" = "amazing" ]
 }
 

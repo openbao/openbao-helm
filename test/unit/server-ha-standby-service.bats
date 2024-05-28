@@ -7,9 +7,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'server.service.annotations=vaultIsAwesome: true' \
+      --set 'server.service.annotations=openBaoIsAwesome: true' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -18,9 +18,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'server.service.annotations.vaultIsAwesome=true' \
+      --set 'server.service.annotations.openBaoIsAwesome=true' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -29,9 +29,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'server.service.standby.annotations=vaultIsAwesome: true' \
+      --set 'server.service.standby.annotations=openBaoIsAwesome: true' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -40,9 +40,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'server.service.standby.annotations.vaultIsAwesome=true' \
+      --set 'server.service.standby.annotations.openBaoIsAwesome=true' \
       . | tee /dev/stderr |
-      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+      yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 @test "server/ha-standby-Service: with both annotations set" {
@@ -50,14 +50,14 @@ load _helpers
   local object=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'server.service.standby.annotations=vaultIsAwesome: true' \
-      --set 'server.service.annotations=vaultIsNotAwesome: false' \
+      --set 'server.service.standby.annotations=openBaoIsAwesome: true' \
+      --set 'server.service.annotations=openbaoIsNotAwesome: false' \
       . | tee /dev/stderr |
       yq -r '.metadata' | tee /dev/stderr)
 
-  local actual=$(echo "$object" | yq '.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  local actual=$(echo "$object" | yq '.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
-  actual=$(echo "$object" | yq '.annotations["vaultIsNotAwesome"]' | tee /dev/stderr)
+  actual=$(echo "$object" | yq '.annotations["openbaoIsNotAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
 @test "server/ha-standby-Service: disable with ha.enabled false" {
@@ -214,7 +214,7 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "server/ha-standby-Service: vault port name is http, when tlsDisable is true" {
+@test "server/ha-standby-Service: openbao port name is http, when tlsDisable is true" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
@@ -225,7 +225,7 @@ load _helpers
   [ "${actual}" = "http" ]
 }
 
-@test "server/ha-standby-Service: vault port name is https, when tlsDisable is false" {
+@test "server/ha-standby-Service: openbao port name is https, when tlsDisable is false" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \

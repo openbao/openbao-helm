@@ -186,7 +186,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "release-name-vault-agent-injector-cfg" ]
+  [ "${value}" = "release-name-openbao-agent-injector-cfg" ]
 
   # helm template does uses current context namespace and ignores namespace flags, so
   # discover the targeted namespace so we can check the rendered value correctly.
@@ -194,7 +194,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO_HOSTS")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "release-name-vault-agent-injector-svc,release-name-vault-agent-injector-svc.${namespace:-default},release-name-vault-agent-injector-svc.${namespace:-default}.svc" ]
+  [ "${value}" = "release-name-openbao-agent-injector-svc,release-name-openbao-agent-injector-svc.${namespace:-default},release-name-openbao-agent-injector-svc.${namespace:-default}.svc" ]
 }
 
 @test "injector/deployment: manual TLS adds volume mount" {
@@ -202,7 +202,7 @@ load _helpers
    local object=$(helm template \
        --show-only templates/injector-deployment.yaml  \
        --set 'injector.enabled=true' \
-       --set 'injector.certs.secretName=vault-tls' \
+       --set 'injector.certs.secretName=openbao-tls' \
        . | tee /dev/stderr |
        yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "webhook-certs")' | tee /dev/stderr)
 
@@ -219,40 +219,40 @@ load _helpers
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/injector-deployment.yaml  \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "http://vault-outside" ]
+  [ "${value}" = "http://openbao-outside" ]
 }
 
 @test "injector/deployment: with global.externalVaultAddr" {
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/injector-deployment.yaml  \
-      --set 'global.externalVaultAddr=http://vault-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "http://vault-outside" ]
+  [ "${value}" = "http://openbao-outside" ]
 }
 
 @test "injector/deployment: global.externalVaultAddr takes precendence over injector.externalVaultAddr" {
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/injector-deployment.yaml  \
-      --set 'global.externalVaultAddr=http://global-vault-outside' \
-      --set 'injector.externalVaultAddr=http://injector-vault-outside' \
+      --set 'global.externalVaultAddr=http://global-openbao-outside' \
+      --set 'injector.externalVaultAddr=http://injector-openbao-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "http://global-vault-outside" ]
+  [ "${value}" = "http://global-openbao-outside" ]
 }
 
 @test "injector/deployment: without externalVaultAddr" {
@@ -266,7 +266,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "http://not-external-test-vault.default.svc:8200" ]
+  [ "${value}" = "http://not-external-test-openbao.default.svc:8200" ]
 }
 
 @test "injector/deployment: default authPath" {

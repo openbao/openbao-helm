@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 variable "project" {
-  default = "vault-helm-dev-246514"
+  default = "openbao-helm-dev-246514"
 
   description = <<EOF
 Google Cloud Project to launch resources in. This project must have GKE

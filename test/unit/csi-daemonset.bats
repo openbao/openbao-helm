@@ -81,7 +81,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault-csi-provider" ]
+  [ "${actual}" = "release-name-openbao-csi-provider" ]
 }
 
 # Image
@@ -666,7 +666,7 @@ load _helpers
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set 'csi.enabled=true' \
-      --set 'global.externalVaultAddr=http://vault-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
@@ -682,7 +682,7 @@ load _helpers
       --set 'csi.enabled=true' \
       --set 'csi.agent.enabled=false' \
       --release-name not-external-test \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
@@ -697,13 +697,13 @@ load _helpers
       --show-only templates/csi-daemonset.yaml \
       --set 'csi.enabled=true' \
       --set 'csi.agent.enabled=false' \
-      --set 'global.externalVaultAddr=http://vault-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "http://vault-outside" ]
+  [ "${value}" = "http://openbao-outside" ]
 }
 
 #--------------------------------------------------------------------

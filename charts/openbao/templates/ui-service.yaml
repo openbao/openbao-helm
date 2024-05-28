@@ -3,22 +3,22 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{ template "vault.mode" . }}
+{{ template "openbao.mode" . }}
 {{- if ne .mode "external" }}
-{{- template "vault.uiEnabled" . -}}
+{{- template "openbao.uiEnabled" . -}}
 {{- if .uiEnabled -}}
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "vault.fullname" . }}-ui
-  namespace: {{ include "vault.namespace" . }}
+  name: {{ template "openbao.fullname" . }}-ui
+  namespace: {{ include "openbao.namespace" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}-ui
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}-ui
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-  {{- template "vault.ui.annotations" . }}
+  {{- template "openbao.ui.annotations" . }}
 spec:
   {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
   {{- if .Values.ui.serviceIPFamilyPolicy }}
@@ -29,15 +29,15 @@ spec:
   {{- end }}
   {{- end }}
   selector:
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
-    {{- if and (.Values.ui.activeVaultPodOnly) (eq .mode "ha") }}
-    vault-active: "true"
+    {{- if and (.Values.ui.activeOpenbaoPodOnly) (eq .mode "ha") }}
+    openbao-active: "true"
     {{- end }}
   publishNotReadyAddresses: {{ .Values.ui.publishNotReadyAddresses }}
   ports:
-    - name: {{ include "vault.scheme" . }}
+    - name: {{ include "openbao.scheme" . }}
       port: {{ .Values.ui.externalPort }}
       targetPort: {{ .Values.ui.targetPort }}
       {{- if .Values.ui.serviceNodePort }}

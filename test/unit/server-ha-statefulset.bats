@@ -27,7 +27,7 @@ load _helpers
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-statefulset.yaml  \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       --set 'server.ha.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -266,7 +266,7 @@ load _helpers
 
   local actual=$(echo $object |
       yq -r '.mountPath' | tee /dev/stderr)
-  [ "${actual}" = "/vault/userconfig/foo" ]
+  [ "${actual}" = "/openbao/userconfig/foo" ]
 }
 
 @test "server/ha-StatefulSet: adds extra volume custom mount path" {
@@ -347,7 +347,7 @@ load _helpers
 
   local actual=$(echo $object |
       yq -r '.mountPath' | tee /dev/stderr)
-  [ "${actual}" = "/vault/userconfig/foo" ]
+  [ "${actual}" = "/openbao/userconfig/foo" ]
 }
 
 #--------------------------------------------------------------------
@@ -450,7 +450,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="VAULT_CLUSTER_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = 'https://$(HOSTNAME).release-name-vault-internal:8201' ]
+  [ "${value}" = 'https://$(HOSTNAME).release-name-openbao-internal:8201' ]
 }
 
 @test "server/ha-StatefulSet: clusterAddr set to null" {
@@ -465,7 +465,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="VAULT_CLUSTER_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = 'https://$(HOSTNAME).release-name-vault-internal:8201' ]
+  [ "${value}" = 'https://$(HOSTNAME).release-name-openbao-internal:8201' ]
 }
 
 @test "server/ha-StatefulSet: clusterAddr set to custom url" {
@@ -489,18 +489,18 @@ load _helpers
       --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.ha.raft.enabled=true' \
-       --set 'server.ha.clusterAddr=http://$(HOSTNAME).release-name-vault-internal:8201' \
+       --set 'server.ha.clusterAddr=http://$(HOSTNAME).release-name-openbao-internal:8201' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="VAULT_CLUSTER_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = 'http://$(HOSTNAME).release-name-vault-internal:8201' ]
+  [ "${value}" = 'http://$(HOSTNAME).release-name-openbao-internal:8201' ]
 }
 
 @test "server/ha-StatefulSet: clusterAddr gets quoted" {
   cd `chart_dir`
-  local customUrl='http://$(HOSTNAME).release-name-vault-internal:8201'
+  local customUrl='http://$(HOSTNAME).release-name-openbao-internal:8201'
   local rendered=$(helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
@@ -511,7 +511,7 @@ load _helpers
 
 local value=$(echo $rendered |
       yq -Y '.' | tee /dev/stderr)
-  [ "${value}" = 'value: "http://$(HOSTNAME).release-name-vault-internal:8201"' ]
+  [ "${value}" = 'value: "http://$(HOSTNAME).release-name-openbao-internal:8201"' ]
 }
 
 #--------------------------------------------------------------------

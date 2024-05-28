@@ -28,7 +28,7 @@ load _helpers
       --set 'server.serviceAccount.createSecret=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault-token" ]
+  [ "${actual}" = "release-name-openbao-token" ]
 
 }
 
@@ -50,7 +50,7 @@ load _helpers
       --set 'server.serviceAccount.createSecret=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["kubernetes.io/service-account.name"]' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault" ]
+  [ "${actual}" = "release-name-openbao" ]
 
 }
 

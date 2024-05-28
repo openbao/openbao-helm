@@ -10,10 +10,10 @@ SPDX-License-Identifier: MPL-2.0
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ template "vault.fullname" . }}
+  name: {{ template "openbao.fullname" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{- /* update the selectors docs in values.yaml whenever the defaults below change. */ -}}
@@ -25,7 +25,7 @@ metadata:
     {{- end }}
 spec:
   groups:
-  - name: {{ include "vault.fullname" . }}
+  - name: {{ include "openbao.fullname" . }}
     rules:
       {{- toYaml .Values.serverTelemetry.prometheusRules.rules | nindent 6 }}
 {{- end }}

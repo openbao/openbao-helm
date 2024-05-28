@@ -32,7 +32,7 @@ load _helpers
 
   [ "$(echo "$output" | yq -r '.spec.groups | length')" = "1" ]
   [ "$(echo "$output" | yq -r '.spec.groups[0] | length')" = "2" ]
-  [ "$(echo "$output" | yq -r '.spec.groups[0].name')" = "release-name-vault" ]
+  [ "$(echo "$output" | yq -r '.spec.groups[0].name')" = "release-name-openbao" ]
   [ "$(echo "$output" | yq -r '.spec.groups[0].rules | length')" = "2" ]
   [ "$(echo "$output" | yq -r '.spec.groups[0].rules[0].foo')" = "bar" ]
   [ "$(echo "$output" | yq -r '.spec.groups[0].rules[1].baz')" = "qux" ]

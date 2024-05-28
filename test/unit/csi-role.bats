@@ -18,7 +18,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault-csi-provider-role" ]
+  [ "${actual}" = "release-name-openbao-csi-provider-role" ]
   local actual=$(helm template \
       --show-only templates/csi-role.yaml \
       --set "csi.enabled=true" \

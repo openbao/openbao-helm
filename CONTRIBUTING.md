@@ -86,7 +86,7 @@ Next, execute the tests with the following commands:
 ```shell
 docker run -it --rm -v "${PWD}:/test" openbao-helm-test bats /test/test/unit
 ```
-It's possible to only run specific bats tests using regular expressions. 
+It's possible to only run specific bats tests using regular expressions.
 For example, the following will run only tests with "injector" in the name:
 ```shell
 docker run -it --rm -v "${PWD}:/test" openbao-helm-test bats /test/test/unit -f "injector"
@@ -123,7 +123,7 @@ may not be properly cleaned up. We recommend recycling the Kubernetes cluster to
 start from a clean slate.
 
 **Note:** There is a Terraform configuration in the
-[`test/terraform/`](https://github.com/hashicorp/vault-helm/tree/main/test/terraform) directory
+[`test/terraform/`](https://github.com/openbao/openbao-helm/tree/main/test/terraform) directory
 that can be used to quickly bring up a GKE cluster and configure
 `kubectl` and `helm` locally. This can be used to quickly spin up a test
 cluster for acceptance tests. Unit tests _do not_ require a running Kubernetes

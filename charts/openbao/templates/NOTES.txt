@@ -2,7 +2,7 @@
 Thank you for installing OpenBao!
 
 Now that you have deployed OpenBao, you should look over the docs on using
-Vault with Kubernetes available here:
+OpenBao with Kubernetes available here:
 
 https://openbao.org/docs/
 

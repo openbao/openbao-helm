@@ -17,7 +17,7 @@ load _helpers
     --from-file ./test/acceptance/injector-test/pgdump-policy.hcl \
     --from-file ./test/acceptance/injector-test/bootstrap.sh
 
-  kubectl label secret test app=vault-agent-demo
+  kubectl label secret test app=openbao-agent-demo
 
   helm install "$(name_prefix)" \
     --set="server.extraVolumes[0].type=secret" \

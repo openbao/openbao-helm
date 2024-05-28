@@ -70,7 +70,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/ui-service.yaml  \
       --set 'server.dev.enabled=true' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -78,7 +78,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/ui-service.yaml  \
       --set 'server.ha.enabled=true' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -86,7 +86,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/ui-service.yaml  \
       --set 'server.standalone.enabled=true' \
-      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'injector.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -311,7 +311,7 @@ load _helpers
       --show-only templates/ui-service.yaml  \
       --set 'ui.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.selector["vault-active"]' | tee /dev/stderr)
+      yq -r '.spec.selector["openbao-active"]' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
 
@@ -320,19 +320,19 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/ui-service.yaml  \
       --set 'ui.enabled=true' \
-      --set 'ui.activeVaultPodOnly=true' \
+      --set 'ui.activeOpenbaoPodOnly=true' \
       --set 'server.dev.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.selector["vault-active"]' | tee /dev/stderr)
+      yq -r '.spec.selector["openbao-active"]' | tee /dev/stderr)
   [ "${actual}" = 'null' ]
 
   local actual=$(helm template \
       --show-only templates/ui-service.yaml  \
       --set 'ui.enabled=true' \
-      --set 'ui.activeVaultPodOnly=true' \
+      --set 'ui.activeOpenbaoPodOnly=true' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.selector["vault-active"]' | tee /dev/stderr)
+      yq -r '.spec.selector["openbao-active"]' | tee /dev/stderr)
   [ "${actual}" = 'true' ]
 }
 

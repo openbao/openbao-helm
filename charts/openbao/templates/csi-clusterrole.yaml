@@ -3,14 +3,14 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{- template "vault.csiEnabled" . -}}
+{{- template "openbao.csiEnabled" . -}}
 {{- if .csiEnabled -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ template "vault.fullname" . }}-csi-provider-clusterrole
+  name: {{ template "openbao.fullname" . }}-csi-provider-clusterrole
   labels:
-    app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
+    app.kubernetes.io/name: {{ include "openbao.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 rules:

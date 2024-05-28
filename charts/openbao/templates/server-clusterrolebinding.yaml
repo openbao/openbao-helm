@@ -3,7 +3,7 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{ template "vault.serverAuthDelegator" . }}
+{{ template "openbao.serverAuthDelegator" . }}
 {{- if .serverAuthDelegator -}}
 {{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" -}}
 apiVersion: rbac.authorization.k8s.io/v1
@@ -12,10 +12,10 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 {{- end }}
 kind: ClusterRoleBinding
 metadata:
-  name: {{ template "vault.fullname" . }}-server-binding
+  name: {{ template "openbao.fullname" . }}-server-binding
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 roleRef:
@@ -24,6 +24,6 @@ roleRef:
   name: system:auth-delegator
 subjects:
 - kind: ServiceAccount
-  name: {{ template "vault.serviceAccount.name" . }}
-  namespace: {{ include "vault.namespace" . }}
+  name: {{ template "openbao.serviceAccount.name" . }}
+  namespace: {{ include "openbao.namespace" . }}
 {{ end }}
