@@ -9,9 +9,9 @@ assignees: ''
 
 <!-- Please reserve GitHub issues for bug reports and feature requests.
 
-For questions, the best place to get answers is on our [discussion forum](https://discuss.hashicorp.com/c/vault), as they will get more visibility from experienced users than the issue tracker.
-
-Please note: We take Vault's security and our users' trust very seriously. If you believe you have found a security issue in OpenBao Helm, _please responsibly disclose_ by contacting us at [openbao-security@lists.lfedge.org](mailto:openbao-security@lists.lfedge.org).
+**Please note**: We take OpenBao's security and our users' trust very seriously. If
+you believe you have found a security issue in OpenBao Helm, _please responsibly disclose_
+by contacting us at [openbao-security@lists.lfedge.org](mailto:openbao-security@lists.lfedge.org).
 
 -->
 
@@ -21,19 +21,19 @@ A clear and concise description of what the bug is.
 **To Reproduce**
 Steps to reproduce the behavior:
 1. Install chart
-2. Run vault command
-3. See error (vault logs, etc.)
+2. Run bao command
+3. See error (openbao logs, etc.)
 
-Other useful info to include: vault pod logs, `kubectl describe statefulset vault` and `kubectl get statefulset vault -o yaml` output
+Other useful info to include: openbao pod logs, `kubectl describe statefulset openbao` and `kubectl get statefulset openbao -o yaml` output
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
 **Environment**
-* Kubernetes version: 
+* Kubernetes version:
   * Distribution or cloud vendor (OpenShift, EKS, GKE, AKS, etc.):
   * Other configuration options or runtime services (istio, etc.):
-* vault-helm version:
+* openbao-helm version:
 
 Chart values:
 
