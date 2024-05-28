@@ -196,7 +196,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].args[2]' | tee /dev/stderr)
-  [ "${actual}" = "--hmac-secret-name=vault-csi-provider-hmac-key" ]
+  [ "${actual}" = "--hmac-secret-name=openbao-csi-provider-hmac-key" ]
 
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
@@ -688,7 +688,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "http://not-external-test-vault.default.svc:8200" ]
+  [ "${value}" = "http://not-external-test-openbao.default.svc:8200" ]
 }
 
 @test "csi/daemonset: with global.externalVaultAddr" {

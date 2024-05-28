@@ -24,7 +24,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.rules[0].resourceNames[0]' | tee /dev/stderr)
-  [ "${actual}" = "vault-csi-provider-hmac-key" ]
+  [ "${actual}" = "openbao-csi-provider-hmac-key" ]
 }
 
 @test "csi/Role: namespace" {
