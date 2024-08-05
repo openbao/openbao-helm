@@ -473,7 +473,7 @@ server:
 
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
-  # method. See https://developer.hashicorp.com/vault/docs/auth/kubernetes
+  # method. See https://openbao.org/docs/auth/kubernetes
   authDelegator:
     enabled: true
 
@@ -764,7 +764,7 @@ server:
 
   # This configures the OpenBao Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.
-  # See https://developer.hashicorp.com/vault/docs/configuration/storage to know more
+  # See https://openbao.org/docs/configuration/storage to know more
   dataStorage:
     enabled: true
     # Size of the PVC created
@@ -793,7 +793,7 @@ server:
   # logs.  Once OpenBao is deployed, initialized, and unsealed, OpenBao must
   # be configured to use this for audit logs.  This will be mounted to
   # /openbao/audit
-  # See https://developer.hashicorp.com/vault/docs/audit to know more
+  # See https://openbao.org/docs/audit to know more
   auditStorage:
     enabled: false
     # Size of the PVC created
@@ -814,7 +814,7 @@ server:
   # and no initialization. This is useful for experimenting with OpenBao without
   # needing to unseal, store keys, et. al. All data is lost on restart - do not
   # use dev mode for anything other than experimenting.
-  # See https://developer.hashicorp.com/vault/docs/concepts/dev-server to know more
+  # See https://openbao.org/docs/concepts/dev-server to know more
   dev:
     enabled: false
 
@@ -836,7 +836,7 @@ server:
     # Note: Configuration files are stored in ConfigMaps so sensitive data
     # such as passwords should be either mounted through extraSecretEnvironmentVars
     # or through a Kube secret.  For more information see:
-    # https://developer.hashicorp.com/vault/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+    # https://openbao.org/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
     config: |
       ui = true
 
@@ -879,12 +879,12 @@ server:
     replicas: 3
 
     # Set the api_addr configuration for OpenBao HA
-    # See https://developer.hashicorp.com/vault/docs/configuration#api_addr
+    # See https://openbao.org/docs/configuration#api_addr
     # If set to null, this will be set to the Pod IP Address
     apiAddr: null
 
     # Set the cluster_addr confuguration for OpenBao HA
-    # See https://developer.hashicorp.com/vault/docs/configuration#cluster_addr
+    # See https://openbao.org/docs/configuration#cluster_addr
     # If set to null, this will be set to https://$(HOSTNAME).{{ template "openbao.fullname" . }}-internal:8201
     clusterAddr: null
 
@@ -902,7 +902,7 @@ server:
       # Note: Configuration files are stored in ConfigMaps so sensitive data
       # such as passwords should be either mounted through extraSecretEnvironmentVars
       # or through a Kube secret.  For more information see:
-      # https://developer.hashicorp.com/vault/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+      # https://openbao.org/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
       config: |
         ui = true
 
@@ -929,7 +929,7 @@ server:
     # Note: Configuration files are stored in ConfigMaps so sensitive data
     # such as passwords should be either mounted through extraSecretEnvironmentVars
     # or through a Kube secret.  For more information see:
-    # https://developer.hashicorp.com/vault/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+    # https://openbao.org/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
     config: |
       ui = true
 
@@ -996,7 +996,7 @@ server:
     extraLabels: {}
     # Enable or disable a service account role binding with the permissions required for
     # OpenBao's Kubernetes service_registration config option.
-    # See https://developer.hashicorp.com/vault/docs/configuration/service-registration/kubernetes
+    # See https://openbao.org/docs/configuration/service-registration/kubernetes
     serviceDiscovery:
       enabled: true
 
@@ -1241,7 +1241,7 @@ csi:
   debug: false
 
   # Pass arbitrary additional arguments to vault-csi-provider.
-  # See https://developer.hashicorp.com/vault/docs/platform/k8s/csi/configurations#command-line-arguments
+  # See https://openbao.org/docs/platform/k8s/csi/configurations#command-line-arguments
   # for the available command line flags.
   extraArgs: []
 
@@ -1250,8 +1250,8 @@ csi:
 # the OpenBao configuration. There are a few examples included in the `config` sections above.
 #
 # For more information see:
-# https://developer.hashicorp.com/vault/docs/configuration/telemetry
-# https://developer.hashicorp.com/vault/docs/internals/telemetry
+# https://openbao.org/docs/configuration/telemetry
+# https://openbao.org/docs/internals/telemetry
 serverTelemetry:
   # Enable support for the Prometheus Operator. Currently, this chart does not support
   # authenticating to OpenBao's metrics endpoint, so the following `telemetry{}` must be included
