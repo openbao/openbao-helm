@@ -117,9 +117,9 @@ spec:
           ports:
             - containerPort: 8200
           env:
-            - name: VAULT_LOG_LEVEL
+            - name: BAO_LOG_LEVEL
               value: "{{ .Values.csi.agent.logLevel }}"
-            - name: VAULT_LOG_FORMAT
+            - name: BAO_LOG_FORMAT
               value: "{{ .Values.csi.agent.logFormat }}"
           securityContext:
             runAsNonRoot: true
