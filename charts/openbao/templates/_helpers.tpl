@@ -1075,7 +1075,6 @@ config file from values
   {{- if or (eq .mode "ha") (eq .mode "standalone") }}
   {{- $type := typeOf (index .Values.server .mode).config }}
   {{- if eq $type "string" }}
-    disable_mlock = true
   {{- if eq .mode "standalone" }}
     {{ tpl .Values.server.standalone.config . | nindent 4 | trim }}
   {{- else if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "false") }}
@@ -1085,9 +1084,9 @@ config file from values
   {{ end }}
   {{- else }}
   {{- if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
-{{ merge (dict "disable_mlock" true) (index .Values.server .mode).raft.config | toPrettyJson | indent 4 }}
+{{ (index .Values.server .mode).raft.config | toPrettyJson | indent 4 }}
   {{- else }}
-{{ merge (dict "disable_mlock" true) (index .Values.server .mode).config | toPrettyJson | indent 4 }}
+{{ (index .Values.server .mode).config | toPrettyJson | indent 4 }}
   {{- end }}
   {{- end }}
   {{- end }}
