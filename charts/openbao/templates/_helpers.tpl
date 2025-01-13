@@ -448,7 +448,7 @@ Sets extra pod annotations
 */}}
 {{- define "openbao.annotations" }}
       annotations:
-  {{- if .Values.server.includeConfigAnnotation }}
+  {{- if .Values.server.configAnnotation }}
         openbao.hashicorp.com/config-checksum: {{ include "openbao.config" . | sha256sum }}
   {{- end }}
   {{- if .Values.server.annotations }}

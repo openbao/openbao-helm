@@ -18,7 +18,7 @@ metadata:
     app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.server.includeConfigAnnotation }}
+{{- if .Values.server.configAnnotation }}
   annotations:
     vault.hashicorp.com/config-checksum: {{ include "openbao.config" . | sha256sum }}
 {{- end }}
