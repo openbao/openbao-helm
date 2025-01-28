@@ -6,7 +6,7 @@ setup_file() {
     cd `chart_dir`
     export VERIFY_OUTPUT="/$BATS_RUN_TMPDIR/verify.json"
     export CHART_VOLUME=openbao-helm-chart-src
-    local IMAGE="quay.io/redhat-certification/chart-verifier:1.13.7"
+    local IMAGE="quay.io/redhat-certification/chart-verifier:1.13.9"
     # chart-verifier requires an openshift version if a cluster isn't available
     local OPENSHIFT_VERSION="4.12"
     local DISABLED_TESTS="chart-testing"
