@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![AppVersion: v2.1.0](https://img.shields.io/badge/AppVersion-v2.1.0-informational?style=flat-square)
+![Version: 0.8.0](https://img.shields.io/badge/Version-0.8.0-informational?style=flat-square) ![AppVersion: v2.1.1](https://img.shields.io/badge/AppVersion-v2.1.1-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -18,7 +18,7 @@ Official OpenBao Chart
 
 ## Requirements
 
-Kubernetes: `>= 1.29.0-0`
+Kubernetes: `>= 1.30.0-0`
 
 ## Values
 
