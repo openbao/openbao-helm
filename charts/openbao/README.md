@@ -18,7 +18,7 @@ Official OpenBao Chart
 
 ## Requirements
 
-Kubernetes: `>= 1.30.0-0`
+Kubernetes: `>= 1.30.0`
 
 ## Values
 
@@ -29,7 +29,7 @@ Kubernetes: `>= 1.30.0-0`
 | csi.agent.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for agent image. if tag is "latest", set to "Always" |
 | csi.agent.image.registry | string | `"quay.io"` | image registry to use for agent image |
 | csi.agent.image.repository | string | `"openbao/openbao"` | image repo to use for agent image |
-| csi.agent.image.tag | string | `"2.1.0"` | image tag to use for agent image |
+| csi.agent.image.tag | string | `"2.1.1"` | image tag to use for agent image |
 | csi.agent.logFormat | string | `"standard"` |  |
 | csi.agent.logLevel | string | `"info"` |  |
 | csi.agent.resources | object | `{}` |  |
@@ -87,11 +87,11 @@ Kubernetes: `>= 1.30.0-0`
 | injector.agentDefaults.template | string | `"map"` |  |
 | injector.agentDefaults.templateConfig.exitOnRetryFailure | bool | `true` |  |
 | injector.agentDefaults.templateConfig.staticSecretRenderInterval | string | `""` |  |
-| injector.agentImage | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"openbao/openbao","tag":"2.1.0"}` | agentImage sets the repo and tag of the OpenBao image to use for the OpenBao Agent containers.  This should be set to the official OpenBao image.  OpenBao 1.3.1+ is required. |
+| injector.agentImage | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"openbao/openbao","tag":"2.1.1"}` | agentImage sets the repo and tag of the OpenBao image to use for the OpenBao Agent containers.  This should be set to the official OpenBao image.  OpenBao 1.3.1+ is required. |
 | injector.agentImage.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for agent image. if tag is "latest", set to "Always" |
 | injector.agentImage.registry | string | `"quay.io"` | image registry to use for agent image |
 | injector.agentImage.repository | string | `"openbao/openbao"` | image repo to use for agent image |
-| injector.agentImage.tag | string | `"2.1.0"` | image tag to use for agent image |
+| injector.agentImage.tag | string | `"2.1.1"` | image tag to use for agent image |
 | injector.annotations | object | `{}` |  |
 | injector.authPath | string | `"auth/kubernetes"` |  |
 | injector.certs.caBundle | string | `""` |  |
@@ -194,7 +194,7 @@ Kubernetes: `>= 1.30.0-0`
 | server.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for server image. if tag is "latest", set to "Always" |
 | server.image.registry | string | `"quay.io"` | image registry to use for server image |
 | server.image.repository | string | `"openbao/openbao"` | image repo to use for server image |
-| server.image.tag | string | `"2.1.0"` | image tag to use for server image |
+| server.image.tag | string | `"2.1.1"` | image tag to use for server image |
 | server.ingress.activeService | bool | `true` |  |
 | server.ingress.annotations | object | `{}` |  |
 | server.ingress.enabled | bool | `false` |  |
