@@ -14,13 +14,13 @@ injector:
   agentImage:
     registry: "quay.io"
     repository: "openbao/openbao"
-    tag: "v2.1.1-ubi"
+    tag: "v2.2.0-ubi"
 
 server:
   image:
     registry: "quay.io"
     repository: "openbao/openbao"
-    tag: "v2.1.1-ubi"
+    tag: "v2.2.0-ubi"
 
   readinessProbe:
     path: "/v1/sys/health?uninitcode=204"
