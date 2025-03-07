@@ -1261,7 +1261,7 @@ csi:
 # https://openbao.org/docs/internals/telemetry
 serverTelemetry:
   # Enable support for the Prometheus Operator. If authorization is not required for
-  # Openbao's metrics endpoint, the following Openbao server `telemetry{}` config must be included
+  # OpenBao's metrics endpoint, the following OpenBao server `telemetry{}` config must be included
   # in the `listener "tcp"{}` stanza
   #  telemetry {
   #    unauthenticated_metrics_access = "true"
