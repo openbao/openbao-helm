@@ -1260,8 +1260,8 @@ csi:
 # https://openbao.org/docs/configuration/telemetry
 # https://openbao.org/docs/internals/telemetry
 serverTelemetry:
-  # Enable support for the Prometheus Operator. Currently, this chart does not support
-  # authenticating to OpenBao's metrics endpoint, so the following `telemetry{}` must be included
+  # Enable support for the Prometheus Operator. If authorization is not required for
+  # Openbao's metrics endpoint, the following Openbao server `telemetry{}` config must be included
   # in the `listener "tcp"{}` stanza
   #  telemetry {
   #    unauthenticated_metrics_access = "true"
@@ -1302,6 +1302,12 @@ serverTelemetry:
 
     # Timeout for Prometheus scrapes
     scrapeTimeout: 10s
+
+    # tlsConfig used for scraping the Vault metrics API.
+    tlsConfig: {}
+
+    # authorization used for scraping the Vault metrics API.
+    authorization: {}
 
   prometheusRules:
     # The Prometheus operator *must* be installed before enabling this feature,
