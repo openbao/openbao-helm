@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square) ![AppVersion: v2.2.0](https://img.shields.io/badge/AppVersion-v2.2.0-informational?style=flat-square)
+![Version: 0.10.1](https://img.shields.io/badge/Version-0.10.1-informational?style=flat-square) ![AppVersion: v2.2.0](https://img.shields.io/badge/AppVersion-v2.2.0-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -18,7 +18,7 @@ Official OpenBao Chart
 
 ## Requirements
 
-Kubernetes: `>= 1.30.0`
+Kubernetes: `>= 1.30.0-0`
 
 ## Values
 
@@ -276,10 +276,12 @@ Kubernetes: `>= 1.30.0`
 | serverTelemetry.prometheusRules.enabled | bool | `false` |  |
 | serverTelemetry.prometheusRules.rules | list | `[]` |  |
 | serverTelemetry.prometheusRules.selectors | object | `{}` |  |
+| serverTelemetry.serviceMonitor.authorization | object | `{}` |  |
 | serverTelemetry.serviceMonitor.enabled | bool | `false` |  |
 | serverTelemetry.serviceMonitor.interval | string | `"30s"` |  |
 | serverTelemetry.serviceMonitor.scrapeTimeout | string | `"10s"` |  |
 | serverTelemetry.serviceMonitor.selectors | object | `{}` |  |
+| serverTelemetry.serviceMonitor.tlsConfig | object | `{}` |  |
 | ui.activeOpenbaoPodOnly | bool | `false` |  |
 | ui.annotations | object | `{}` |  |
 | ui.enabled | bool | `false` |  |
