@@ -140,12 +140,26 @@ Add a special case for replicas=1, where it should default to 0 as well.
 {{- end -}}
 
 {{/*
+Resolve the external OpenBao/Vault address by checking global and injector values in order of precedence:
+1. global.externalBaoAddr
+2. global.externalVaultAddr 
+*/}}
+
+{{- define "openbao.externalAddr" -}}
+  {{- if .Values.global.externalBaoAddr -}}
+    {{- .Values.global.externalBaoAddr -}}
+  {{- else -}}
+    {{- .Values.global.externalVaultAddr -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
 Set the variable 'mode' to the server mode requested by the user to simplify
 template logic.
 */}}
 {{- define "openbao.mode" -}}
   {{- template "openbao.serverEnabled" . -}}
-  {{- if or (.Values.injector.externalVaultAddr) (.Values.global.externalVaultAddr) -}}
+  {{- if or (.Values.injector.externalVaultAddr) (.Values.global.externalVaultAddr) (.Values.global.externalBaoAddr) -}}
     {{- $_ := set . "mode" "external" -}}
   {{- else if not .serverEnabled -}}
     {{- $_ := set . "mode" "external" -}}
