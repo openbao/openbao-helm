@@ -18,8 +18,8 @@ metadata:
 data:
   config.hcl: |
     vault {
-        {{- if .Values.global.externalVaultAddr }}
-        "address" = "{{ .Values.global.externalVaultAddr }}"
+        {{- if include "openbao.externalAddr" . }}
+        "address" = "{{ include "openbao.externalAddr" . }}"
         {{- else }}
         "address" = "{{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}"
         {{- end }}
