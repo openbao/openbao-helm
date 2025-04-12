@@ -62,3 +62,26 @@ load _helpers
       yq -r '.data["config.hcl"]' | tee /dev/stderr)
   echo "${actual}" | grep "http://openbao-outside"
 }
+
+@test "csi/Agent-ConfigMap: OpenBao addr correctly set for externalBaoAddr" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-agent-configmap.yaml \
+      --set "csi.enabled=true" \
+      --set 'global.externalBaoAddr=http://openbao-outside' \
+      . | tee /dev/stderr |
+      yq -r '.data["config.hcl"]' | tee /dev/stderr)
+  echo "${actual}" | grep "http://openbao-outside"
+}
+
+@test "csi/Agent-ConfigMap: OpenBao addr correctly set for externalBaoAddr, verify if externalBaoAddr takes precendece over externalVaultAddr" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-agent-configmap.yaml \
+      --set "csi.enabled=true" \
+      --set 'global.externalBaoAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://vault-outside' \
+      . | tee /dev/stderr |
+      yq -r '.data["config.hcl"]' | tee /dev/stderr)
+  echo "${actual}" | grep "http://openbao-outside"
+}
