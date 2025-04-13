@@ -14,7 +14,7 @@ LOCAL_ACCEPTANCE_TESTS?=false
 KIND_CLUSTER_NAME?=openbao-helm
 
 # kind k8s version
-KIND_K8S_VERSION?=v1.29.2
+KIND_K8S_VERSION?=v1.30.10
 
 # Generate json schema for chart values. See test/README.md for more details.
 values-schema:
