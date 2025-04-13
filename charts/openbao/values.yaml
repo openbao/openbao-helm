@@ -22,8 +22,9 @@ global:
 
   # -- External openbao server address for the injector and CSI provider to use.
   # Setting this will disable deployment of a openbao server.
-  externalVaultAddr: "" # -- Deprecated: Please use global.externalBaoAddr instead.
   externalBaoAddr: "" 
+  # -- Deprecated: Please use global.externalBaoAddr instead.
+  externalVaultAddr: ""
 
   # -- If deploying to OpenShift
   openshift: false
