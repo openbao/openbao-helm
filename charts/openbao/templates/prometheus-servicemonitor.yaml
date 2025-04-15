@@ -23,6 +23,9 @@ metadata:
     release: prometheus
     {{- end }}
 spec:
+  {{- if .Values.serverTelemetry.serviceMonitor.scrapeClass }}
+  scrapeClass: {{ .Values.serverTelemetry.serviceMonitor.scrapeClass }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "openbao.name" . }}
