@@ -22,6 +22,8 @@ global:
 
   # -- External openbao server address for the injector and CSI provider to use.
   # Setting this will disable deployment of a openbao server.
+  externalBaoAddr: ""
+  # -- Deprecated: Please use global.externalBaoAddr instead.
   externalVaultAddr: ""
 
   # -- If deploying to OpenShift
@@ -61,7 +63,7 @@ injector:
   metrics:
     enabled: false
 
-  # -- Deprecated: Please use global.externalVaultAddr instead.
+  # -- Deprecated: Please use global.externalBaoAddr instead.
   externalVaultAddr: ""
 
   # image sets the repo and tag of the vault-k8s image to use for the injector.

@@ -234,6 +234,9 @@
                 "externalVaultAddr": {
                     "type": "string"
                 },
+                "externalBaoAddr": {
+                    "type": "string"
+                },
                 "imagePullSecrets": {
                     "type": "array"
                 },

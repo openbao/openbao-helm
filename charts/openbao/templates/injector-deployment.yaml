@@ -59,8 +59,8 @@ spec:
             - name: AGENT_INJECT_LOG_LEVEL
               value: {{ .Values.injector.logLevel | default "info" }}
             - name: AGENT_INJECT_VAULT_ADDR
-            {{- if .Values.global.externalVaultAddr }}
-              value: "{{ .Values.global.externalVaultAddr }}"
+            {{- if include "openbao.externalAddr" . }}
+              value: "{{ include "openbao.externalAddr" . }}"
             {{- else if .Values.injector.externalVaultAddr }}
               value: "{{ .Values.injector.externalVaultAddr }}"
             {{- else }}

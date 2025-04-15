@@ -661,12 +661,26 @@ load _helpers
   [ "${value}" = "unix:///var/run/vault/agent.sock" ]
 }
 
-@test "csi/daemonset: VAULT_ADDR remains pointed to Agent unix socket if external Vault" {
+@test "csi/daemonset: VAULT_ADDR remains pointed to Agent unix socket if external Vault, using externalVaultAddr" {
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set 'csi.enabled=true' \
       --set 'global.externalVaultAddr=http://openbao-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "unix:///var/run/vault/agent.sock" ]
+}
+
+@test "csi/daemonset: VAULT_ADDR remains pointed to Agent unix socket if external Vault, using externalBaoAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'global.externalBaoAddr=http://openbao-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
@@ -698,6 +712,37 @@ load _helpers
       --set 'csi.enabled=true' \
       --set 'csi.agent.enabled=false' \
       --set 'global.externalVaultAddr=http://openbao-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://openbao-outside" ]
+}
+
+@test "csi/daemonset: with global.externalBaoAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.enabled=false' \
+      --set 'global.externalBaoAddr=http://openbao-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://openbao-outside" ]
+}
+
+@test "csi/daemonset: with global.externalBaoAddr, verify if global.externalBaoAddr takes precendece over global.externalVaultAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.enabled=false' \
+      --set 'global.externalBaoAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://vault-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
