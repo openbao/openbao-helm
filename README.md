@@ -1,8 +1,8 @@
 # OpenBao Helm Chart
 
 > :warning: **Please note**: We take OpenBao's security and our users' trust very seriously. If
-you believe you have found a security issue in OpenBao Helm, _please responsibly disclose_
-by contacting us at [openbao-security@lists.lfedge.org](mailto:openbao-security@lists.lfedge.org).
+> you believe you have found a security issue in OpenBao Helm, _please responsibly disclose_
+> by contacting us at [openbao-security@lists.lfedge.org](mailto:openbao-security@lists.lfedge.org).
 
 This repository contains the OpenBao Helm chart for installing
 and configuring OpenBao on Kubernetes. This chart supports multiple use
@@ -16,10 +16,10 @@ this README. Please refer to the Kubernetes and Helm documentation.
 
 The versions required are:
 
-  * **Helm 3.12+** - Earliest verison tested
-  * **Kubernetes 1.29+** - This is the earliest version of Kubernetes tested.
-    It is possible that this chart works with earlier versions but it is
-    untested.
+- **Helm 3.12+** - Earliest verison tested
+- **Kubernetes 1.30+** - This is the earliest version of Kubernetes tested.
+  It is possible that this chart works with earlier versions but it is
+  untested.
 
 ## Usage
 
