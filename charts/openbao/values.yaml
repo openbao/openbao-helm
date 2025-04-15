@@ -1309,6 +1309,9 @@ serverTelemetry:
     # authorization used for scraping the Vault metrics API.
     authorization: {}
 
+    # scrapeClass to be used by the serviceMonitor
+    scrapeClass: ""
+
   prometheusRules:
     # The Prometheus operator *must* be installed before enabling this feature,
     # if not the chart will fail to install due to missing CustomResourceDefinitions

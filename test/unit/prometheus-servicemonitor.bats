@@ -167,3 +167,14 @@ load _helpers
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].authorization.credentials.key')" = "secretkey" ]
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].authorization.credentials.name')" = "secretname" ]
 }
+
+@test "prometheus/ServiceMonitor-server: scrapeClass set" {
+  cd `chart_dir`
+  local output=$( (helm template \
+    --show-only templates/prometheus-servicemonitor.yaml \
+    --set 'serverTelemetry.serviceMonitor.enabled=true' \
+    --set 'serverTelemetry.serviceMonitor.scrapeClass=foo' \
+    .) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.scrapeClass')" = "foo" ]
+}
