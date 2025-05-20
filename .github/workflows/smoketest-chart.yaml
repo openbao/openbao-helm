@@ -1,0 +1,117 @@
+name: Helm Chart Smoketest
+
+on: [push, workflow_dispatch, pull_request]
+
+env:
+  K8S_VERSION: v1.32.3
+  MICROK8S_CHANNEL: 1.32/stable
+
+jobs:
+  helm-install-smoke-test:
+    permissions: {}
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        config:
+          - {
+              type: "kind"
+            }
+          - {
+              type: "minikube"
+            }
+          - {
+              type: "microk8s"
+            }
+          - {
+              type: "k3d"
+            }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install helm
+        uses: Azure/setup-helm@v4
+        with:
+          version: v3.18.0
+
+      # Note: 'uses' doesn't support variable interpolation, hence the
+      # k8s-specific steps below.
+      # Ref: https://github.com/orgs/community/discussions/25824
+      - name: Create kind cluster
+        if: matrix.config.type == 'kind'
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: kind
+          version: v0.27.0
+          node_image: kindest/node:${{ env.K8S_VERSION }}
+
+      - name: Create minikube cluster
+        if: matrix.config.type == 'minikube'
+        uses: medyagh/setup-minikube@v0.0.19
+        with:
+          container-runtime: containerd
+          kubernetes-version: ${{ env.K8S_VERSION }}
+
+      - name: Create microk8s cluster
+        if: matrix.config.type == 'microk8s'
+        uses: balchua/microk8s-actions@v0.4.3
+        with:
+          channel: ${{ env.MICROK8S_CHANNEL }}
+          addons: '["hostpath-storage"]'
+
+      - name: Create k3d cluster
+        if: matrix.config.type == 'k3d'
+        uses: AbsaOSS/k3d-action@v2
+        with:
+          cluster-name: k3s-default
+          k3d-version: v5.8.3
+          args: |
+            --image docker.io/rancher/k3s:${{ env.K8S_VERSION }}-k3s1
+
+      - name: helm install openbao
+        run: |
+          helm install openbao \
+            --namespace openbao \
+            --create-namespace \
+            --debug \
+            charts/openbao
+
+      - name: Wait until OpenBao is in Running state
+        run: |
+          timeout 60s bash -c 'until [[ "$(kubectl -n openbao get pods $(kubectl -n openbao get pods -l statefulset.kubernetes.io/pod-name=openbao-0 -ojsonpath="{.items[].metadata.name}") -o jsonpath="{.status.phase}" 2>/dev/null)" == "Running" ]]; do kubectl -n openbao get pods $(kubectl get pods -n openbao -l statefulset.kubernetes.io/pod-name=openbao-0 -ojsonpath="{.items[].metadata.name}") -o jsonpath="{.status.phase}" && sleep 5; done'
+
+      - name: run OpenBao agent
+        run: |
+          kubectl get pods -A
+          openbao_pod=$(kubectl get pods -n openbao -l statefulset.kubernetes.io/pod-name=openbao-0 -ojsonpath="{.items[].metadata.name}")
+
+          kubectl -n openbao exec $openbao_pod -c openbao -- bao operator init -key-shares=1 -key-threshold=1 -format=json > init.json
+          unseal_key=$(jq -r '.unseal_keys_b64[0]' init.json)
+          kubectl -n openbao exec $openbao_pod -c openbao -- bao operator unseal $unseal_key
+
+          kubectl -n openbao port-forward svc/openbao 8200 &
+          timeout 60s bash -c 'until curl -H "X-Vault-Request: true" "http://127.0.0.1:8200/v1/sys/seal-status"; do sleep 5 && kubectl get pods -A; done'
+
+          seal_status=$(curl -s -H "X-Vault-Request: true" "http://127.0.0.1:8200/v1/sys/seal-status" | jq -r '.sealed')
+
+          if [[ "$seal_status" == "true" ]]; then
+            echo "Failed to unseal OpenBao"
+            exit 1
+          fi
+
+      - name: debug
+        if: failure()
+        run: |
+          kubectl get nodes -owide
+          kubectl get pods -A -owide
+
+          openbao_pod=$(kubectl -n openbao get pods -l statefulset.kubernetes.io/pod-name=openbao-0 -ojsonpath="{.items[].metadata.name}")
+          injector_pod=$(kubectl -n openbao get pods -l app.kubernetes.io/name=openbao-agent-injector -ojsonpath="{.items[].metadata.name}")
+
+          # Get pod metadata
+          kubectl -n openbao describe pod $openbao_pod || true
+          kubectl -n openbao describe pod $injector_pod || true
+
+          # Get pod logs
+          kubectl -n openbao logs -c openbao $openbao_pod || true
+          kubectl -n openbao logs -c sidecar-injector $injector_pod || true
