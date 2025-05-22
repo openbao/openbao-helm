@@ -39,7 +39,7 @@ jobs:
       # Ref: https://github.com/orgs/community/discussions/25824
       - name: Create kind cluster
         if: matrix.config.type == 'kind'
-        uses: helm/kind-action@v1
+        uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
         with:
           cluster_name: kind
           version: v0.27.0
@@ -47,21 +47,21 @@ jobs:
 
       - name: Create minikube cluster
         if: matrix.config.type == 'minikube'
-        uses: medyagh/setup-minikube@v0.0.19
+        uses: medyagh/setup-minikube@cea33675329b799adccc9526aa5daccc26cd5052 # v0.0.19
         with:
           container-runtime: containerd
           kubernetes-version: ${{ env.K8S_VERSION }}
 
       - name: Create microk8s cluster
         if: matrix.config.type == 'microk8s'
-        uses: balchua/microk8s-actions@v0.4.3
+        uses: balchua/microk8s-actions@13f73436011eb4925c22526f64fb3ecdd81289a9 # v0.4.3
         with:
           channel: ${{ env.MICROK8S_CHANNEL }}
           addons: '["hostpath-storage"]'
 
       - name: Create k3d cluster
         if: matrix.config.type == 'k3d'
-        uses: AbsaOSS/k3d-action@v2
+        uses: AbsaOSS/k3d-action@4e8b3239042be1dc0aed6c5eb80c13b18200fc79 # v2.4.0
         with:
           cluster-name: k3s-default
           k3d-version: v5.8.3
