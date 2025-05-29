@@ -3,8 +3,8 @@
 
 apiVersion: v2
 name: openbao
-version: 0.12.0
-appVersion: v2.2.0
+version: 0.13.0
+appVersion: v2.2.2
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
 home: https://github.com/openbao/openbao-helm
