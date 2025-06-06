@@ -2,7 +2,7 @@
 
 > :warning: **Please note**: We take OpenBao's security and our users' trust very seriously. If
 > you believe you have found a security issue in OpenBao Helm, _please responsibly disclose_
-> by contacting us at [openbao-security@lists.lfedge.org](mailto:openbao-security@lists.lfedge.org).
+> by contacting us at [openbao-security@lists.openssf.org](mailto:openbao-security@lists.openssf.org).
 
 This repository contains the OpenBao Helm chart for installing
 and configuring OpenBao on Kubernetes. This chart supports multiple use

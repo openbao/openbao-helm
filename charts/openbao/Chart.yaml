@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.13.1
+version: 0.13.2
 appVersion: v2.2.2
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -27,5 +27,5 @@ annotations:
 
 maintainers:
   - name: OpenBao
-    email: openbao-security@lists.lfedge.org
+    email: openbao-security@lists.openssf.org
     url: https://openbao.org

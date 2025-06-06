@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.13.1](https://img.shields.io/badge/Version-0.13.1-informational?style=flat-square) ![AppVersion: v2.2.2](https://img.shields.io/badge/AppVersion-v2.2.2-informational?style=flat-square)
+![Version: 0.13.2](https://img.shields.io/badge/Version-0.13.2-informational?style=flat-square) ![AppVersion: v2.2.2](https://img.shields.io/badge/AppVersion-v2.2.2-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -10,7 +10,7 @@ Official OpenBao Chart
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| OpenBao | <openbao-security@lists.lfedge.org> | <https://openbao.org> |
+| OpenBao | <openbao-security@lists.openssf.org> | <https://openbao.org> |
 
 ## Source Code
 
