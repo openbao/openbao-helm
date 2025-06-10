@@ -10,6 +10,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: {{ template "openbao.fullname" . }}-agent-injector
+  namespace: {{ include "openbao.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ template "openbao.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}
