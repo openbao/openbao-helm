@@ -1344,3 +1344,17 @@ serverTelemetry:
     #    for: 10m
     #    labels:
     #      severity: critical
+
+  grafanaDashboard:
+    # Enable deployment of the OpenBao Grafana dashboard.
+    # https://grafana.com/grafana/dashboards/23554
+    enabled: false
+
+    # Add `grafana_dashboard: "1"` default label
+    defaultLabel: true
+
+    # Extra labels for dashboard ConfigMap
+    extraLabel: {} 
+
+    # Extra annotations for dashboard ConfigMap
+    extraAnnotations: {}
