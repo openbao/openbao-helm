@@ -1354,7 +1354,7 @@ serverTelemetry:
     defaultLabel: true
 
     # Extra labels for dashboard ConfigMap
-    extraLabel: {} 
+    extraLabel: {}
 
     # Extra annotations for dashboard ConfigMap
     extraAnnotations: {}
