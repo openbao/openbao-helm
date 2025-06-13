@@ -1347,7 +1347,7 @@ serverTelemetry:
 
   grafanaDashboard:
     # Enable deployment of the OpenBao Grafana dashboard.
-    # https://grafana.com/grafana/dashboards/23554
+    # https://grafana.com/grafana/dashboards/23554-openbao/
     enabled: false
 
     # Add `grafana_dashboard: "1"` default label
