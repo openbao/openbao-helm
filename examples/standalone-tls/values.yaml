@@ -1,0 +1,132 @@
+# Standalone OpenBao with TLS Configuration
+global:
+  # Enable TLS for all components
+  tlsDisable: false
+
+server:
+  # Use standalone mode
+  standalone:
+    enabled: true
+    config: |
+      ui = true
+      
+      listener "tcp" {
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+        tls_cert_file = "/openbao/userconfig/tls/tls.crt"
+        tls_key_file = "/openbao/userconfig/tls/tls.key"
+        tls_min_version = "tls12"
+      }
+      
+      storage "file" {
+        path = "/openbao/data"
+      }
+      
+      # Enable audit logging
+      # audit {
+      #   type = "file"
+      #   path = "/openbao/audit/audit.log"
+      # }
+      
+      # Example telemetry configuration
+      telemetry {
+        prometheus_retention_time = "30s"
+        disable_hostname = true
+      }
+
+  # Configure persistent storage
+  dataStorage:
+    enabled: true
+    size: "10Gi"
+    storageClass: null  # Uses default storage class
+    accessMode: "ReadWriteOnce"
+
+  # Enable audit storage
+  auditStorage:
+    enabled: true
+    size: "5Gi"
+    storageClass: null
+    accessMode: "ReadWriteOnce"
+
+  # Resource allocation
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  # Extra volumes for TLS certificates
+  extraVolumes:
+    - type: secret
+      name: openbao-tls
+      path: /openbao/userconfig/tls
+
+  # Security context
+  statefulSet:
+    securityContext:
+      pod:
+        runAsNonRoot: true
+        runAsUser: 100
+        fsGroup: 1000
+      container:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+
+  # Readiness and liveness probes
+  readinessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+  
+  livenessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true"
+    initialDelaySeconds: 60
+
+# Enable UI with TLS
+ui:
+  enabled: true
+  serviceType: "LoadBalancer"
+  externalPort: 8200
+  
+  # Optionally configure a specific LoadBalancer IP
+  # loadBalancerIP: "10.0.0.100"
+  
+  # Add annotations for cloud load balancers
+  # annotations:
+  #   service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+
+# Configure agent injector (optional)
+injector:
+  enabled: true
+  
+  # Configure injector for TLS
+  agentDefaults:
+    # Skip TLS verification for self-signed certs (not for production)
+    # template: |
+    #   vault {
+    #     ca_cert = "/openbao/tls/ca.crt"
+    #   }
+
+# Monitoring with Prometheus
+serverTelemetry:
+  serviceMonitor:
+    enabled: false  # Enable if using Prometheus Operator
+    interval: "30s"
+    scrapeTimeout: "10s"
+  
+  prometheusRules:
+    enabled: false  # Enable if using Prometheus Operator
+    rules:
+      - alert: OpenBaoSealed
+        expr: vault_core_unsealed{job="openbao"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "OpenBao instance is sealed"
+          description: "OpenBao instance {{ $labels.instance }} is sealed."

@@ -1,0 +1,218 @@
+# High Availability OpenBao with Raft Storage
+global:
+  enabled: true
+  
+  # Namespace to deploy into (defaults to .Release.Namespace)
+  # namespace: "openbao"
+
+server:
+  # HA configuration with Raft
+  ha:
+    enabled: true
+    replicas: 3
+    
+    # Raft integrated storage
+    raft:
+      enabled: true
+      setNodeId: true
+      
+      config: |
+        ui = true
+        
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          
+          # Enable unauthenticated metrics access for Prometheus
+          telemetry {
+            unauthenticated_metrics_access = "true"
+          }
+        }
+        
+        storage "raft" {
+          path = "/openbao/data"
+          
+          # Raft performance tuning
+          performance_multiplier = 1
+          trailing_logs = 10000
+          snapshot_threshold = 10000
+          max_entry_size = "1MB"
+        }
+        
+        # Kubernetes service registration for leader detection
+        service_registration "kubernetes" {}
+        
+        # AWS KMS auto-unseal (optional)
+        # Uncomment and configure if using AWS KMS
+        # seal "awskms" {
+        #   region     = "us-east-1"
+        #   kms_key_id = "12345678-1234-1234-1234-123456789012"
+        # }
+        
+        # Telemetry
+        telemetry {
+          prometheus_retention_time = "30s"
+          disable_hostname = true
+        }
+    
+    # Configure disruption budget
+    disruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+
+  # Resources for each server pod
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+  # Persistent storage configuration
+  dataStorage:
+    enabled: true
+    size: "50Gi"
+    storageClass: null  # Uses default storage class
+    accessMode: "ReadWriteOnce"
+
+  # Audit log storage
+  auditStorage:
+    enabled: true
+    size: "10Gi"
+    storageClass: null
+    accessMode: "ReadWriteOnce"
+    mountPath: "/openbao/audit"
+
+  # Affinity rules to spread pods across nodes
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ template "openbao.name" . }}
+              app.kubernetes.io/instance: "{{ .Release.Name }}"
+              component: server
+          topologyKey: kubernetes.io/hostname
+
+  # Security context
+  statefulSet:
+    securityContext:
+      pod:
+        runAsNonRoot: true
+        runAsUser: 100
+        fsGroup: 1000
+      container:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+
+  # Network policy to restrict traffic
+  networkPolicy:
+    enabled: true
+    ingress:
+      - from:
+        - namespaceSelector:
+            matchLabels:
+              name: openbao
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: openbao
+        ports:
+        - port: 8200
+          protocol: TCP
+        - port: 8201
+          protocol: TCP
+
+  # Configure update strategy
+  updateStrategyType: "RollingUpdate"
+
+  # Extra environment variables
+  extraEnvironmentVars:
+    VAULT_LOG_LEVEL: "info"
+    VAULT_LOG_FORMAT: "json"
+
+  # Annotations for the pods
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/v1/sys/metrics"
+    prometheus.io/port: "8200"
+
+# UI Configuration
+ui:
+  enabled: true
+  serviceType: "LoadBalancer"
+  externalPort: 8200
+  
+  # Configure session affinity to route to active node
+  serviceAnnotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+
+# Agent Injector Configuration
+injector:
+  enabled: true
+  replicas: 2
+  
+  # Resources for injector
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  # Injector high availability
+  affinity: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: {{ template "openbao.name" . }}-agent-injector
+                app.kubernetes.io/instance: "{{ .Release.Name }}"
+            topologyKey: kubernetes.io/hostname
+
+# Monitoring Configuration
+serverTelemetry:
+  serviceMonitor:
+    enabled: true
+    interval: "30s"
+    scrapeTimeout: "10s"
+    
+  prometheusRules:
+    enabled: true
+    rules:
+      - alert: OpenBaoSealed
+        expr: vault_core_unsealed == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "OpenBao instance is sealed"
+          description: "OpenBao instance {{ $labels.pod }} is sealed."
+      
+      - alert: OpenBaoHighMemoryUsage
+        expr: |
+          (container_memory_working_set_bytes{pod=~"openbao-[0-9]+", container="openbao"} 
+          / container_spec_memory_limit_bytes{pod=~"openbao-[0-9]+", container="openbao"}) > 0.90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "OpenBao high memory usage"
+          description: "OpenBao pod {{ $labels.pod }} memory usage is above 90%."
+      
+      - alert: OpenBaoRaftFollowerBehind
+        expr: vault_raft_follower_last_contact_ms > 5000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Raft follower lagging"
+          description: "Raft follower {{ $labels.pod }} is {{ $value }}ms behind leader."

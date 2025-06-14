@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  labels:
+    app: webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+      annotations:
+        # Enable OpenBao agent injection
+        openbao.openbao.org/agent-inject: "true"
+        
+        # OpenBao role to use for authentication
+        openbao.openbao.org/role: "webapp"
+        
+        # Inject secret from OpenBao
+        openbao.openbao.org/agent-inject-secret-config: "secret/data/webapp/config"
+        
+        # Template for rendering the secret
+        openbao.openbao.org/agent-inject-template-config: |
+          {{ with secret "secret/data/webapp/config" -}}
+          # Rendered by OpenBao Agent
+          export USERNAME="{{ .Data.data.username }}"
+          export PASSWORD="{{ .Data.data.password }}"
+          export API_KEY="{{ .Data.data.api_key }}"
+          export DATABASE_URL="{{ .Data.data.database_url }}"
+          {{- end }}
+        
+        # Additional agent configuration
+        openbao.openbao.org/agent-inject-perms-config: "0400"
+        openbao.openbao.org/agent-limits-cpu: "100m"
+        openbao.openbao.org/agent-limits-mem: "128Mi"
+        openbao.openbao.org/agent-requests-cpu: "50m"
+        openbao.openbao.org/agent-requests-mem: "64Mi"
+        
+        # Example of injecting multiple secrets
+        openbao.openbao.org/agent-inject-secret-tls: "pki/issue/webapp"
+        openbao.openbao.org/agent-inject-template-tls: |
+          {{ with secret "pki/issue/webapp" "common_name=webapp.example.com" -}}
+          {{ .Data.certificate }}
+          {{ .Data.private_key }}
+          {{- end }}
+        
+    spec:
+      serviceAccountName: webapp
+      containers:
+      - name: webapp
+        image: busybox:latest
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - |
+            echo "Starting application..."
+            echo "Checking injected secrets:"
+            
+            if [ -f /vault/secrets/config ]; then
+              echo "Config file found at /vault/secrets/config"
+              echo "Contents:"
+              cat /vault/secrets/config
+              
+              # Source the environment variables
+              . /vault/secrets/config
+              
+              echo ""
+              echo "Environment variables loaded:"
+              echo "USERNAME: $USERNAME"
+              echo "API_KEY: $API_KEY"
+            else
+              echo "ERROR: Config file not found!"
+            fi
+            
+            # Keep container running
+            while true; do
+              sleep 30
+              echo "Application running... $(date)"
+            done
+        
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        
+        # Optional: Mount the secrets to a different path
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+      
+      # Optional: Define volumes if you need custom mounts
+      volumes:
+      - name: config
+        emptyDir: {}
+
+---
+# Example of a job that uses pre-populate only (no sidecar)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: webapp-migration
+spec:
+  template:
+    metadata:
+      annotations:
+        openbao.openbao.org/agent-inject: "true"
+        openbao.openbao.org/role: "webapp"
+        openbao.openbao.org/agent-pre-populate-only: "true"
+        openbao.openbao.org/agent-inject-secret-migration: "secret/data/webapp/migration"
+        openbao.openbao.org/agent-inject-template-migration: |
+          {{ with secret "secret/data/webapp/migration" -}}
+          export MIGRATION_KEY="{{ .Data.data.key }}"
+          {{- end }}
+    spec:
+      serviceAccountName: webapp
+      restartPolicy: Never
+      containers:
+      - name: migration
+        image: busybox:latest
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - |
+            . /vault/secrets/migration
+            echo "Running migration with key: $MIGRATION_KEY"
+            # Your migration logic here
+            echo "Migration completed!"
