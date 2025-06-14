@@ -1,0 +1,54 @@
+# Example cert-manager Certificate resource for OpenBao TLS
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: openbao-tls
+  namespace: default
+spec:
+  secretName: openbao-tls
+  duration: 8760h # 1 year
+  renewBefore: 720h # 30 days
+  subject:
+    organizations:
+      - openbao
+  commonName: openbao.default.svc.cluster.local
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - digital signature
+    - key encipherment
+    - server auth
+    - client auth
+  dnsNames:
+    - openbao
+    - openbao.default
+    - openbao.default.svc
+    - openbao.default.svc.cluster.local
+    - openbao-internal
+    - openbao-internal.default
+    - openbao-internal.default.svc
+    - openbao-internal.default.svc.cluster.local
+    - openbao-0.openbao-internal
+    - openbao-0.openbao-internal.default
+    - openbao-0.openbao-internal.default.svc
+    - openbao-0.openbao-internal.default.svc.cluster.local
+  ipAddresses:
+    - 127.0.0.1
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
+    group: cert-manager.io
+
+---
+# Self-signed issuer for development/testing
+# For production, use a proper CA issuer
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+  namespace: default
+spec:
+  selfSigned: {}

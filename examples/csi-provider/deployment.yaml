@@ -1,0 +1,232 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: webapp
+  namespace: default
+  labels:
+    app: webapp
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  namespace: default
+  labels:
+    app: webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      serviceAccountName: webapp
+      
+      # Security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      
+      containers:
+      - name: webapp
+        image: busybox:latest
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - |
+            echo "Application starting..."
+            echo ""
+            echo "=== Checking mounted secrets ==="
+            echo "Contents of /mnt/secrets-store:"
+            ls -la /mnt/secrets-store/
+            echo ""
+            
+            echo "=== Database Configuration ==="
+            echo "Username: $(cat /mnt/secrets-store/database-username)"
+            echo "Host: $(cat /mnt/secrets-store/database-host)"
+            echo "Password: [HIDDEN]"
+            echo ""
+            
+            echo "=== API Configuration ==="
+            echo "API Key: $(cat /mnt/secrets-store/api-key)"
+            echo "API Secret: [HIDDEN]"
+            echo ""
+            
+            # Example: Source environment variables from files
+            export DB_USER=$(cat /mnt/secrets-store/database-username)
+            export DB_PASS=$(cat /mnt/secrets-store/database-password)
+            export DB_HOST=$(cat /mnt/secrets-store/database-host)
+            export API_KEY=$(cat /mnt/secrets-store/api-key)
+            export API_SECRET=$(cat /mnt/secrets-store/api-secret)
+            
+            echo "=== Environment Variables Set ==="
+            echo "DB_USER=$DB_USER"
+            echo "DB_HOST=$DB_HOST"
+            echo ""
+            
+            # Keep container running
+            echo "Application running... (refresh every 30s)"
+            while true; do
+              sleep 30
+              echo "[$(date)] Application heartbeat - secrets mounted at /mnt/secrets-store"
+            done
+        
+        # Mount the CSI volume
+        volumeMounts:
+        - name: secrets-store
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+        
+        # If syncing to environment variables via Kubernetes secret
+        # envFrom:
+        # - secretRef:
+        #     name: webapp-db-secret
+        # - secretRef:
+        #     name: webapp-api-secret
+        
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        
+        # Security context for container
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+      
+      volumes:
+      # CSI volume configuration
+      - name: secrets-store
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "webapp-secrets"
+          # Optional: Node publish secret for authentication
+          # nodePublishSecretRef:
+          #   name: openbao-csi-provider-hmac-key
+
+---
+# Example with multiple containers sharing secrets
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-multi
+  namespace: default
+  labels:
+    app: webapp-multi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp-multi
+  template:
+    metadata:
+      labels:
+        app: webapp-multi
+    spec:
+      serviceAccountName: webapp
+      
+      initContainers:
+      # Init container to validate secrets before main app starts
+      - name: secret-validator
+        image: busybox:latest
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "Validating secrets..."
+            
+            # Check all required files exist
+            for secret in database-username database-password database-host api-key api-secret; do
+              if [ ! -f "/mnt/secrets-store/$secret" ]; then
+                echo "ERROR: Missing secret file: $secret"
+                exit 1
+              fi
+            done
+            
+            echo "All secrets validated successfully!"
+        
+        volumeMounts:
+        - name: secrets-store
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      
+      containers:
+      # Main application
+      - name: app
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        
+        volumeMounts:
+        - name: secrets-store
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+        
+        # Use secrets via environment variables from synced K8s secret
+        envFrom:
+        - secretRef:
+            name: webapp-db-secret
+        - secretRef:
+            name: webapp-api-secret
+      
+      # Sidecar for metrics/monitoring
+      - name: metrics
+        image: prom/node-exporter:latest
+        ports:
+        - containerPort: 9100
+        
+        # Also has access to the same secrets
+        volumeMounts:
+        - name: secrets-store
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      
+      volumes:
+      - name: secrets-store
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "webapp-secrets"
+      
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+
+---
+# Example ConfigMap for nginx
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: default
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+        
+        location / {
+            root /usr/share/nginx/html;
+            index index.html;
+        }
+        
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+        }
+    }

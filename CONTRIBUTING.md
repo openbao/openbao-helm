@@ -240,9 +240,18 @@ Here are some examples of common test patterns:
     Here we are check the length of the command output to see if the anything is rendered.
     This style can easily be switched to check that a file is rendered instead.
 
-## Contributor License Agreement
+## Developer Certificate of Origin (DCO)
 
-We require that all contributors sign our Contributor License Agreement ("CLA")
-before we can accept the contribution.
+OpenBao uses the Developer Certificate of Origin (DCO) instead of a Contributor License Agreement (CLA). The DCO is a legally binding statement asserting that you are the creator of your contribution, or that you otherwise have the authority to distribute the contribution, and that you are intentionally making the contribution available under the license associated with the project.
 
-[Learn more about why HashiCorp requires a CLA and what the CLA includes](https://www.hashicorp.com/cla)
+All commits must include a DCO sign-off in the form of:
+
+```
+Signed-off-by: Your Name <your-email@example.com>
+```
+
+You can add this automatically by using the `-s` flag with `git commit`:
+
+```bash
+git commit -s -m "Your commit message"
+```

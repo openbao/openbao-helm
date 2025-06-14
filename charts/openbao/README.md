@@ -6,6 +6,416 @@ Official OpenBao Chart
 
 **Homepage:** <https://github.com/openbao/openbao-helm>
 
+## Overview
+
+This Helm chart deploys OpenBao on Kubernetes with support for:
+- **Standalone Mode**: Single OpenBao server with file storage
+- **High Availability Mode**: Multi-server setup with Consul backend
+- **Raft Mode**: Multi-server setup with integrated Raft storage
+- **Agent Injection**: Automatic secret injection into pods
+- **CSI Provider**: Mount secrets as volumes using secrets-store-csi-driver
+
+## Prerequisites
+
+- Kubernetes `>= 1.30.0-0`
+- Helm 3.x
+- For CSI: [secrets-store-csi-driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) must be installed separately
+
+## Installation
+
+### Quick Start - Standalone Mode
+
+Deploy a single OpenBao server with UI enabled:
+
+```bash
+helm repo add openbao https://openbao.github.io/openbao-helm
+helm install openbao openbao/openbao --set ui.enabled=true
+```
+
+### Development Mode
+
+For testing and development (NOT for production):
+
+```bash
+helm install openbao openbao/openbao \
+  --set server.dev.enabled=true \
+  --set server.dev.devRootToken=myroot \
+  --set ui.enabled=true
+```
+
+## Deployment Configurations
+
+### 1. Standalone Mode (Default)
+
+Single OpenBao server with file storage:
+
+```yaml
+# values-standalone.yaml
+server:
+  standalone:
+    enabled: true
+    config: |
+      ui = true
+      
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+      
+      storage "file" {
+        path = "/openbao/data"
+      }
+
+ui:
+  enabled: true
+  serviceType: "LoadBalancer"  # or NodePort/ClusterIP
+
+server:
+  dataStorage:
+    enabled: true
+    size: "10Gi"
+    storageClass: "standard"  # adjust for your cluster
+```
+
+Deploy:
+```bash
+helm install openbao openbao/openbao -f values-standalone.yaml
+```
+
+### 2. High Availability with Consul
+
+Multi-server setup using Consul for storage:
+
+```yaml
+# values-ha-consul.yaml
+server:
+  ha:
+    enabled: true
+    replicas: 3
+    config: |
+      ui = true
+      
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+      
+      storage "consul" {
+        path = "openbao"
+        address = "consul:8500"
+      }
+      
+      service_registration "kubernetes" {}
+
+ui:
+  enabled: true
+
+# Requires Consul to be deployed separately
+```
+
+Deploy:
+```bash
+# First deploy Consul
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm install consul hashicorp/consul
+
+# Then deploy OpenBao
+helm install openbao openbao/openbao -f values-ha-consul.yaml
+```
+
+### 3. High Availability with Raft
+
+Multi-server setup using integrated Raft storage:
+
+```yaml
+# values-ha-raft.yaml
+server:
+  ha:
+    enabled: true
+    raft:
+      enabled: true
+      setNodeId: true
+    replicas: 3
+    config: |
+      ui = true
+      
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+      
+      storage "raft" {
+        path = "/openbao/data"
+      }
+      
+      service_registration "kubernetes" {}
+
+ui:
+  enabled: true
+
+server:
+  dataStorage:
+    enabled: true
+    size: "10Gi"
+```
+
+Deploy:
+```bash
+helm install openbao openbao/openbao -f values-ha-raft.yaml
+```
+
+### 4. External OpenBao Server
+
+Use with existing OpenBao server:
+
+```yaml
+# values-external.yaml
+global:
+  externalVaultAddr: "https://my-openbao.example.com:8200"
+
+server:
+  enabled: false
+
+injector:
+  enabled: true
+  # Agent injection only
+
+csi:
+  enabled: true
+  # CSI provider only
+```
+
+## Advanced Configurations
+
+### Auto-Unseal with Cloud KMS
+
+Example using Google Cloud KMS:
+
+```yaml
+# values-auto-unseal.yaml
+server:
+  standalone:
+    config: |
+      ui = true
+      
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+      
+      storage "file" {
+        path = "/openbao/data"
+      }
+      
+      seal "gcpckms" {
+        project     = "my-project"
+        region      = "global"
+        key_ring    = "openbao-kr"
+        crypto_key  = "openbao-key"
+      }
+
+# Ensure your cluster has appropriate GCP service account permissions
+```
+
+### Enable Agent Injection
+
+Automatically inject secrets into pods:
+
+```yaml
+# values-injection.yaml
+injector:
+  enabled: true
+  agentImage:
+    repository: "openbao/openbao"
+    tag: "2.2.2"
+  
+  # Configure defaults for injected agents
+  agentDefaults:
+    cpuRequest: "250m"
+    cpuLimit: "500m"
+    memRequest: "64Mi"
+    memLimit: "128Mi"
+
+# Example pod annotation for injection:
+# openbao.openbao.org/agent-inject: "true"
+# openbao.openbao.org/agent-inject-secret-db: "database/creds/readonly"
+```
+
+### Enable CSI Provider
+
+Mount secrets as files using CSI driver:
+
+```yaml
+# values-csi.yaml
+csi:
+  enabled: true
+  image:
+    repository: "hashicorp/vault-csi-provider"
+    tag: "1.4.0"
+
+# Requires secrets-store-csi-driver to be installed:
+# helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+# helm install csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver
+```
+
+### Production-Ready Configuration
+
+```yaml
+# values-production.yaml
+global:
+  tlsDisable: false  # Enable TLS
+
+server:
+  ha:
+    enabled: true
+    raft:
+      enabled: true
+    replicas: 5
+  
+  # Resource limits
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "256Mi"
+      cpu: "250m"
+  
+  # Persistent storage
+  dataStorage:
+    enabled: true
+    size: "50Gi"
+    storageClass: "ssd"
+  
+  auditStorage:
+    enabled: true
+    size: "20Gi"
+    storageClass: "ssd"
+  
+  # Network policies
+  networkPolicy:
+    enabled: true
+  
+  # Pod disruption budget
+  ha:
+    disruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+
+# Monitoring
+serverTelemetry:
+  serviceMonitor:
+    enabled: true
+    interval: "30s"
+  prometheusRules:
+    enabled: true
+
+ui:
+  enabled: true
+  serviceType: "LoadBalancer"
+
+injector:
+  enabled: true
+  replicas: 2
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "256Mi"
+      cpu: "250m"
+```
+
+## Post-Installation Steps
+
+### 1. Initialize OpenBao (Standalone/HA)
+
+```bash
+# Port forward to access OpenBao
+kubectl port-forward svc/openbao 8200:8200
+
+# Initialize OpenBao
+bao operator init
+
+# Unseal OpenBao (repeat for each unseal key)
+bao operator unseal
+```
+
+### 2. Initialize Raft Cluster
+
+```bash
+# Initialize the first node
+kubectl exec -it openbao-0 -- bao operator init
+
+# Join other nodes to the cluster
+kubectl exec -it openbao-1 -- bao operator raft join http://openbao-0.openbao-internal:8200
+kubectl exec -it openbao-2 -- bao operator raft join http://openbao-0.openbao-internal:8200
+```
+
+### 3. Configure Kubernetes Auth
+
+```bash
+# Enable Kubernetes auth method
+bao auth enable kubernetes
+
+# Configure Kubernetes auth
+bao write auth/kubernetes/config \
+    token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+    kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443" \
+    kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+```
+
+## Upgrading
+
+```bash
+# Update Helm repository
+helm repo update
+
+# Upgrade with new values
+helm upgrade openbao openbao/openbao -f values.yaml
+
+# Check rollout status
+kubectl rollout status statefulset/openbao
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Pod stuck in pending**: Check storage class and PVC creation
+2. **OpenBao sealed**: Run `bao operator unseal` on each pod
+3. **Agent injection not working**: Verify webhook certificates and RBAC
+4. **CSI mount failures**: Ensure secrets-store-csi-driver is installed
+
+### Useful Commands
+
+```bash
+# Check OpenBao status
+kubectl exec -it openbao-0 -- bao status
+
+# View OpenBao logs
+kubectl logs openbao-0
+
+# Check configuration
+kubectl get configmap openbao-config -o yaml
+
+# List Raft peers
+kubectl exec -it openbao-0 -- bao operator raft list-peers
+```
+
+## Security Considerations
+
+- **Always enable TLS in production** (`global.tlsDisable: false`)
+- **Use auto-unseal for production workloads**
+- **Enable audit logging** (`server.auditStorage.enabled: true`)
+- **Implement network policies** (`server.networkPolicy.enabled: true`)
+- **Use dedicated service accounts with minimal permissions**
+- **Regularly rotate unseal keys and root tokens**
+
 ## Maintainers
 
 | Name | Email | Url |
@@ -294,4 +704,3 @@ Kubernetes: `>= 1.30.0-0`
 | ui.serviceNodePort | string | `nil` |  |
 | ui.serviceType | string | `"ClusterIP"` |  |
 | ui.targetPort | int | `8200` |  |
-
