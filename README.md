@@ -23,7 +23,7 @@ The versions required are:
 
 ## Usage
 
-To install the latest version of this chart, add the Hashicorp helm repository and run `helm install`:
+To install the latest version of this chart, add the OpenBao helm repository and run `helm install`:
 
 ```console
 helm repo add openbao https://openbao.github.io/openbao-helm
