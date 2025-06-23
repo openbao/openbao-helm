@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.14.0](https://img.shields.io/badge/Version-0.14.0-informational?style=flat-square) ![AppVersion: v2.2.2](https://img.shields.io/badge/AppVersion-v2.2.2-informational?style=flat-square)
+![Version: 0.15.0](https://img.shields.io/badge/Version-0.15.0-informational?style=flat-square) ![AppVersion: v2.2.2](https://img.shields.io/badge/AppVersion-v2.2.2-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -46,9 +46,9 @@ Kubernetes: `>= 1.30.0-0`
 | csi.extraArgs | list | `[]` |  |
 | csi.hmacSecretName | string | `""` |  |
 | csi.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for csi image. if tag is "latest", set to "Always" |
-| csi.image.registry | string | `"docker.io"` | image registry to use for csi image |
-| csi.image.repository | string | `"hashicorp/vault-csi-provider"` | image repo to use for csi image |
-| csi.image.tag | string | `"1.4.0"` | image tag to use for csi image |
+| csi.image.registry | string | `"quay.io"` | image registry to use for csi image |
+| csi.image.repository | string | `"openbao/openbao-csi-provider"` | image repo to use for csi image |
+| csi.image.tag | string | `"1.5.0"` | image tag to use for csi image |
 | csi.livenessProbe.failureThreshold | int | `2` |  |
 | csi.livenessProbe.initialDelaySeconds | int | `5` |  |
 | csi.livenessProbe.periodSeconds | int | `5` |  |
@@ -299,4 +299,3 @@ Kubernetes: `>= 1.30.0-0`
 | ui.serviceNodePort | string | `nil` |  |
 | ui.serviceType | string | `"ClusterIP"` |  |
 | ui.targetPort | int | `8200` |  |
-

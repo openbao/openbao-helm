@@ -1098,11 +1098,11 @@ csi:
 
   image:
     # -- image registry to use for csi image
-    registry: "docker.io"
+    registry: "quay.io"
     # -- image repo to use for csi image
-    repository: "hashicorp/vault-csi-provider"
+    repository: "openbao/openbao-csi-provider"
     # -- image tag to use for csi image
-    tag: "1.4.0"
+    tag: "1.5.0"
     # -- image pull policy to use for csi image. if tag is "latest", set to "Always"
     pullPolicy: IfNotPresent
 
