@@ -31,4 +31,10 @@ helm repo add openbao https://openbao.github.io/openbao-helm
 helm install openbao openbao/openbao
 ```
 
+Alternatively you can use the OCI based helm chart as well:
+
+```
+helm install oci://ghcr.io/openbao/charts/openbao
+```
+
 Please see the many options supported in the [`values.yaml`](./charts/openbao/values.yaml) file. These are also fully documented directly in the [openbao README](./charts/openbao/README.md) along with more detailed installation instructions.
