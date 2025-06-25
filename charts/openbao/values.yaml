@@ -86,7 +86,7 @@ injector:
     # -- image repo to use for agent image
     repository: "openbao/openbao"
     # -- image tag to use for agent image
-    tag: "2.2.2"
+    tag: "2.3.1"
     # -- image pull policy to use for agent image. if tag is "latest", set to "Always"
     pullPolicy: IfNotPresent
 
@@ -290,8 +290,7 @@ injector:
 
   # extraEnvironmentVars is a list of extra environment variables to set in the
   # injector deployment.
-  extraEnvironmentVars:
-    {}
+  extraEnvironmentVars: {}
     # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
   # Affinity Settings for injector pods
@@ -382,7 +381,7 @@ server:
     # -- image repo to use for server image
     repository: "openbao/openbao"
     # -- image tag to use for server image
-    tag: "2.2.2"
+    tag: "2.3.1"
     # -- image pull policy to use for server image. if tag is "latest", set to "Always"
     pullPolicy: IfNotPresent
 
@@ -413,11 +412,9 @@ server:
   # In order to expose the service, use the route section below
   ingress:
     enabled: false
-    labels:
-      {}
+    labels: {}
       # traffic: external
-    annotations:
-      {}
+    annotations: {}
       # |
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
@@ -485,8 +482,7 @@ server:
   # -- extraInitContainers is a list of init containers. Specified as a YAML list.
   # This is useful if you need to run a script to provision TLS certificates or
   # write out configuration files in a dynamic way.
-  extraInitContainers:
-    []
+  extraInitContainers: []
     # # This example installs a plugin pulled from github into the /usr/local/libexec/vault/oauthapp folder,
     # # which is defined in the volumes value.
     # - name: oauthapp
@@ -514,8 +510,7 @@ server:
 
   # -- extraPorts is a list of extra ports. Specified as a YAML list.
   # This is useful if you need to add additional ports to the statefulset in dynamic way.
-  extraPorts:
-    []
+  extraPorts: []
     # - containerPort: 8300
     #   name: http-monitoring
 
@@ -577,16 +572,14 @@ server:
 
   # extraEnvironmentVars is a list of extra environment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
-  extraEnvironmentVars:
-    {}
+  extraEnvironmentVars: {}
     # GOOGLE_REGION: global
     # GOOGLE_PROJECT: myproject
     # GOOGLE_APPLICATION_CREDENTIALS: /openbao/userconfig/myproject/myproject-creds.json
 
   # extraSecretEnvironmentVars is a list of extra environment variables to set with the stateful set.
   # These variables take value from existing Secret objects.
-  extraSecretEnvironmentVars:
-    []
+  extraSecretEnvironmentVars: []
     # - envName: AWS_SECRET_ACCESS_KEY
     #   secretName: openbao
     #   secretKey: AWS_SECRET_ACCESS_KEY
@@ -595,8 +588,7 @@ server:
   # extraVolumes is a list of extra volumes to mount. These will be exposed
   # to OpenBao in the path `/openbao/userconfig/<name>/`. The value below is
   # an array of objects, examples are shown below.
-  extraVolumes:
-    []
+  extraVolumes: []
     # - type: secret (or "configMap")
     #   name: my-secret
     #   path: null # default is `/openbao/userconfig`
@@ -1192,7 +1184,7 @@ csi:
       # -- image repo to use for agent image
       repository: "openbao/openbao"
       # -- image tag to use for agent image
-      tag: "2.2.2"
+      tag: "2.3.1"
       # -- image pull policy to use for agent image. if tag is "latest", set to "Always"
       pullPolicy: IfNotPresent
 
