@@ -289,7 +289,9 @@ storage might be desired by the user.
   {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled) }}
   volumeClaimTemplates:
       {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (eq (.Values.server.ha.raft.enabled | toString ) "true" )) }}
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: data
         {{- include "openbao.dataVolumeClaim.annotations" . | nindent 6 }}
         {{- include "openbao.dataVolumeClaim.labels" . | nindent 6 }}
@@ -304,7 +306,9 @@ storage might be desired by the user.
           {{- end }}
       {{ end }}
       {{- if eq (.Values.server.auditStorage.enabled | toString) "true" }}
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: audit
         {{- include "openbao.auditVolumeClaim.annotations" . | nindent 6 }}
         {{- include "openbao.auditVolumeClaim.labels" . | nindent 6 }}
