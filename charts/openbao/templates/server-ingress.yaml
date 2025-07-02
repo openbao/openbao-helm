@@ -3,7 +3,6 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{- if not .Values.global.openshift }}
 {{ template "openbao.mode" . }}
 {{- if ne .mode "external" }}
 {{- if .Values.server.ingress.enabled -}}
@@ -63,7 +62,6 @@ spec:
                   number: {{ $servicePort }}
         {{- end }}
   {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
