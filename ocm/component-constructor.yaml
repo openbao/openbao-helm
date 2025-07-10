@@ -1,0 +1,15 @@
+# specify a schema to validate the configuration and get auto-completion in your editor
+# yaml-language-server: $schema=https://ocm.software/schemas/configuration-schema.yaml
+components:
+  - name: "{{ .COMPONENT_NAME }}"
+    version: "{{ .OPENBAO_CHART_VERSION }}"
+    provider:
+      name: "{{ .PROVIDER }}"
+    resources:
+      - name: openbao-helm-chart
+        type: helmChart
+        version: "{{ .OPENBAO_CHART_VERSION }}"
+        relation: external
+        access:
+          type: ociArtifact
+          imageReference: "ghcr.io/openbao/charts/openbao:{{ .OPENBAO_CHART_VERSION }}"
