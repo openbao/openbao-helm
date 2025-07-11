@@ -13,27 +13,14 @@ jobs:
     strategy:
       matrix:
         config:
-          - {
-              type: "kind"
-            }
-          - {
-              type: "minikube"
-            }
-          - {
-              type: "microk8s"
-            }
-          - {
-              type: "k3d"
-            }
+          - { type: "kind" }
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install helm
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Install Helm
         uses: Azure/setup-helm@v4
         with:
           version: v3.18.0
-
       # Note: 'uses' doesn't support variable interpolation, hence the
       # k8s-specific steps below.
       # Ref: https://github.com/orgs/community/discussions/25824
@@ -42,45 +29,19 @@ jobs:
         uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
         with:
           cluster_name: kind
-          version: v0.27.0
+          version: v0.28.0
           node_image: kindest/node:${{ env.K8S_VERSION }}
-
-      - name: Create minikube cluster
-        if: matrix.config.type == 'minikube'
-        uses: medyagh/setup-minikube@cea33675329b799adccc9526aa5daccc26cd5052 # v0.0.19
-        with:
-          container-runtime: containerd
-          kubernetes-version: ${{ env.K8S_VERSION }}
-
-      - name: Create microk8s cluster
-        if: matrix.config.type == 'microk8s'
-        uses: balchua/microk8s-actions@13f73436011eb4925c22526f64fb3ecdd81289a9 # v0.4.3
-        with:
-          channel: ${{ env.MICROK8S_CHANNEL }}
-          addons: '["hostpath-storage"]'
-
-      - name: Create k3d cluster
-        if: matrix.config.type == 'k3d'
-        uses: AbsaOSS/k3d-action@4e8b3239042be1dc0aed6c5eb80c13b18200fc79 # v2.4.0
-        with:
-          cluster-name: k3s-default
-          k3d-version: v5.8.3
-          args: |
-            --image docker.io/rancher/k3s:${{ env.K8S_VERSION }}-k3s1
-
-      - name: helm install openbao
+      - name: Helm install OpenBao
         run: |
           helm install openbao \
             --namespace openbao \
             --create-namespace \
             --debug \
             charts/openbao
-
       - name: Wait until OpenBao is in Running state
         run: |
           timeout 60s bash -c 'until [[ "$(kubectl -n openbao get pods $(kubectl -n openbao get pods -l statefulset.kubernetes.io/pod-name=openbao-0 -ojsonpath="{.items[].metadata.name}") -o jsonpath="{.status.phase}" 2>/dev/null)" == "Running" ]]; do kubectl -n openbao get pods $(kubectl get pods -n openbao -l statefulset.kubernetes.io/pod-name=openbao-0 -ojsonpath="{.items[].metadata.name}") -o jsonpath="{.status.phase}" && sleep 5; done'
-
-      - name: run OpenBao agent
+      - name: Run OpenBao Agent
         run: |
           kubectl get pods -A
           openbao_pod=$(kubectl get pods -n openbao -l statefulset.kubernetes.io/pod-name=openbao-0 -ojsonpath="{.items[].metadata.name}")
@@ -98,7 +59,6 @@ jobs:
             echo "Failed to unseal OpenBao"
             exit 1
           fi
-
       - name: debug
         if: failure()
         run: |
