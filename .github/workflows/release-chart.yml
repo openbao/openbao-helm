@@ -55,3 +55,10 @@ jobs:
 
             helm push "${pkg}" "oci://${chart_registry}"
           done
+          
+  ocm:
+    needs:
+      - release
+    name: Release OCM Artifact
+    uses: ./.github/workflows/job-ocm.yaml
+    secrets: inherit

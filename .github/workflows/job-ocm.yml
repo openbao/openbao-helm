@@ -55,5 +55,5 @@ jobs:
       - name: Push OCM artifact to OCI
         run: |
           OCI_REGISTRY="ghcr.io/${GITHUB_REPOSITORY_OWNER}/charts/openbao"
-          echo $OCI_REGISTRY
+          echo "Pushing to ${OCI_REGISTRY} as user '${{ github.actor }}'"
           ocm transfer ctf ./ocm/transport.ctf OCIRegistry::${OCI_REGISTRY}
