@@ -33,7 +33,7 @@ jobs:
                     type: OCIRegistry
                     scheme: https
                     hostname: ghcr.io
-                    pathprefix: openbao/ocm
+                    pathprefix: openbao/charts/openbao
                   credentials:
                     - type: Credentials
                       properties:
