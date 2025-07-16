@@ -18,9 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Install Helm
-        uses: Azure/setup-helm@v4
+        uses: Azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112 # v4.3.0
         with:
-          version: v3.18.0
+          version: v3.18.4
       # Note: 'uses' doesn't support variable interpolation, hence the
       # k8s-specific steps below.
       # Ref: https://github.com/orgs/community/discussions/25824
@@ -38,10 +38,10 @@ jobs:
             --create-namespace \
             --debug \
             charts/openbao
-      - name: Wait until OpenBao is in Running state
+      - name: Wait until OpenBao instance is scheduled (in Running state)
         run: |
           timeout 60s bash -c 'until [[ "$(kubectl -n openbao get pods $(kubectl -n openbao get pods -l statefulset.kubernetes.io/pod-name=openbao-0 -ojsonpath="{.items[].metadata.name}") -o jsonpath="{.status.phase}" 2>/dev/null)" == "Running" ]]; do kubectl -n openbao get pods $(kubectl get pods -n openbao -l statefulset.kubernetes.io/pod-name=openbao-0 -ojsonpath="{.items[].metadata.name}") -o jsonpath="{.status.phase}" && sleep 5; done'
-      - name: Run OpenBao Agent
+      - name: Initialize and Unseal OpenBao instance
         run: |
           kubectl get pods -A
           openbao_pod=$(kubectl get pods -n openbao -l statefulset.kubernetes.io/pod-name=openbao-0 -ojsonpath="{.items[].metadata.name}")
