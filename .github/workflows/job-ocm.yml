@@ -52,7 +52,7 @@ jobs:
 
       - name: Create OCM component archive
         run: |
-          OPENBAO_VERSION=$(cat ./charts/openbao/Chart.yaml | grep version | awk '{print $2}')
+          OPENBAO_VERSION=$(cat ./charts/openbao/Chart.yaml | grep appVersion | awk '{print $2}' | cut -c2-)
           CHART_VERSION=$(cat ./charts/openbao/Chart.yaml | grep version | awk '{print $2}')
 
           echo "Building OCM artifact for ${CHART_VERSION}"
