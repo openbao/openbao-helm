@@ -37,7 +37,7 @@ jobs:
                     type: OCIRegistry
                     scheme: https
                     hostname: ghcr.io
-                    pathprefix: openbao/charts/openbao
+                    pathprefix: openbao
                   credentials:
                     - type: Credentials
                       properties:
@@ -65,6 +65,6 @@ jobs:
 
       - name: Push OCM artifact to OCI
         run: |
-          OCI_REGISTRY="ghcr.io/${GITHUB_REPOSITORY_OWNER}/charts/openbao"
+          OCI_REGISTRY="ghcr.io/${GITHUB_REPOSITORY_OWNER}"
           echo "Pushing to ${OCI_REGISTRY} as user '${{ github.actor }}'"
           ocm transfer ctf --copy-resources ./ocm/transport.ctf OCIRegistry::${OCI_REGISTRY}
