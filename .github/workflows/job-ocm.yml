@@ -10,6 +10,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Helm
+        uses: azure/setup-helm@v3.5
+        id: helm-install
+
       - name: Setup ocm-cli
         run: |
           VERSION="0.26.0"
@@ -43,6 +47,12 @@ jobs:
 
       - name: Create OCM component archive
         run: |
+          helm package charts/openbao
+          ls -lah
+
+      - name: Create OCM component archive
+        run: |
+          OPENBAO_VERSION=$(cat ./charts/openbao/Chart.yaml | grep version | awk '{print $2}')
           CHART_VERSION=$(cat ./charts/openbao/Chart.yaml | grep version | awk '{print $2}')
 
           echo "Building OCM artifact for ${CHART_VERSION}"
@@ -50,10 +60,11 @@ jobs:
           ocm add componentversions --create --templater=go --file=ocm/transport.ctf ocm/component-constructor.yaml -- \
                             COMPONENT_NAME="openbao.org/openbao" \
                             PROVIDER="openbao" \
+                            OPENBAO_VERSION=${OPENBAO_VERSION} \
                             OPENBAO_CHART_VERSION=${CHART_VERSION}
 
       - name: Push OCM artifact to OCI
         run: |
           OCI_REGISTRY="ghcr.io/${GITHUB_REPOSITORY_OWNER}/charts/openbao"
           echo "Pushing to ${OCI_REGISTRY} as user '${{ github.actor }}'"
-          ocm transfer ctf ./ocm/transport.ctf OCIRegistry::${OCI_REGISTRY}
+          ocm transfer ctf --copy-resources ./ocm/transport.ctf OCIRegistry::${OCI_REGISTRY}
