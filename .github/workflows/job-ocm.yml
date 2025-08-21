@@ -1,0 +1,72 @@
+name: OCM
+on: [workflow_dispatch, workflow_call, pull_request, push]
+
+jobs:
+  ocm:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3.5
+        id: helm-install
+
+      - name: Setup ocm-cli
+        run: |
+          VERSION="0.26.0"
+          ARCHIVE_FILE="ocm-${VERSION}-linux-amd64.tar.gz"
+          URL="https://github.com/open-component-model/ocm/releases/download/v${VERSION}/$ARCHIVE_FILE"
+
+          echo "Installing ocm-cli version v${VERSION} from ${URL}"
+
+          curl -LsS -o ocm-cli.tgz "$URL"
+          tar --overwrite -xvzf ocm-cli.tgz -C /usr/local/bin
+          chmod a+x /usr/local/bin/ocm
+
+      - name: Write .ocmconfig
+        run: |
+          cat <<EOF > $HOME/.ocmconfig
+          type: generic.config.ocm.software/v1
+          configurations:
+            - type: credentials.config.ocm.software
+              consumers:
+                - identity:
+                    type: OCIRegistry
+                    scheme: https
+                    hostname: ghcr.io
+                    pathprefix: openbao
+                  credentials:
+                    - type: Credentials
+                      properties:
+                        username: ${{ github.actor }}
+                        password: ${{ secrets.GITHUB_TOKEN }}
+          EOF
+
+      - name: Create OCM component archive
+        run: |
+          helm package charts/openbao
+          ls -lah
+
+      - name: Create OCM component archive
+        run: |
+          OPENBAO_VERSION=$(cat ./charts/openbao/Chart.yaml | grep appVersion | awk '{print $2}' | cut -c2-)
+          CHART_VERSION=$(cat ./charts/openbao/Chart.yaml | grep version | awk '{print $2}')
+
+          echo "Building OCM artifact for ${CHART_VERSION}"
+
+          ocm add componentversions --create --templater=go --file=ocm/transport.ctf ocm/component-constructor.yaml -- \
+                            COMPONENT_NAME="openbao.org/openbao" \
+                            PROVIDER="openbao" \
+                            OPENBAO_VERSION=${OPENBAO_VERSION} \
+                            OPENBAO_CHART_VERSION=${CHART_VERSION}
+
+      - name: Push OCM artifact to OCI
+        run: |
+          OCI_REGISTRY="ghcr.io/${GITHUB_REPOSITORY_OWNER}"
+          echo "Pushing to ${OCI_REGISTRY} as user '${{ github.actor }}'"
+          ocm transfer ctf --copy-resources ./ocm/transport.ctf OCIRegistry::${OCI_REGISTRY}
