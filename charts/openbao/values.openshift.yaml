@@ -14,7 +14,7 @@ injector:
   agentImage:
     registry: "quay.io"
     repository: "openbao/openbao-ubi"
-    tag: "2.3.1"
+    tag: "2.3.2"
     # Use UBI-based OpenBao image for better OpenShift compatibility
     # See: https://openbao.org/docs/install/#container-registries
 
@@ -22,7 +22,7 @@ server:
   image:
     registry: "quay.io"
     repository: "openbao/openbao-ubi"
-    tag: "2.3.1"
+    tag: "2.3.2"
     # Use UBI-based OpenBao image for better OpenShift compatibility
     # See: https://openbao.org/docs/install/#container-registries
 
