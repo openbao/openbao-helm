@@ -138,8 +138,8 @@ spec:
               value: "{{ .Values.server.logFormat }}"
             {{- end }}
             {{ template "openbao.envs" . }}
-            {{- include "openbao.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "openbao.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
+            {{- include "openbao.extraEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
           {{ template "openbao.mounts" . }}
             - name: home
