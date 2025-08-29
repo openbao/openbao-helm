@@ -29,7 +29,7 @@ Kubernetes: `>= 1.30.0-0`
 | csi.agent.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for agent image. if tag is "latest", set to "Always" |
 | csi.agent.image.registry | string | `"quay.io"` | image registry to use for agent image |
 | csi.agent.image.repository | string | `"openbao/openbao"` | image repo to use for agent image |
-| csi.agent.image.tag | string | `""` | image tag to use for agent image |
+| csi.agent.image.tag | string | `""` | image tag to use for agent image - defaults to chart appVersion |
 | csi.agent.logFormat | string | `"standard"` |  |
 | csi.agent.logLevel | string | `"info"` |  |
 | csi.agent.resources | object | `{}` |  |
@@ -92,7 +92,7 @@ Kubernetes: `>= 1.30.0-0`
 | injector.agentImage.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for agent image. if tag is "latest", set to "Always" |
 | injector.agentImage.registry | string | `"quay.io"` | image registry to use for agent image |
 | injector.agentImage.repository | string | `"openbao/openbao"` | image repo to use for agent image |
-| injector.agentImage.tag | string | `""` | image tag to use for agent image |
+| injector.agentImage.tag | string | `""` | image tag to use for agent image - defaults to chart appVersion |
 | injector.annotations | object | `{}` |  |
 | injector.authPath | string | `"auth/kubernetes"` |  |
 | injector.certs.caBundle | string | `""` |  |
@@ -195,7 +195,7 @@ Kubernetes: `>= 1.30.0-0`
 | server.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for server image. if tag is "latest", set to "Always" |
 | server.image.registry | string | `"quay.io"` | image registry to use for server image |
 | server.image.repository | string | `"openbao/openbao"` | image repo to use for server image |
-| server.image.tag | string | `""` | image tag to use for server image |
+| server.image.tag | string | `""` | image tag to use for server image - defaults to chart appVersion |
 | server.ingress.activeService | bool | `true` |  |
 | server.ingress.annotations | object | `{}` |  |
 | server.ingress.enabled | bool | `false` |  |
