@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.17.0](https://img.shields.io/badge/Version-0.17.0-informational?style=flat-square) ![AppVersion: v2.4.0](https://img.shields.io/badge/AppVersion-v2.4.0-informational?style=flat-square)
+![Version: 0.17.1](https://img.shields.io/badge/Version-0.17.1-informational?style=flat-square) ![AppVersion: v2.4.0](https://img.shields.io/badge/AppVersion-v2.4.0-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -34,6 +34,7 @@ Kubernetes: `>= 1.30.0-0`
 | csi.agent.logLevel | string | `"info"` |  |
 | csi.agent.resources | object | `{}` |  |
 | csi.daemonSet.annotations | object | `{}` |  |
+| csi.daemonSet.endpoint | string | `"/provider/openbao.sock"` |  |
 | csi.daemonSet.extraLabels | object | `{}` |  |
 | csi.daemonSet.kubeletRootDir | string | `"/var/lib/kubelet"` |  |
 | csi.daemonSet.providersDir | string | `"/etc/kubernetes/secrets-store-csi-providers"` |  |
