@@ -85,8 +85,8 @@ injector:
     registry: "quay.io"
     # -- image repo to use for agent image
     repository: "openbao/openbao"
-    # -- image tag to use for agent image
-    tag: "2.3.2"
+    # -- image tag to use for agent image - defaults to chart appVersion
+    tag: ""
     # -- image pull policy to use for agent image. if tag is "latest", set to "Always"
     pullPolicy: IfNotPresent
 
@@ -380,8 +380,8 @@ server:
     registry: "quay.io"
     # -- image repo to use for server image
     repository: "openbao/openbao"
-    # -- image tag to use for server image
-    tag: "2.3.2"
+    # -- image tag to use for server image - defaults to chart appVersion
+    tag: ""
     # -- image pull policy to use for server image. if tag is "latest", set to "Always"
     pullPolicy: IfNotPresent
 
@@ -1183,8 +1183,8 @@ csi:
       registry: "quay.io"
       # -- image repo to use for agent image
       repository: "openbao/openbao"
-      # -- image tag to use for agent image
-      tag: "2.3.2"
+      # -- image tag to use for agent image - defaults to chart appVersion
+      tag: ""
       # -- image pull policy to use for agent image. if tag is "latest", set to "Always"
       pullPolicy: IfNotPresent
 
