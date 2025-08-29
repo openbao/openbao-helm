@@ -117,15 +117,16 @@ load _helpers
   [ "${actual}" = "quay.io/foo:1.2.3" ]
 }
 
-@test "server/standalone-StatefulSet: image tag defaults to latest" {
+@test "server/standalone-StatefulSet: image tag defaults to appVersion" {
   cd `chart_dir`
+  local appVersion=$(helm show chart . | yq -r '.appVersion' | tr -d "v")
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
       --set 'server.image.tag=' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "quay.io/foo:latest" ]
+  [ "${actual}" = "quay.io/foo:${appVersion}" ]
 
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -134,7 +135,7 @@ load _helpers
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "quay.io/foo:latest" ]
+  [ "${actual}" = "quay.io/foo:${appVersion}" ]
 }
 
 @test "server/standalone-StatefulSet: default imagePullPolicy" {
