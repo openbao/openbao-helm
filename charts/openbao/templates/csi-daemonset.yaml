@@ -54,7 +54,7 @@ spec:
           image: "{{ .Values.csi.image.registry | default "docker.io" }}/{{ .Values.csi.image.repository }}:{{ .Values.csi.image.tag }}"
           imagePullPolicy: {{ .Values.csi.image.pullPolicy }}
           args:
-            - --endpoint={{ .Values.csi.endpoint }}
+            - --endpoint={{ .Values.csi.daemonSet.endpoint }}
             - --debug={{ .Values.csi.debug }}
             {{- if .Values.csi.hmacSecretName }}
             - --hmac-secret-name={{ .Values.csi.hmacSecretName }}
