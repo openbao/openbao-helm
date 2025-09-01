@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.17.1](https://img.shields.io/badge/Version-0.17.1-informational?style=flat-square) ![AppVersion: v2.4.0](https://img.shields.io/badge/AppVersion-v2.4.0-informational?style=flat-square)
+![Version: 0.18.0](https://img.shields.io/badge/Version-0.18.0-informational?style=flat-square) ![AppVersion: v2.4.0](https://img.shields.io/badge/AppVersion-v2.4.0-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -49,7 +49,7 @@ Kubernetes: `>= 1.30.0-0`
 | csi.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for csi image. if tag is "latest", set to "Always" |
 | csi.image.registry | string | `"quay.io"` | image registry to use for csi image |
 | csi.image.repository | string | `"openbao/openbao-csi-provider"` | image repo to use for csi image |
-| csi.image.tag | string | `"1.5.0"` | image tag to use for csi image |
+| csi.image.tag | string | `"2.0.0"` | image tag to use for csi image |
 | csi.livenessProbe.failureThreshold | int | `2` |  |
 | csi.livenessProbe.initialDelaySeconds | int | `5` |  |
 | csi.livenessProbe.periodSeconds | int | `5` |  |
