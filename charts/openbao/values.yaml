@@ -1094,7 +1094,7 @@ csi:
     # -- image repo to use for csi image
     repository: "openbao/openbao-csi-provider"
     # -- image tag to use for csi image
-    tag: "1.5.0"
+    tag: "2.0.0"
     # -- image pull policy to use for csi image. if tag is "latest", set to "Always"
     pullPolicy: IfNotPresent
 
