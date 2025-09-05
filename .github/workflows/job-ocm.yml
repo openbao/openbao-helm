@@ -16,6 +16,13 @@ jobs:
         uses: azure/setup-helm@v3.5
         id: helm-install
 
+      - name: Setup yq
+        run: |
+          VERSION="4.47.2"
+          FILE="yq_linux_amd64"
+          wget https://github.com/mikefarah/yq/releases/download/v${VERSION}/${FILE} -O /usr/local/bin/yq
+          chmod a+x /usr/local/bin/yq
+
       - name: Setup ocm-cli
         run: |
           VERSION="0.26.0"
@@ -52,16 +59,26 @@ jobs:
 
       - name: Create OCM component archive
         run: |
-          OPENBAO_VERSION=$(cat ./charts/openbao/Chart.yaml | grep appVersion | awk '{print $2}' | cut -c2-)
-          CHART_VERSION=$(cat ./charts/openbao/Chart.yaml | grep version | awk '{print $2}')
+          OPENBAO_REGISTRY=$(yq '.server.image.registry' ./charts/openbao/values.yaml)
+          OPENBAO_VERSION=$(yq '.appVersion | sub("v", "")' ./charts/openbao/Chart.yaml)
+          CHART_VERSION=$(yq '.version' ./charts/openbao/Chart.yaml)
+          OPENBAO_CSI_VERSION=$(yq '.csi.image.tag' ./charts/openbao/values.yaml)
+          INJECTOR_REGISTRY=$(yq '.injector.image.registry' ./charts/openbao/values.yaml)
+          INJECTOR_REPOSITORY=$(yq '.injector.image.repository' ./charts/openbao/values.yaml)
+          INJECTOR_VERSION=$(yq '.injector.image.tag' ./charts/openbao/values.yaml)
 
           echo "Building OCM artifact for ${CHART_VERSION}"
 
           ocm add componentversions --create --templater=go --file=ocm/transport.ctf ocm/component-constructor.yaml -- \
                             COMPONENT_NAME="openbao.org/openbao" \
                             PROVIDER="openbao" \
+                            OPENBAO_REGISTRY=${OPENBAO_REGISTRY} \
                             OPENBAO_VERSION=${OPENBAO_VERSION} \
-                            OPENBAO_CHART_VERSION=${CHART_VERSION}
+                            OPENBAO_CHART_VERSION=${CHART_VERSION} \
+                            OPENBAO_CSI_VERSION=${OPENBAO_CSI_VERSION} \
+                            INJECTOR_REGISTRY=${INJECTOR_REGISTRY} \
+                            INJECTOR_REPOSITORY=${INJECTOR_REPOSITORY} \
+                            INJECTOR_VERSION=${INJECTOR_VERSION}
 
       - name: Push OCM artifact to OCI
         run: |

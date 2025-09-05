@@ -22,7 +22,7 @@ components:
         relation: local
         access:
           type: ociArtifact
-          imageReference: "ghcr.io/openbao/openbao:{{ .OPENBAO_VERSION }}"
+          imageReference: "{{ .OPENBAO_REGISTRY }}/openbao/openbao:{{ .OPENBAO_VERSION }}"
 
       # UBI Image referenced in the Helm chart
       - name: openbao-ubi-image
@@ -31,7 +31,7 @@ components:
         relation: local
         access:
           type: ociArtifact
-          imageReference: "ghcr.io/openbao/openbao-ubi:{{ .OPENBAO_VERSION }}"
+          imageReference: "{{ .OPENBAO_REGISTRY }}/openbao/openbao-ubi:{{ .OPENBAO_VERSION }}"
 
       # HSM Image referenced in the Helm chart
       - name: openbao-hsm-ubi-image
@@ -40,4 +40,22 @@ components:
         relation: local
         access:
           type: ociArtifact
-          imageReference: "ghcr.io/openbao/openbao-hsm-ubi:{{ .OPENBAO_VERSION }}"
+          imageReference: "{{ .OPENBAO_REGISTRY }}/openbao/openbao-hsm-ubi:{{ .OPENBAO_VERSION }}"
+
+      # CSI Image referenced in the Helm chart
+      - name: openbao-csi-provider
+        type: ociImage
+        version: "{{ .OPENBAO_CSI_VERSION }}"
+        relation: local
+        access:
+          type: ociArtifact
+          imageReference: "{{ .OPENBAO_REGISTRY }}/openbao/openbao-csi-provider:{{ .OPENBAO_CSI_VERSION }}"
+
+      # Injector Image referenced in the Helm chart
+      - name: openbao-agent-injector
+        type: ociImage
+        version: "{{ .INJECTOR_VERSION }}"
+        relation: external
+        access:
+          type: ociArtifact
+          imageReference: "{{ .INJECTOR_REGISTRY }}/{{ .INJECTOR_REPOSITORY }}:{{ .INJECTOR_VERSION }}"
