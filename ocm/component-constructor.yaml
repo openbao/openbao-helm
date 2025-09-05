@@ -10,30 +10,16 @@ components:
       - name: openbao-helm-chart-external-oci
         type: helmChart
         version: "{{ .OPENBAO_CHART_VERSION }}"
-        relation: external
+        relation: local
         access:
           type: ociArtifact
           imageReference: "ghcr.io/openbao/charts/openbao:{{ .OPENBAO_CHART_VERSION }}"
-
-      # Helm chart as local tgz file
-      - name: openbao-helm-chart-local-tgz
-        type: helmChart
-        input:
-          type: helm
-          path: "../openbao-{{ .OPENBAO_CHART_VERSION }}.tgz"
-
-      # Helm chart as local folder
-      - name: openbao-helm-chart-local-folder
-        type: helmChart
-        version: "{{ .OPENBAO_CHART_VERSION }}"
-        input:
-          type: dir
-          path: ../charts/openbao
 
       # Image referenced in the Helm chart
       - name: openbao-image
         type: ociImage
         version: "{{ .OPENBAO_VERSION }}"
+        relation: local
         access:
           type: ociArtifact
           imageReference: "ghcr.io/openbao/openbao:{{ .OPENBAO_VERSION }}"
@@ -42,6 +28,7 @@ components:
       - name: openbao-ubi-image
         type: ociImage
         version: "{{ .OPENBAO_VERSION }}"
+        relation: local
         access:
           type: ociArtifact
           imageReference: "ghcr.io/openbao/openbao-ubi:{{ .OPENBAO_VERSION }}"
@@ -50,6 +37,7 @@ components:
       - name: openbao-hsm-ubi-image
         type: ociImage
         version: "{{ .OPENBAO_VERSION }}"
+        relation: local
         access:
           type: ociArtifact
           imageReference: "ghcr.io/openbao/openbao-hsm-ubi:{{ .OPENBAO_VERSION }}"

@@ -1,5 +1,5 @@
 name: OCM
-on: [workflow_dispatch, workflow_call, pull_request, push]
+on: [workflow_call]
 
 jobs:
   ocm:
@@ -39,7 +39,6 @@ jobs:
                     type: OCIRegistry
                     scheme: https
                     hostname: ghcr.io
-                    pathprefix: openbao
                   credentials:
                     - type: Credentials
                       properties:
@@ -47,10 +46,9 @@ jobs:
                         password: ${{ secrets.GITHUB_TOKEN }}
           EOF
 
-      - name: Create OCM component archive
+      - name: Create Helm Chart archive
         run: |
           helm package charts/openbao
-          ls -lah
 
       - name: Create OCM component archive
         run: |
@@ -67,6 +65,6 @@ jobs:
 
       - name: Push OCM artifact to OCI
         run: |
-          OCI_REGISTRY="ghcr.io/${GITHUB_REPOSITORY_OWNER}"
+          OCI_REGISTRY="ghcr.io/openbao"
           echo "Pushing to ${OCI_REGISTRY} as user '${{ github.actor }}'"
-          ocm transfer ctf --copy-resources ./ocm/transport.ctf OCIRegistry::${OCI_REGISTRY}
+          ocm transfer ctf ./ocm/transport.ctf OCIRegistry::${OCI_REGISTRY}
