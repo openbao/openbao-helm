@@ -56,8 +56,10 @@ jobs:
 
             helm push "${pkg}" "oci://${chart_registry}"
           done
-          
+
   ocm:
+    permissions:
+      packages: write
     needs:
       - release
     name: Release OCM Artifact
