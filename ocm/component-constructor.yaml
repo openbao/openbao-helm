@@ -1,0 +1,61 @@
+# specify a schema to validate the configuration and get auto-completion in your editor
+# yaml-language-server: $schema=https://ocm.software/schemas/configuration-schema.yaml
+components:
+  - name: "{{ .COMPONENT_NAME }}"
+    version: "{{ .OPENBAO_CHART_VERSION }}"
+    provider:
+      name: "{{ .PROVIDER }}"
+    resources:
+      # Helm chart in OCI registry
+      - name: openbao-helm-chart-external-oci
+        type: helmChart
+        version: "{{ .OPENBAO_CHART_VERSION }}"
+        relation: local
+        access:
+          type: ociArtifact
+          imageReference: "ghcr.io/openbao/charts/openbao:{{ .OPENBAO_CHART_VERSION }}"
+
+      # Image referenced in the Helm chart
+      - name: openbao-image
+        type: ociImage
+        version: "{{ .OPENBAO_VERSION }}"
+        relation: local
+        access:
+          type: ociArtifact
+          imageReference: "{{ .OPENBAO_REGISTRY }}/openbao/openbao:{{ .OPENBAO_VERSION }}"
+
+      # UBI Image referenced in the Helm chart
+      - name: openbao-ubi-image
+        type: ociImage
+        version: "{{ .OPENBAO_VERSION }}"
+        relation: local
+        access:
+          type: ociArtifact
+          imageReference: "{{ .OPENBAO_REGISTRY }}/openbao/openbao-ubi:{{ .OPENBAO_VERSION }}"
+
+      # HSM Image referenced in the Helm chart
+      - name: openbao-hsm-ubi-image
+        type: ociImage
+        version: "{{ .OPENBAO_VERSION }}"
+        relation: local
+        access:
+          type: ociArtifact
+          imageReference: "{{ .OPENBAO_REGISTRY }}/openbao/openbao-hsm-ubi:{{ .OPENBAO_VERSION }}"
+
+      # CSI Image referenced in the Helm chart
+      - name: openbao-csi-provider
+        type: ociImage
+        version: "{{ .OPENBAO_CSI_VERSION }}"
+        relation: local
+        access:
+          type: ociArtifact
+          imageReference: "{{ .OPENBAO_REGISTRY }}/openbao/openbao-csi-provider:{{ .OPENBAO_CSI_VERSION }}"
+
+      # Injector Image referenced in the Helm chart
+      - name: openbao-agent-injector
+        type: ociImage
+        version: "{{ .INJECTOR_VERSION }}"
+        relation: external
+        access:
+          type: ociArtifact
+          imageReference: "{{ .INJECTOR_REGISTRY }}/{{ .INJECTOR_REPOSITORY }}:{{ .INJECTOR_VERSION }}"
