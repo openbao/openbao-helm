@@ -20,7 +20,7 @@ metadata:
   {{- template "openbao.statefulSet.annotations" . }}
 spec:
   serviceName: {{ template "openbao.fullname" . }}-internal
-  podManagementPolicy: {{ .Values.server.podManagementPolicy | default "Parallel" }}
+  podManagementPolicy: {{ .Values.server.podManagementPolicy }}
   replicas: {{ template "openbao.replicas" . }}
   updateStrategy:
     type: {{ .Values.server.updateStrategyType }}
