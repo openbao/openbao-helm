@@ -1952,3 +1952,35 @@ load _helpers
       yq -r '.spec.volumeClaimTemplates[0].metadata.labels["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+#--------------------------------------------------------------------
+# podManagementPolicy
+
+@test "server/standalone-StatefulSet: default podManagementPolicy is Parallel" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.podManagementPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Parallel" ]
+}
+
+@test "server/standalone-StatefulSet: podManagementPolicy can be set to OrderedReady" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.podManagementPolicy=OrderedReady' \
+      . | tee /dev/stderr |
+      yq -r '.spec.podManagementPolicy' | tee /dev/stderr)
+  [ "${actual}" = "OrderedReady" ]
+}
+
+@test "server/standalone-StatefulSet: podManagementPolicy can be explicitly set to Parallel" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.podManagementPolicy=Parallel' \
+      . | tee /dev/stderr |
+      yq -r '.spec.podManagementPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Parallel" ]
+}
