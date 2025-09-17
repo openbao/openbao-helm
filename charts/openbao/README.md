@@ -273,6 +273,7 @@ Kubernetes: `>= 1.30.0-0`
 | server.tolerations | list | `[]` |  |
 | server.topologySpreadConstraints | list | `[]` |  |
 | server.updateStrategyType | string | `"OnDelete"` |  |
+| server.podManagementPolicy | string | `"Parallel"` |  |
 | server.volumeMounts | string | `nil` |  |
 | server.volumes | string | `nil` |  |
 | serverTelemetry.grafanaDashboard.defaultLabel | bool | `true` |  |
