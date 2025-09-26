@@ -391,7 +391,7 @@ server:
 
   # Configure the pod management policy for the StatefulSet
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
-  podManagementPolicy: "Parallel"
+  podManagementPolicy: "OrderedReady"
 
   # Configure the logging verbosity for the OpenBao server.
   # Supported log levels include: trace, debug, info, warn, error
