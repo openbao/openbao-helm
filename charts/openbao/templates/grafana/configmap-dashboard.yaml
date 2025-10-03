@@ -8,6 +8,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ printf "%s-%s" (include "openbao.fullname" $) $dashboardName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ include "openbao.namespace" $ }}
   labels:
     app.kubernetes.io/name: {{ include "openbao.name" $ }}-grafana-dashboard
     app.kubernetes.io/instance: {{ $.Release.Name }}

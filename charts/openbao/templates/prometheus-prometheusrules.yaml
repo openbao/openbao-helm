@@ -11,6 +11,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: {{ template "openbao.fullname" . }}
+  namespace: {{ include "openbao.namespace" . }}
   labels:
     helm.sh/chart: {{ include "openbao.chart" . }}
     app.kubernetes.io/name: {{ include "openbao.name" . }}
