@@ -13,7 +13,6 @@ apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
   name: {{ template "openbao.fullname" . }}-agent-injector-cfg
-  namespace: {{ include "openbao.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "openbao.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}
