@@ -904,6 +904,10 @@ server:
       # Set the Node Raft ID to the name of the pod
       setNodeId: false
 
+      # config is a raw string of default configuration when using a Stateful
+      # deployment.
+      # This should be HCL.
+
       # Note: Configuration files are stored in ConfigMaps so sensitive data
       # such as passwords should be either mounted through extraSecretEnvironmentVars
       # or through a Kube secret.  For more information see:
