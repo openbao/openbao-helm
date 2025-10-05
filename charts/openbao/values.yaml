@@ -1080,9 +1080,9 @@ ui:
   # of the annotations to apply to the ui service
   annotations: {}
 
-# secrets-store-csi-driver-provider-vault
+# openbao-csi-provider
 csi:
-  # -- True if you want to install a secrets-store-csi-driver-provider-vault daemonset.
+  # -- True if you want to install a openbao-csi-provider daemonset.
   #
   # Requires installing the secrets-store-csi-driver separately, see:
   # https://secrets-store-csi-driver.sigs.k8s.io/getting-started/installation
@@ -1147,7 +1147,7 @@ csi:
     # endpoint path for the provider
     endpoint: "/provider/openbao.sock"
 
-    # Extra labels to attach to the vault-csi-provider daemonSet
+    # Extra labels to attach to the openbao-csi-provider daemonSet
     # This should be a YAML map of the labels to apply to the csi provider daemonSet
     extraLabels: {}
     # security context for the pod template and container in the csi provider daemonSet
@@ -1177,7 +1177,7 @@ csi:
     # This should be either a multi-line string or YAML matching the PodSpec's affinity field.
     affinity: {}
 
-    # Extra labels to attach to the vault-csi-provider pod
+    # Extra labels to attach to the openbao-csi-provider pod
     # This should be a YAML map of the labels to apply to the csi provider pod
     extraLabels: {}
 
@@ -1216,7 +1216,7 @@ csi:
     # annotations to apply to the serviceAccount.
     annotations: {}
 
-    # Extra labels to attach to the vault-csi-provider serviceAccount
+    # Extra labels to attach to the openbao-csi-provider serviceAccount
     # This should be a YAML map of the labels to apply to the csi provider serviceAccount
     extraLabels: {}
 
@@ -1248,7 +1248,7 @@ csi:
   # Enables debug logging.
   debug: false
 
-  # Pass arbitrary additional arguments to vault-csi-provider.
+  # Pass arbitrary additional arguments to openbao-csi-provider.
   # See https://openbao.org/docs/platform/k8s/csi/configurations
   # for the available command line flags.
   extraArgs: []
