@@ -568,7 +568,7 @@ server:
 
   # Used to define commands to run after the pod is ready.
   # This can be used to automate processes such as initialization
-  # or boostrapping auth methods.
+  # or bootstrapping auth methods.
   postStart: []
   # - /bin/sh
   # - -c
@@ -842,7 +842,7 @@ server:
     # Note: Configuration files are stored in ConfigMaps so sensitive data
     # such as passwords should be either mounted through extraSecretEnvironmentVars
     # or through a Kube secret.  For more information see:
-    # https://openbao.org/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+    # https://openbao.org/docs/platform/k8s/helm/run/#protecting-sensitive-openbao-configurations
     config: |
       ui = true
 
@@ -885,12 +885,12 @@ server:
     replicas: 3
 
     # Set the api_addr configuration for OpenBao HA
-    # See https://openbao.org/docs/configuration#api_addr
+    # See https://openbao.org/docs/configuration/#high-availability-parameters
     # If set to null, this will be set to the Pod IP Address
     apiAddr: null
 
-    # Set the cluster_addr confuguration for OpenBao HA
-    # See https://openbao.org/docs/configuration#cluster_addr
+    # Set the cluster_addr configuration for OpenBao HA
+    # See https://openbao.org/docs/configuration/#high-availability-parameters
     # If set to null, this will be set to https://$(HOSTNAME).{{ template "openbao.fullname" . }}-internal:8201
     clusterAddr: null
 
@@ -904,10 +904,14 @@ server:
       # Set the Node Raft ID to the name of the pod
       setNodeId: false
 
+      # config is a raw string of default configuration when using a Stateful
+      # deployment.
+      # This should be HCL.
+
       # Note: Configuration files are stored in ConfigMaps so sensitive data
       # such as passwords should be either mounted through extraSecretEnvironmentVars
       # or through a Kube secret.  For more information see:
-      # https://openbao.org/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+      # https://openbao.org/docs/platform/k8s/helm/run/#protecting-sensitive-openbao-configurations
       config: |
         ui = true
 
@@ -934,7 +938,7 @@ server:
     # Note: Configuration files are stored in ConfigMaps so sensitive data
     # such as passwords should be either mounted through extraSecretEnvironmentVars
     # or through a Kube secret.  For more information see:
-    # https://openbao.org/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+    # https://openbao.org/docs/platform/k8s/helm/run/#protecting-sensitive-openbao-configurations
     config: |
       ui = true
 
@@ -989,7 +993,7 @@ server:
     # Create a Secret API object to store a non-expiring token for the service account.
     # Prior to v1.24.0, Kubernetes used to generate this secret for each service account by default.
     # Kubernetes now recommends using short-lived tokens from the TokenRequest API or projected volumes instead if possible.
-    # For more details, see https://kubernetes.io/docs/concepts/configuration/secret/#service-account-token-secrets
+    # For more details, see https://kubernetes.io/docs/concepts/configuration/secret/#serviceaccount-token-secrets
     # serviceAccount.create must be equal to 'true' in order to use this feature.
     createSecret: false
     # Extra annotations for the serviceAccount definition. This can either be
@@ -1080,12 +1084,12 @@ ui:
   # of the annotations to apply to the ui service
   annotations: {}
 
-# secrets-store-csi-driver-provider-vault
+# openbao-csi-provider
 csi:
-  # -- True if you want to install a secrets-store-csi-driver-provider-vault daemonset.
+  # -- True if you want to install a openbao-csi-provider daemonset.
   #
   # Requires installing the secrets-store-csi-driver separately, see:
-  # https://github.com/kubernetes-sigs/secrets-store-csi-driver#install-the-secrets-store-csi-driver
+  # https://secrets-store-csi-driver.sigs.k8s.io/getting-started/installation
   #
   # With the driver and provider installed, you can mount OpenBao secrets into volumes
   # similar to the OpenBao Agent injector, and you can also sync those secrets into
@@ -1147,7 +1151,7 @@ csi:
     # endpoint path for the provider
     endpoint: "/provider/openbao.sock"
 
-    # Extra labels to attach to the vault-csi-provider daemonSet
+    # Extra labels to attach to the openbao-csi-provider daemonSet
     # This should be a YAML map of the labels to apply to the csi provider daemonSet
     extraLabels: {}
     # security context for the pod template and container in the csi provider daemonSet
@@ -1177,7 +1181,7 @@ csi:
     # This should be either a multi-line string or YAML matching the PodSpec's affinity field.
     affinity: {}
 
-    # Extra labels to attach to the vault-csi-provider pod
+    # Extra labels to attach to the openbao-csi-provider pod
     # This should be a YAML map of the labels to apply to the csi provider pod
     extraLabels: {}
 
@@ -1216,7 +1220,7 @@ csi:
     # annotations to apply to the serviceAccount.
     annotations: {}
 
-    # Extra labels to attach to the vault-csi-provider serviceAccount
+    # Extra labels to attach to the openbao-csi-provider serviceAccount
     # This should be a YAML map of the labels to apply to the csi provider serviceAccount
     extraLabels: {}
 
@@ -1248,8 +1252,8 @@ csi:
   # Enables debug logging.
   debug: false
 
-  # Pass arbitrary additional arguments to vault-csi-provider.
-  # See https://openbao.org/docs/platform/k8s/csi/configurations#command-line-arguments
+  # Pass arbitrary additional arguments to openbao-csi-provider.
+  # See https://openbao.org/docs/platform/k8s/csi/configurations
   # for the available command line flags.
   extraArgs: []
 
