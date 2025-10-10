@@ -9,7 +9,7 @@ on:
       - 'charts/**'
 
 jobs:
-  check-version:
+  check-versions:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -38,8 +38,8 @@ jobs:
           fi
 
   release:
-    needs: check-version
-    if: needs.check-version.outputs.should_release == 'true'
+    needs: check-versions
+    if: needs.check-versions.outputs.should_release == 'true'
     environment: helm-release
     permissions:
       contents: write
