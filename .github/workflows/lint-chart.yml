@@ -4,9 +4,14 @@ on:
   pull_request:
     paths:
       - "charts/**"
+    types: [opened, reopened, synchronize, labeled, unlabeled, ready_for_review]
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
@@ -35,7 +40,9 @@ jobs:
       - name: Run chart-testing (lint)
         id: lint
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct lint --target-branch ${{ github.event.repository.default_branch }}
+        run: |
+          CHECK_VERSION_INCREMENT=${{ !contains(github.event.pull_request.labels.*.name, 'no-release') }}
+          ct lint --target-branch ${{ github.event.repository.default_branch }} --check-version-increment=${CHECK_VERSION_INCREMENT}
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.10.0
