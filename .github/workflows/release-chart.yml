@@ -9,7 +9,37 @@ on:
       - 'charts/**'
 
 jobs:
+  check-versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      should_release: ${{ steps.check-versions.outputs.should_release }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check latest version
+        id: check-versions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          current_version=$(yq .version ./charts/openbao/Chart.yaml)
+          url="https://api.github.com/repos/openbao/openbao-helm/releases/latest"
+          latest_version=$(curl -sSfL -H "Authorization: Bearer ${GITHUB_TOKEN}" "$url" | jq -r '.tag_name' | sed 's/openbao-//')
+
+          if [ "$current_version" != "$latest_version" ]; then
+            echo "should_release=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+          fi
+
   release:
+    needs: check-versions
+    if: needs.check-versions.outputs.should_release == 'true'
     environment: helm-release
     permissions:
       contents: write
