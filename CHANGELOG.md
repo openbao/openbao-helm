@@ -1,6 +1,6 @@
 ## Unreleased
 
-Docs:
+### Docs:
 
 - Reintroduce `CHANGELOG.md`
 
