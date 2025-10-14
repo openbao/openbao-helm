@@ -1,0 +1,44 @@
+name: Update GitHub pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'README.md'
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Create gh pages worktree
+        run: |
+          gh_pages_worktree=$(mktemp -d)
+          git worktree add "$gh_pages_worktree" gh-pages || true
+          echo "gh_pages_worktree=$gh_pages_worktree" >> $GITHUB_ENV
+
+      - name: Update README
+        run: |
+          cp --force README.md "$gh_pages_worktree/index.md"
+          git -C "$gh_pages_worktree" add index.md
+
+      - name: Commit and push changes
+        run: |
+          # abort pages update if no changes detected
+          `git -C "$gh_pages_worktree" diff --cached --quiet` && exit 0
+
+          git -C "$gh_pages_worktree" commit --message="Update GitHub pages" --signoff
+          git -C "$gh_pages_worktree" push
