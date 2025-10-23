@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.19.1
+
+### Changes
+
+- Security update to `2.4.3`
+
 ### Docs:
 
 - Reintroduce `CHANGELOG.md`
