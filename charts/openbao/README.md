@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.18.4](https://img.shields.io/badge/Version-0.18.4-informational?style=flat-square) ![AppVersion: v2.4.1](https://img.shields.io/badge/AppVersion-v2.4.1-informational?style=flat-square)
+![Version: 0.19.1](https://img.shields.io/badge/Version-0.19.1-informational?style=flat-square) ![AppVersion: v2.4.3](https://img.shields.io/badge/AppVersion-v2.4.3-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -43,7 +43,7 @@ Kubernetes: `>= 1.30.0-0`
 | csi.daemonSet.updateStrategy.maxUnavailable | string | `""` |  |
 | csi.daemonSet.updateStrategy.type | string | `"RollingUpdate"` |  |
 | csi.debug | bool | `false` |  |
-| csi.enabled | bool | `false` | True if you want to install a secrets-store-csi-driver-provider-vault daemonset.  Requires installing the secrets-store-csi-driver separately, see: https://github.com/kubernetes-sigs/secrets-store-csi-driver#install-the-secrets-store-csi-driver  With the driver and provider installed, you can mount OpenBao secrets into volumes similar to the OpenBao Agent injector, and you can also sync those secrets into Kubernetes secrets. |
+| csi.enabled | bool | `false` | True if you want to install a openbao-csi-provider daemonset.  Requires installing the secrets-store-csi-driver separately, see: https://secrets-store-csi-driver.sigs.k8s.io/getting-started/installation  With the driver and provider installed, you can mount OpenBao secrets into volumes similar to the OpenBao Agent injector, and you can also sync those secrets into Kubernetes secrets. |
 | csi.extraArgs | list | `[]` |  |
 | csi.hmacSecretName | string | `""` |  |
 | csi.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for csi image. if tag is "latest", set to "Always" |
@@ -71,6 +71,7 @@ Kubernetes: `>= 1.30.0-0`
 | csi.serviceAccount.extraLabels | object | `{}` |  |
 | csi.volumeMounts | list | `[]` | volumeMounts is a list of volumeMounts for the main server container. These are rendered via toYaml rather than pre-processed like the extraVolumes value. The purpose is to make it easy to share volumes between containers. |
 | csi.volumes | list | `[]` | volumes is a list of volumes made available to all containers. These are rendered via toYaml rather than pre-processed like the extraVolumes value. The purpose is to make it easy to share volumes between containers. |
+| extraObjects | list | `[]` |  |
 | global.enabled | bool | `true` | enabled is the master enabled switch. Setting this to true or false will enable or disable all the components within this chart by default. |
 | global.externalBaoAddr | string | `""` | External openbao server address for the injector and CSI provider to use. Setting this will disable deployment of a openbao server. |
 | global.externalVaultAddr | string | `""` | Deprecated: Please use global.externalBaoAddr instead. |
