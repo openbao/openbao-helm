@@ -26,6 +26,9 @@ annotations:
   charts.openshift.io/name: Openbao
   artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |
+    - kind: fixed
+      description: |
+        fix: grafana dashboard
     - kind: changed
       description: |
         chore: update OpenBao to 2.4.3
