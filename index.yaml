@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: |
+            fix: grafana dashboard datasource
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.3
+    created: "2025-11-06T10:13:39.028624821Z"
+    description: Official OpenBao Chart
+    digest: 41728e859556e6494f677055adcbe0f385720c0b2918a5d1d67266f55086877a
+    home: https://github.com/openbao/openbao-helm
+    icon: https://github.com/openbao/artwork/blob/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.19.2/openbao-0.19.2.tgz
+    version: 0.19.2
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: |
             chore: update OpenBao to 2.4.3
@@ -991,4 +1025,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2025-10-23T06:45:29.990061694Z"
+generated: "2025-11-06T10:13:39.02891882Z"
