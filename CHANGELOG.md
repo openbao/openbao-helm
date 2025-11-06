@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.19.2
+
+### Changes
+
+- fix(grafana): dashboard datasource by @CorentinPtrl
+
 ## 0.19.1
 
 ### Changes

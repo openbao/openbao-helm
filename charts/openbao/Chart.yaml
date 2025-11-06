@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.19.1
+version: 0.19.2
 appVersion: v2.4.3
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -26,12 +26,9 @@ annotations:
   charts.openshift.io/name: Openbao
   artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |
-    - kind: changed
+    - kind: fixed
       description: |
-        chore: update OpenBao to 2.4.3
-      links:
-        - name: OpenBao 2.4.3 Release
-          url: https://github.com/openbao/openbao/releases/tag/v2.4.3
+        fix: grafana dashboard datasource
 
 maintainers:
   - name: OpenBao

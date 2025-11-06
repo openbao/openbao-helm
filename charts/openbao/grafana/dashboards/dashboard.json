@@ -2430,6 +2430,20 @@
   "templating": {
     "list": [
       {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "DS_PROMXY",
+        "label": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
         "allValue": null,
         "current": {},
         "datasource": "${DS_PROMXY}",
