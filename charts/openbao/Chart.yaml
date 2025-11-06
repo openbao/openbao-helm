@@ -28,7 +28,7 @@ annotations:
   artifacthub.io/changes: |
     - kind: fixed
       description: |
-        fix: grafana dashboard
+        fix: grafana dashboard datasource
 
 maintainers:
   - name: OpenBao
