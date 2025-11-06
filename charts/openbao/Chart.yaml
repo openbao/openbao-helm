@@ -29,12 +29,6 @@ annotations:
     - kind: fixed
       description: |
         fix: grafana dashboard
-    - kind: changed
-      description: |
-        chore: update OpenBao to 2.4.3
-      links:
-        - name: OpenBao 2.4.3 Release
-          url: https://github.com/openbao/openbao/releases/tag/v2.4.3
 
 maintainers:
   - name: OpenBao
