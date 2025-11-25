@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.19.2](https://img.shields.io/badge/Version-0.19.2-informational?style=flat-square) ![AppVersion: v2.4.3](https://img.shields.io/badge/AppVersion-v2.4.3-informational?style=flat-square)
+![Version: 0.19.3](https://img.shields.io/badge/Version-0.19.3-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
 
 Official OpenBao Chart
 
