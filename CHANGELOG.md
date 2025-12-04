@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.20.0
+
+### Changes
+
+- Set default value for podManagementPolicy to 'OrderedReady'
+
 ## 0.19.3
 
 ### Changes
