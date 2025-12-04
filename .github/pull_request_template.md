@@ -7,7 +7,7 @@
 
 <!-- Describe the changes your PR introduces here. -->
 
-# Issues
+# Rationale
 
 <!--
     Link related issues here, it's ok if this is empty but we do recommend that
@@ -27,11 +27,16 @@
 
 - [ ] This PR contains a description of the changes I'm making
 - [ ] I read the `CONTRIBUTING.md` guide
-- [ ] I updated the version in Chart.yaml if feasable.
+- [ ] I updated the version in Chart.yaml if feasable according to [Semantic versioning](https://semver.org/)
 - [ ] I updated the changelog with an `artifacthub.io/changes` annotation in `Chart.yaml`
 - [ ] I update the changelog in `CHANGELOG.md`
 - [ ] I updated applicable `README.md` files using [helm-docs](https://github.com/norwoodj/helm-docs)
-- [ ] I signed off all my commits
+- [ ] By contributing this change, I certify I have signed-off on the
+      [DCO ownership](https://developercertificate.org/) statement
+      and this change did not use post-BUSL-licensed code from HashiCorp.
+      Existing MPL-licensed code is still allowed, subject to attribution.
+      Code authored by yourself and submitted to HashiCorp for inclusion is
+      also allowed.
 
 <!--
     Please open PRs as Draft while you make CI green and/or finalise
