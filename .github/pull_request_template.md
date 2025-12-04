@@ -27,7 +27,7 @@
 
 - [ ] This PR contains a description of the changes I'm making
 - [ ] I read the `CONTRIBUTING.md` guide
-- [ ] I updated the version in Chart.yaml if feasable according to [Semantic versioning](https://semver.org/)
+- [ ] I updated the version in `Chart.yaml` if feasible according to [Semantic versioning](https://semver.org/)
 - [ ] I updated the changelog with an `artifacthub.io/changes` annotation in `Chart.yaml`
 - [ ] I update the changelog in `CHANGELOG.md`
 - [ ] I updated applicable `README.md` files using [helm-docs](https://github.com/norwoodj/helm-docs)
