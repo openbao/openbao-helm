@@ -73,15 +73,16 @@ load _helpers
   sleep 5
 
   # OpenBao Unseal
-  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=openbao' -o json | jq -r '.items[].metadata.name'))
-  for pod in "${pods[@]}"
-  do
-      if [[ ${pod?} != "$(name_prefix)-0" ]]
-      then
+  # Due to OrderedReady we need to run this several times and wait for each pod to be created
+  while [[ $(kubectl get pods --selector='app.kubernetes.io/name=openbao' --no-headers -o go-template='{{range .items}}{{.metadata.name}}{{"\t"}}{{range .status.conditions}}{{if eq .type "Ready"}}{{.status}}{{end}}{{end}}{{"\n"}}{{end}}' | grep -c True) -lt ${replicas} ]]; do
+    local pods=($(kubectl get pods --selector='app.kubernetes.io/name=openbao' -o json | jq -r '.items[].metadata.name'))
+      for pod in "${pods[@]}"; do
+        if [[ $(kubectl get po ${pod} -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "True" ]]; then
           kubectl exec -ti ${pod} -- bao operator raft join http://$(name_prefix)-0.$(name_prefix)-internal:8200
           kubectl exec -ti ${pod} -- bao operator unseal ${token}
           wait_for_ready "${pod}"
-      fi
+        fi
+      done
   done
 
   # Sealed, not initialized

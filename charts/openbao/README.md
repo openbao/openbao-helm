@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.19.1](https://img.shields.io/badge/Version-0.19.1-informational?style=flat-square) ![AppVersion: v2.4.3](https://img.shields.io/badge/AppVersion-v2.4.3-informational?style=flat-square)
+![Version: 0.20.0](https://img.shields.io/badge/Version-0.20.0-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -228,7 +228,7 @@ Kubernetes: `>= 1.30.0-0`
 | server.networkPolicy.ingress[0].ports[1].protocol | string | `"TCP"` |  |
 | server.nodeSelector | object | `{}` |  |
 | server.persistentVolumeClaimRetentionPolicy | object | `{}` |  |
-| server.podManagementPolicy | string | `"Parallel"` |  |
+| server.podManagementPolicy | string | `"OrderedReady"` |  |
 | server.postStart | list | `[]` |  |
 | server.preStopSleepSeconds | int | `5` |  |
 | server.priorityClassName | string | `""` |  |

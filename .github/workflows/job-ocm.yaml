@@ -8,20 +8,9 @@ jobs:
       packages: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
-
-      - name: Install Helm
-        uses: azure/setup-helm@v3.5
-        id: helm-install
-
-      - name: Setup yq
-        run: |
-          VERSION="4.47.2"
-          FILE="yq_linux_amd64"
-          wget https://github.com/mikefarah/yq/releases/download/v${VERSION}/${FILE} -O /usr/local/bin/yq
-          chmod a+x /usr/local/bin/yq
 
       - name: Setup ocm-cli
         run: |
