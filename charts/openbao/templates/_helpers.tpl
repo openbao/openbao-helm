@@ -694,6 +694,21 @@ Sets extra ingress annotations
 {{- end -}}
 
 {{/*
+Sets extra TLSRoute annotations
+*/}}
+{{- define "openbao.gateway.tlsRoute.annotations" -}}
+  {{- if .Values.server.gateway.tlsRoute.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.server.gateway.tlsRoute.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.gateway.tlsRoute.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.gateway.tlsRoute.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra route annotations
 */}}
 {{- define "openbao.route.annotations" -}}

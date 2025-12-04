@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.21.0
+
+- feat: add support for gateway-api tlsroutes
+
 ## 0.20.0
 
 ### Changes
