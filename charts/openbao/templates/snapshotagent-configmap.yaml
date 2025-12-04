@@ -1,0 +1,23 @@
+
+---
+{{- if .Values.snapshotAgent.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "openbao.fullname" . }}-snapshot
+  namespace: {{ include "openbao.namespace" . }}
+  labels:
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  S3_HOST: {{ .Values.snapshotAgent.config.s3Host }}
+  S3_BUCKET: {{ .Values.snapshotAgent.config.s3Bucket }}
+  S3CMD_EXTRA_FLAG: {{ .Values.snapshotAgent.config.s3cmdExtraFlag }}
+  S3_URI: {{ .Values.snapshotAgent.config.s3Uri }}
+  S3_EXPIRE_DAYS: {{ .Values.snapshotAgent.config.s3ExpireDays }}
+  BAO_AUTH_PATH: {{ .Values.snapshotAgent.config.baoAuthPath }}
+  BAO_ROLE: {{ .Values.snapshotAgent.config.baoRole }}
+  BAO_ADDR: {{ .Values.snapshotAgent.config.baoAddr }}
+{{ end }}

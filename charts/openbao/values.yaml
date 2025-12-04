@@ -1409,3 +1409,29 @@ extraObjects: []
 #     kind: ConfigMap
 #     metadata:
 #       name: cert-manager-configmap-{{ include "some-other-template" }}
+
+# Snapshot Agent Configuration
+snapshotAgent:
+  enabled: false
+  annotations: {}
+  schedule: "*/5 * * * *"
+  restartPolicy: OnFailure
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
+    extraLabels: {}
+  image:
+    repository: ghcr.io/openbao/openbao-snapshot-agent
+    tag: v0.2.3
+    extraVolumes: {} 
+  config:
+    s3Host: ""
+    s3Bucket: ""
+    s3Uri: ""
+    s3ExpireDays: ""
+    s3CredentialsSecret: ""
+    s3cmdExtraFlag: ""
+    baoAuthPath: "auth/kubernetes"
+    baoRole: ""
+    baoAddr: ""
