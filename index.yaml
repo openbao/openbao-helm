@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: |
+            feat: add support for gateway-api tlsroutes
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2025-12-04T11:47:41.914166166Z"
+    description: Official OpenBao Chart
+    digest: 708d9767d5959cd966a14e33f51f4509cd5380e06b13bd99f53c87ace00f892e
+    home: https://github.com/openbao/openbao-helm
+    icon: https://github.com/openbao/artwork/blob/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.21.0/openbao-0.21.0.tgz
+    version: 0.21.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: |
             feat(podManagementPolicy): set default to OrderedReady
@@ -1095,4 +1129,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2025-12-04T09:36:52.611962662Z"
+generated: "2025-12-04T11:47:41.914463742Z"
