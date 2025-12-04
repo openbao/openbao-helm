@@ -43,6 +43,6 @@
     documentation. Your PR will be assigned to a CODEOWNER once you mark it
     as "Ready for Review".
 
-   Once it is approved we will squash your changes onto the default branch
-   and our trusty bot account will release them to the repository.
+    Once it is approved we will squash your changes onto the default branch
+    and our trusty bot account will release them to the repository.
 -->
