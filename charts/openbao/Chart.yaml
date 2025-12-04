@@ -3,8 +3,8 @@
 
 apiVersion: v2
 name: openbao
-version: 0.19.1
-appVersion: v2.4.3
+version: 0.19.3
+appVersion: v2.4.4
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
 home: https://github.com/openbao/openbao-helm
@@ -28,10 +28,10 @@ annotations:
   artifacthub.io/changes: |
     - kind: changed
       description: |
-        chore: update OpenBao to 2.4.3
+        chore: update OpenBao to 2.4.4
       links:
-        - name: OpenBao 2.4.3 Release
-          url: https://github.com/openbao/openbao/releases/tag/v2.4.3
+        - name: OpenBao 2.4.4 Release
+          url: https://github.com/openbao/openbao/releases/tag/v2.4.4
 
 maintainers:
   - name: OpenBao

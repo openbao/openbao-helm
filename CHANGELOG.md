@@ -1,5 +1,17 @@
 ## Unreleased
 
+## 0.19.3
+
+### Changes
+
+- Update default image to `2.4.4` 
+
+## 0.19.2
+
+### Changes
+
+- fix(grafana): dashboard datasource by @CorentinPtrl
+
 ## 0.19.1
 
 ### Changes
