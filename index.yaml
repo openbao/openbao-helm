@@ -5,6 +5,39 @@ entries:
       artifacthub.io/changes: |
         - kind: changed
           description: |
+            feat(podManagementPolicy): set default to OrderedReady
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2025-12-04T09:36:52.611608574Z"
+    description: Official OpenBao Chart
+    digest: bdf380c4bd8ec4e02fc34bc6fb6e38e9d1788167285c7a45abf61a47f774a653
+    home: https://github.com/openbao/openbao-helm
+    icon: https://github.com/openbao/artwork/blob/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.20.0/openbao-0.20.0.tgz
+    version: 0.20.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
+          description: |
             chore: update OpenBao to 2.4.4
           links:
             - name: OpenBao 2.4.4 Release
@@ -1062,4 +1095,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2025-11-25T11:26:27.657176281Z"
+generated: "2025-12-04T09:36:52.611962662Z"
