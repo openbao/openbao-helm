@@ -24,10 +24,11 @@ sources:
   - https://github.com/openbao/openbao-helm
 annotations:
   charts.openshift.io/name: Openbao
+  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: changed
+    - kind: added
       description: |
-        feat(podManagementPolicy): set default to OrderedReady
+        feat: add support for gateway-api tlsroutes
 
 maintainers:
   - name: OpenBao

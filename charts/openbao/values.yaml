@@ -453,6 +453,36 @@ server:
     #    hosts:
     #      - chart-example.local
 
+  # Gateway consolidates configuration related to the Kubernetes Gateway API
+  # Currently, only creating a TLSRoute is supported
+  # See: https://gateway-api.sigs.k8s.io/
+  gateway:
+    # Configures a TLSRoute for the OpenBao server. This can be enabled independently of the ingress configuration to allow for side-by-side scenarios for migration.
+    tlsRoute:
+      enabled: false
+      labels: {}
+      # traffic: external
+      annotations: {}
+      # external-dns.alpha.kubernetes.io/hostname: chart-example.local
+
+      hosts:
+      - host: chart-example.local
+
+      # Allows overriding the TLSRoutes apiVersion in case a different version of Gateway API is installed on the cluster.
+      apiVersion: gateway.networking.k8s.io/v1alpha3
+
+      # When HA mode is enabled and K8s service registration is being used,
+      # configure the ingress to point to the OpenBao active service.
+      activeService: true
+
+      # List of ParentRefs. As the helm chart configures no gateways itself,
+      # this should be set to at least one gateway with one or more TLS listeners
+      parentRefs: []
+        # - name: my-gw
+        #   namespace: gateway-namespace
+        #   # sectionName is optional to fix to a specific listener
+        #   sectionName: listener-name
+
   # hostAliases is a list of aliases to be added to /etc/hosts. Specified as a YAML list.
   hostAliases: []
   # - ip: 127.0.0.1
