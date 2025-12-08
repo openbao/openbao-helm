@@ -1412,26 +1412,35 @@ extraObjects: []
 
 # Snapshot Agent Configuration
 snapshotAgent:
+  # whether or not to enable the snapshot agent cronjob
   enabled: false
+  # extra Annotations for the job
   annotations: {}
+  # schedule of the cronjob
   schedule: "*/5 * * * *"
   restartPolicy: OnFailure
+  # service account settings for the snapshot agent
   serviceAccount:
     create: true
     name: ""
     annotations: {}
     extraLabels: {}
+  # The image settings for the snapshot agent
   image:
     repository: ghcr.io/openbao/openbao-snapshot-agent
     tag: v0.2.3
-    extraVolumes: {} 
+
+  # extraVolumes for the snapshot agent cronjob
+  extraVolumes: {} 
+
+  # configuration for the snapshot agent
   config:
-    s3Host: ""
-    s3Bucket: ""
-    s3Uri: ""
-    s3ExpireDays: ""
-    s3CredentialsSecret: ""
-    s3cmdExtraFlag: ""
-    baoAuthPath: "auth/kubernetes"
-    baoRole: ""
-    baoAddr: ""
+    s3Host: "s3.eu-east-1.amazonaws.com"
+    s3Bucket: "openbao-snapshotis"
+    s3Uri: "s3://openbao-snapshots"
+    s3ExpireDays: "14"
+    s3CredentialsSecret: "my-s3-credentials"
+    s3cmdExtraFlag: "-v"
+    baoAuthPath: "kubernetes"
+    baoRole: "snapshot"
+    baoAddr: "https://openbao.example.com:8200"
