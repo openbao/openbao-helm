@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.20.0
+version: 0.21.0
 appVersion: v2.4.4
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -24,10 +24,11 @@ sources:
   - https://github.com/openbao/openbao-helm
 annotations:
   charts.openshift.io/name: Openbao
+  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: changed
+    - kind: added
       description: |
-        feat(podManagementPolicy): set default to OrderedReady
+        feat: add support for gateway-api tlsroutes
 
 maintainers:
   - name: OpenBao
