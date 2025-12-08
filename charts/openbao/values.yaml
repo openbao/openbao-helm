@@ -1433,13 +1433,15 @@ snapshotAgent:
   # extraVolumes for the snapshot agent cronjob
   extraVolumes: {} 
 
+  # s3CredentialsSecret to use
+  s3CredentialsSecret: "my-s3-credentials"
+
   # configuration for the snapshot agent
   config:
     s3Host: "s3.eu-east-1.amazonaws.com"
     s3Bucket: "openbao-snapshotis"
     s3Uri: "s3://openbao-snapshots"
     s3ExpireDays: "14"
-    s3CredentialsSecret: "my-s3-credentials"
     s3cmdExtraFlag: "-v"
     baoAuthPath: "kubernetes"
     baoRole: "snapshot"

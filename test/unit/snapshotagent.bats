@@ -3,7 +3,7 @@
 load _helpers
 
 @test "snapshotagent/cronjob: disabled by default" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local
   local actual=$( (helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
@@ -13,7 +13,7 @@ load _helpers
 }
 
 @test "snapshotagent/cronjob: namespace:" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -32,7 +32,7 @@ load _helpers
 }
 
 @test "snapshotagent/cronjob: annotations:" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -44,7 +44,7 @@ load _helpers
 }
 
 @test "snapshotagent/cronjob: schedule:" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -57,7 +57,7 @@ load _helpers
 }
 
 @test "snapshot/cronjob: extraVolumes" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -70,7 +70,7 @@ load _helpers
 }
 
 @test "snapshot/cronjob: image overwrite" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -82,8 +82,28 @@ load _helpers
   [ "${actual}" = "my-repo:my-tag" ]
 }
 
+@test "snapshot/cronjob: configuration: s3CredentialsSecret" {
+  cd $(chart_dir)
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.s3CredentialsSecret=creds' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.jobTemplate.spec.template.spec.containers[0].env[] | select(.name == "AWS_SECRET_ACCESS_KEY") | .valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${actual}" = "creds" ]
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.s3CredentialsSecret=creds' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.jobTemplate.spec.template.spec.containers[0].env[] | select(.name == "AWS_ACCESS_KEY_ID") | .valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${actual}" = "creds" ]
+}
+
 @test "snapshot/serviceaccount: disabled" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-serviceaccount.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -103,7 +123,7 @@ load _helpers
 }
 
 @test "snapshot/serviceaccount: own name" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -115,22 +135,100 @@ load _helpers
   [ "${actual}" = "my-sa" ]
 }
 
-@test "snapshot/configmap: configuration" {
-  cd `chart_dir`
+@test "snapshot/configmap: configuration: s3Host" {
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \
     --set 'snapshotAgent.config.s3Host=s3.us-west-1.amazonaws.com' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.S3_HOST' | tee /dev/stderr)
+  [ "${actual}" = "s3.us-west-1.amazonaws.com" ]
+}
+
+@test "snapshot/configmap: configuration: s3Bucket" {
+  cd $(chart_dir)
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
     --set 'snapshotAgent.config.s3Bucket=my-bucket' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.S3_BUCKET' | tee /dev/stderr)
+  [ "${actual}" = "my-bucket" ]
+}
+
+@test "snapshot/configmap: configuration: s3Uri" {
+  cd $(chart_dir)
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
     --set 'snapshotAgent.config.s3Uri=s3://my-bucket' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.S3_URI' | tee /dev/stderr)
+  [ "${actual}" = "s3://my-bucket" ]
+}
+
+@test "snapshot/configmap: configuration: s3ExpireDays" {
+  cd $(chart_dir)
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
     --set 'snapshotAgent.config.s3ExpireDays=1' \
-    --set 'snapshotAgent.config.s3CredentialsSecret=creds' \
-    --set 'snapshotAgent.config.s3CmdExtraFlags=-q' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.S3_EXPIRE_DAYS' | tee /dev/stderr)
+  [ "${actual}" = 1 ]
+}
+
+@test "snapshot/configmap: configuration: s3cmdExtraFlag" {
+  cd $(chart_dir)
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.config.s3cmdExtraFlag=-q' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.S3CMD_EXTRA_FLAG' | tee /dev/stderr)
+  [ "${actual}" = "-q" ]
+}
+
+@test "snapshot/configmap: configuration: baoAuthPath" {
+  cd $(chart_dir)
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
     --set 'snapshotAgent.config.baoAuthPath=jwt' \
-    --set 'snapshotAgent.config.baoRole=backup' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.BAO_AUTH_PATH' | tee /dev/stderr)
+  [ "${actual}" = "jwt" ]
+}
+
+@test "snapshot/configmap: configuration: baoRole" {
+  cd $(chart_dir)
+  local actual=$(
+    helm template \
+      --show-only templates/snapshotagent-configmap.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.config.baoRole=backup' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.data.BAO_ROLE' | tee /dev/stderr
+  )
+  [ "${actual}" = "backup" ]
+}
+
+@test "snapshot/configmap: configuration: baoAddr" {
+  cd $(chart_dir)
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
     --set 'snapshotAgent.config.baoAddr=http://openbao.openbao.svc:8200' \
     --namespace foo \
     . | tee /dev/stderr |
-    yq -r '.data' | sha256sum | tee /dev/stderr)
-  [ "${actual}" = "fc5538001af4cfe6bbe4d48cc9f13dc4c908a1029960e60e372af7cb56926c43  -" ]
+    yq -r '.data.BAO_ADDR' | tee /dev/stderr)
+  [ "${actual}" = "http://openbao.openbao.svc:8200" ]
 }
