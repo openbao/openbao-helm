@@ -17,6 +17,15 @@ jobs:
           config: test/kind/config.yaml
           node_image: kindest/node:v${{ matrix.kind-k8s-version }}
           version: v0.29.0
+      - name: Deploy LocalStack on Kind
+        run: |
+          helm repo add localstack-repo https://helm.localstack.cloud
+          helm upgrade localstack -n localstack --create-namespace --install --version=0.6.27 localstack-repo/localstack
+      - name: Set up S3 Bucket on localstack
+        run: |
+          kubectl run -it --rm aws-cli --image=amazon/aws-cli --restart=Never -n localstack -- \
+          --endpoint-url=http://localstack:4566 \
+          s3 mb s3://openbao-snapshots
       - run: bats --tap --timing ./test/acceptance
 permissions:
   contents: read

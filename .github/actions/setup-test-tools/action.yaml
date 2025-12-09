@@ -20,9 +20,5 @@ runs:
         python-version: "3.14"
     - run: pip install yq
       shell: bash
-    - uses: LocalStack/setup-localstack@v0.2.2
-      with:
-        image-tag: "latest"
-        install-awslocal: "true"
 permissions:
   contents: read
