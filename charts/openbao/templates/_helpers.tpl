@@ -1103,7 +1103,7 @@ Create the name of the service account to use for the snasphot-agent
 */}}
 {{- define "openbao.snapshotAgent.serviceAccount.name" -}}
 {{- if .Values.snapshotAgent.serviceAccount.create -}}
-    {{ default (printf "%s-%s" (include "openbao.fullname" .) "-snapshot") .Values.snapshotAgent.serviceAccount.name }}
+    {{ default (printf "%s-%s" (include "openbao.fullname" .) "snapshot") .Values.snapshotAgent.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.snapshotAgent.serviceAccount.name }}
 {{- end -}}
