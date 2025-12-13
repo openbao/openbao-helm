@@ -1431,7 +1431,7 @@ snapshotAgent:
     tag: 0.2.3
 
   # extraVolumes for the snapshot agent cronjob
-  extraVolumes: {} 
+  extraVolumes: {}
 
   # s3CredentialsSecret to use
   s3CredentialsSecret: "my-s3-credentials"
