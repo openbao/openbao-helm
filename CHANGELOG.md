@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.21.1
+
+- fix: do not produce empty annotations and consolidate general annotation handling in helpers file
+
 ## 0.21.0
 
 - feat: add support for gateway-api tlsroutes

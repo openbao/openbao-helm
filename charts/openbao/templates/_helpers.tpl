@@ -370,7 +370,6 @@ Sets the topologySpreadConstraints when running in standalone and HA modes.
   {{ end }}
 {{- end -}}
 
-
 {{/*
 Sets the injector topologySpreadConstraints for pod placement
 */}}
@@ -462,35 +461,59 @@ Sets the injector deployment update strategy
 {{- end -}}
 
 {{/*
+Renders service annotations from either a string (templated) or a map with indent 4.
+Usage: {{ include "openbao.annotations.render.4" (list . <annotations>) }}
+*/}}
+{{- define "openbao.annotations.render.4" -}}
+  {{- $ctx := index . 0 -}}
+  {{- $annotations := index . 1 -}}
+  {{- $annotationsType := typeOf $annotations -}}
+  {{- if eq $annotationsType "string" -}}
+    {{- tpl $annotations $ctx | nindent 4 -}}
+  {{- else -}}
+    {{- toYaml $annotations | nindent 4 -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Renders service annotations from either a string (templated) or a map with indent 8.
+Usage: {{ include "openbao.annotations.render.4" (list . <annotations>) }}
+*/}}
+{{- define "openbao.annotations.render.8" -}}
+  {{- $ctx := index . 0 -}}
+  {{- $annotations := index . 1 -}}
+  {{- $annotationsType := typeOf $annotations -}}
+  {{- if eq $annotationsType "string" -}}
+    {{- tpl $annotations $ctx | nindent 8 -}}
+  {{- else -}}
+    {{- toYaml $annotations | nindent 8 -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
 Sets extra pod annotations
 */}}
 {{- define "openbao.annotations" }}
+  {{- if or .Values.server.configAnnotation .Values.server.annotations }}
       annotations:
   {{- if .Values.server.configAnnotation }}
         openbao.hashicorp.com/config-checksum: {{ include "openbao.config" . | sha256sum }}
   {{- end }}
-  {{- if .Values.server.annotations }}
-        {{- $tp := typeOf .Values.server.annotations }}
-        {{- if eq $tp "string" }}
-          {{- tpl .Values.server.annotations . | nindent 8 }}
-        {{- else }}
-          {{- toYaml .Values.server.annotations | nindent 8 }}
-        {{- end }}
+  {{- $generic := .Values.server.annotations -}}
+  {{- if $generic }}
+    {{- include "openbao.annotations.render.8" (list . $generic) -}}
   {{- end }}
+{{- end -}}
 {{- end -}}
 
 {{/*
 Sets extra injector pod annotations
 */}}
 {{- define "injector.annotations" -}}
-  {{- if .Values.injector.annotations }}
+  {{- $generic := .Values.injector.annotations -}}
+  {{- if $generic }}
       annotations:
-        {{- $tp := typeOf .Values.injector.annotations }}
-        {{- if eq $tp "string" }}
-          {{- tpl .Values.injector.annotations . | nindent 8 }}
-        {{- else }}
-          {{- toYaml .Values.injector.annotations | nindent 8 }}
-        {{- end }}
+    {{- include "openbao.annotations.render.8" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -498,14 +521,10 @@ Sets extra injector pod annotations
 Sets extra injector service annotations
 */}}
 {{- define "injector.service.annotations" -}}
-  {{- if .Values.injector.service.annotations }}
+  {{- $generic := .Values.injector.service.annotations -}}
+  {{- if $generic }}
   annotations:
-    {{- $tp := typeOf .Values.injector.service.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.injector.service.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.injector.service.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -595,14 +614,10 @@ securityContext for the statefulset openbao container
 Sets extra injector service account annotations
 */}}
 {{- define "injector.serviceAccount.annotations" -}}
-  {{- if and (ne .mode "dev") .Values.injector.serviceAccount.annotations }}
+  {{- $generic := .Values.injector.serviceAccount.annotations -}}
+  {{- if and (ne .mode "dev") $generic }}
   annotations:
-    {{- $tp := typeOf .Values.injector.serviceAccount.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.injector.serviceAccount.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.injector.serviceAccount.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -610,13 +625,15 @@ Sets extra injector service account annotations
 Sets extra injector webhook annotations
 */}}
 {{- define "injector.webhookAnnotations" -}}
-  {{- if or (((.Values.injector.webhook)).annotations) (.Values.injector.webhookAnnotations)  }}
+  {{- $wa1 := ((.Values.injector.webhook)).annotations -}}
+  {{- $wa2 := .Values.injector.webhookAnnotations -}}
+  {{- if or $wa1 $wa2 }}
   annotations:
-    {{- $tp := typeOf (or (((.Values.injector.webhook)).annotations) (.Values.injector.webhookAnnotations)) }}
-    {{- if eq $tp "string" }}
-      {{- tpl (((.Values.injector.webhook)).annotations | default .Values.injector.webhookAnnotations) . | nindent 4 }}
-    {{- else }}
-      {{- toYaml (((.Values.injector.webhook)).annotations | default .Values.injector.webhookAnnotations) | nindent 4 }}
+    {{- if $wa1 }}
+      {{- include "openbao.annotations.render.4" (list . $wa1) -}}
+    {{- end }}
+    {{- if $wa2 }}
+      {{- include "openbao.annotations.render.4" (list . $wa2) -}}
     {{- end }}
   {{- end }}
 {{- end -}}
@@ -641,14 +658,10 @@ Set's the injector webhook objectSelector
 Sets extra ui service annotations
 */}}
 {{- define "openbao.ui.annotations" -}}
-  {{- if .Values.ui.annotations }}
+  {{- $generic := .Values.ui.annotations -}}
+  {{- if $generic }}
   annotations:
-    {{- $tp := typeOf .Values.ui.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.ui.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.ui.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -667,14 +680,10 @@ Create the name of the service account to use
 Sets extra service account annotations
 */}}
 {{- define "openbao.serviceAccount.annotations" -}}
-  {{- if and (ne .mode "dev") .Values.server.serviceAccount.annotations }}
+  {{- $generic := .Values.server.serviceAccount.annotations -}}
+  {{- if and (ne .mode "dev") $generic }}
   annotations:
-    {{- $tp := typeOf .Values.server.serviceAccount.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.server.serviceAccount.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.server.serviceAccount.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -682,14 +691,10 @@ Sets extra service account annotations
 Sets extra ingress annotations
 */}}
 {{- define "openbao.ingress.annotations" -}}
-  {{- if .Values.server.ingress.annotations }}
+  {{- $generic := .Values.server.ingress.annotations -}}
+  {{- if $generic }}
   annotations:
-    {{- $tp := typeOf .Values.server.ingress.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.server.ingress.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.server.ingress.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -697,14 +702,10 @@ Sets extra ingress annotations
 Sets extra TLSRoute annotations
 */}}
 {{- define "openbao.gateway.tlsRoute.annotations" -}}
-  {{- if .Values.server.gateway.tlsRoute.annotations }}
+  {{- $generic := .Values.server.gateway.tlsRoute.annotations -}}
+  {{- if $generic }}
   annotations:
-    {{- $tp := typeOf .Values.server.gateway.tlsRoute.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.server.gateway.tlsRoute.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.server.gateway.tlsRoute.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -712,14 +713,10 @@ Sets extra TLSRoute annotations
 Sets extra route annotations
 */}}
 {{- define "openbao.route.annotations" -}}
-  {{- if .Values.server.route.annotations }}
+  {{- $generic := .Values.server.route.annotations -}}
+  {{- if $generic }}
   annotations:
-    {{- $tp := typeOf .Values.server.route.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.server.route.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.server.route.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -727,13 +724,10 @@ Sets extra route annotations
 Sets extra openbao server Service annotations
 */}}
 {{- define "openbao.service.annotations" -}}
-  {{- if .Values.server.service.annotations }}
-    {{- $tp := typeOf .Values.server.service.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.server.service.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.server.service.annotations | nindent 4 }}
-    {{- end }}
+  {{- $generic := .Values.server.service.annotations -}}
+  {{- if $generic }}
+  annotations:
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -741,25 +735,32 @@ Sets extra openbao server Service annotations
 Sets extra openbao server Service (active) annotations
 */}}
 {{- define "openbao.service.active.annotations" -}}
-  {{- if .Values.server.service.active.annotations }}
-    {{- $tp := typeOf .Values.server.service.active.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.server.service.active.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.server.service.active.annotations | nindent 4 }}
+  {{- $active := .Values.server.service.active.annotations -}}
+  {{- $generic := .Values.server.service.annotations -}}
+  {{- if or $active $generic }}
+  annotations:
+    {{- if $active }}
+      {{- include "openbao.annotations.render.4" (list . $active) -}}
+    {{- end }}
+    {{- if $generic }}
+      {{- include "openbao.annotations.render.4" (list . $generic) -}}
     {{- end }}
   {{- end }}
 {{- end -}}
+
 {{/*
-Sets extra openbao server Service annotations
+Sets extra openbao server Service (standby) annotations
 */}}
 {{- define "openbao.service.standby.annotations" -}}
-  {{- if .Values.server.service.standby.annotations }}
-    {{- $tp := typeOf .Values.server.service.standby.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.server.service.standby.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.server.service.standby.annotations | nindent 4 }}
+  {{- $standby := .Values.server.service.standby.annotations -}}
+  {{- $generic := .Values.server.service.annotations -}}
+  {{- if or $standby $generic }}
+  annotations:
+    {{- if $standby }}
+      {{- include "openbao.annotations.render.4" (list . $standby) -}}
+    {{- end }}
+    {{- if $generic }}
+      {{- include "openbao.annotations.render.4" (list . $generic) -}}
     {{- end }}
   {{- end }}
 {{- end -}}
@@ -768,14 +769,10 @@ Sets extra openbao server Service annotations
 Sets PodSecurityPolicy annotations
 */}}
 {{- define "openbao.psp.annotations" -}}
-  {{- if .Values.global.psp.annotations }}
+  {{- $generic := .Values.global.psp.annotations -}}
+  {{- if $generic }}
   annotations:
-    {{- $tp := typeOf .Values.global.psp.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.global.psp.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.global.psp.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -783,14 +780,10 @@ Sets PodSecurityPolicy annotations
 Sets extra statefulset annotations
 */}}
 {{- define "openbao.statefulSet.annotations" -}}
-  {{- if .Values.server.statefulSet.annotations }}
+  {{- $generic := .Values.server.statefulSet.annotations -}}
+  {{- if $generic }}
   annotations:
-    {{- $tp := typeOf .Values.server.statefulSet.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.server.statefulSet.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.server.statefulSet.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -798,14 +791,10 @@ Sets extra statefulset annotations
 Sets VolumeClaim annotations for data volume
 */}}
 {{- define "openbao.dataVolumeClaim.annotations" -}}
-  {{- if and (ne .mode "dev") (.Values.server.dataStorage.enabled) (.Values.server.dataStorage.annotations) }}
+  {{- $generic := .Values.server.dataStorage.annotations -}}
+  {{- if and (ne .mode "dev") (.Values.server.dataStorage.enabled) $generic }}
   annotations:
-    {{- $tp := typeOf .Values.server.dataStorage.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.server.dataStorage.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.server.dataStorage.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -828,14 +817,10 @@ Sets VolumeClaim labels for data volume
 Sets VolumeClaim annotations for audit volume
 */}}
 {{- define "openbao.auditVolumeClaim.annotations" -}}
-  {{- if and (ne .mode "dev") (.Values.server.auditStorage.enabled) (.Values.server.auditStorage.annotations) }}
+  {{- $generic := .Values.server.auditStorage.annotations -}}
+  {{- if and (ne .mode "dev") (.Values.server.auditStorage.enabled) $generic }}
   annotations:
-    {{- $tp := typeOf .Values.server.auditStorage.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.server.auditStorage.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.server.auditStorage.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -898,14 +883,10 @@ Sets the container resources for CSI's Agent sidecar if the user has set any.
 Sets extra CSI daemonset annotations
 */}}
 {{- define "csi.daemonSet.annotations" -}}
-  {{- if .Values.csi.daemonSet.annotations }}
+  {{- $generic := .Values.csi.daemonSet.annotations -}}
+  {{- if $generic }}
   annotations:
-    {{- $tp := typeOf .Values.csi.daemonSet.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.csi.daemonSet.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.csi.daemonSet.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -987,14 +968,10 @@ Sets the CSI provider affinity for pod placement.
 Sets extra CSI provider pod annotations
 */}}
 {{- define "csi.pod.annotations" -}}
-  {{- if .Values.csi.pod.annotations }}
+  {{- $generic := .Values.csi.pod.annotations -}}
+  {{- if $generic }}
       annotations:
-      {{- $tp := typeOf .Values.csi.pod.annotations }}
-      {{- if eq $tp "string" }}
-        {{- tpl .Values.csi.pod.annotations . | nindent 8 }}
-      {{- else }}
-        {{- toYaml .Values.csi.pod.annotations | nindent 8 }}
-      {{- end }}
+    {{- include "openbao.annotations.render.8" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
@@ -1002,14 +979,10 @@ Sets extra CSI provider pod annotations
 Sets extra CSI service account annotations
 */}}
 {{- define "csi.serviceAccount.annotations" -}}
-  {{- if .Values.csi.serviceAccount.annotations }}
+  {{- $generic := .Values.csi.serviceAccount.annotations -}}
+  {{- if $generic }}
   annotations:
-    {{- $tp := typeOf .Values.csi.serviceAccount.annotations }}
-    {{- if eq $tp "string" }}
-      {{- tpl .Values.csi.serviceAccount.annotations . | nindent 4 }}
-    {{- else }}
-      {{- toYaml .Values.csi.serviceAccount.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
   {{- end }}
 {{- end -}}
 
