@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: |
+            fix: do not produce empty annotations and consolidate general annotation handling in helpers file
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2025-12-16T08:22:51.857814273Z"
+    description: Official OpenBao Chart
+    digest: 56b6fd8eff04217c76924b738629eae90d7e627f15bf31025d3062f2c33dfc1f
+    home: https://github.com/openbao/openbao-helm
+    icon: https://github.com/openbao/artwork/blob/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.21.1/openbao-0.21.1.tgz
+    version: 0.21.1
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: |
             feat: add support for gateway-api tlsroutes
@@ -1129,4 +1163,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2025-12-04T11:47:41.914463742Z"
+generated: "2025-12-16T08:22:51.858068309Z"
