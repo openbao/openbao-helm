@@ -95,21 +95,16 @@ EOF
     -- s3 ls s3://openbao-snapshots
   kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n localstack --timeout=60s || true
 
+  # check if snapshot is there
   local s3_ls=$(kubectl logs -n localstack aws-cli | grep -c snapshot)
   [ "${s3_ls}" -gt 0 ]
 
-  # teardown everything and delete pvc
+  # check if snapshot has some size
+  local s3_size=$(kubectl logs -n localstack aws-cli | grep snapshot | head -1 | awk '{print $3}')
+  [ "${s3_size}" -gt 0 ]
+
+  # delete aws-cli pod
   kubectl delete po aws-cli -n localstack
-
-  #teardown
-
-  # backup old root_token
-  #mv root.json snapshot-root.json
-
-  # re-initialize
-  #init
-
-  # restore from backup
 
 }
 
