@@ -1445,4 +1445,3 @@ snapshotAgent:
     s3cmdExtraFlag: "-v"
     baoAuthPath: "kubernetes"
     baoRole: "snapshot"
-    baoAddr: "https://openbao.example.com:8200"

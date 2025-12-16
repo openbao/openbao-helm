@@ -19,5 +19,9 @@ data:
   S3_EXPIRE_DAYS: {{ .Values.snapshotAgent.config.s3ExpireDays | quote }}
   BAO_AUTH_PATH: {{ .Values.snapshotAgent.config.baoAuthPath }}
   BAO_ROLE: {{ .Values.snapshotAgent.config.baoRole }}
-  BAO_ADDR: {{ .Values.snapshotAgent.config.baoAddr }}
+  {{- if include "openbao.externalAddr" . }}
+  BAO_ADDR: "{{ include "openbao.externalAddr" . }}"
+  {{- else }}
+  BAO_ADDR: {{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}
+  {{- end }}
 {{ end }}
