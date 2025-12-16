@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.22.0
+
+- feat: added [openbao-snapshot-agent](https://github.com/openbao/openbao-snapshot-agent) as cronjob to chart
+
 ## 0.21.2
 
 - fix: Fix removed whitespace for extraObjects by @javex in https://github.com/openbao/openbao-helm/pull/114
@@ -22,7 +26,7 @@
 
 ### Changes
 
-- Update default image to `2.4.4` 
+- Update default image to `2.4.4`
 
 ## 0.19.2
 

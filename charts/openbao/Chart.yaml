@@ -26,9 +26,9 @@ annotations:
   charts.openshift.io/name: Openbao
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: fixed
+    - kind: feature
       description: |
-        fix: avoid clearing whitespace on extraObjects
+        feat: added snapshot-agent cronjob to chart
 
 maintainers:
   - name: OpenBao
