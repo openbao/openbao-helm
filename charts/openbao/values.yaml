@@ -1417,7 +1417,7 @@ snapshotAgent:
   # extra Annotations for the job
   annotations: {}
   # schedule of the cronjob
-  schedule: "*/5 * * * *"
+  schedule: "*/15 * * * *"
   restartPolicy: OnFailure
   # service account settings for the snapshot agent
   serviceAccount:
