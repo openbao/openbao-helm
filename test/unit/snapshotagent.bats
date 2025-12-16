@@ -229,7 +229,7 @@ load _helpers
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \
-    -- set 'global.externalBaoAddr=https://bao.example.com' \
+    --set 'global.externalBaoAddr=https://bao.example.com' \
     --namespace foo \
     . | tee /dev/stderr |
     yq -r '.data.BAO_ADDR' | tee /dev/stderr)
