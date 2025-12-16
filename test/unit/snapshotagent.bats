@@ -218,9 +218,20 @@ load _helpers
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \
-    --set 'snapshotAgent.config.baoAddr=http://openbao.openbao.svc:8200' \
     --namespace foo \
     . | tee /dev/stderr |
     yq -r '.data.BAO_ADDR' | tee /dev/stderr)
-  [ "${actual}" = "http://openbao.openbao.svc:8200" ]
+  [ "${actual}" = "http://release-name-openbao.foo.svc:8200" ]
+}
+
+@test "snapshot/configmap: configuration: externalBaoAddr" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    -- set 'global.externalBaoAddr=https://bao.example.com' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.BAO_ADDR' | tee /dev/stderr)
+  [ "${actual}" = "https://bao.example.com" ]
 }
