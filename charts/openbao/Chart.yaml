@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.21.1
+version: 0.21.2
 appVersion: v2.4.4
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -28,7 +28,7 @@ annotations:
   artifacthub.io/changes: |
     - kind: fixed
       description: |
-        fix: do not produce empty annotations and consolidate general annotation handling in helpers file
+        fix: avoid clearing whitespace on extraObjects
 
 maintainers:
   - name: OpenBao
