@@ -5,6 +5,40 @@ entries:
       artifacthub.io/changes: |
         - kind: fixed
           description: |
+            fix: avoid clearing whitespace on extraObjects
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2025-12-17T05:15:42.424643297Z"
+    description: Official OpenBao Chart
+    digest: 2842c94b6d4a1158a260ceb522c64c4cdf71e81cbbf99ccd4000eace187ff327
+    home: https://github.com/openbao/openbao-helm
+    icon: https://github.com/openbao/artwork/blob/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.21.2/openbao-0.21.2.tgz
+    version: 0.21.2
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
+          description: |
             fix: do not produce empty annotations and consolidate general annotation handling in helpers file
       artifacthub.io/containsSecurityUpdates: "false"
       charts.openshift.io/name: Openbao
@@ -1163,4 +1197,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2025-12-16T08:22:51.858068309Z"
+generated: "2025-12-17T05:15:42.425010956Z"
