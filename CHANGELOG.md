@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.21.2
+
+- fix: Fix removed whitespace for extraObjects by @javex in https://github.com/openbao/openbao-helm/pull/114
+
 ## 0.21.1
 
 - fix: do not produce empty annotations and consolidate general annotation handling in helpers file
