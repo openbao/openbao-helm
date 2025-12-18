@@ -14,7 +14,9 @@ metadata:
 data:
   S3_HOST: {{ .Values.snapshotAgent.config.s3Host }}
   S3_BUCKET: {{ .Values.snapshotAgent.config.s3Bucket }}
+  {{- if .Values.snapshotAgent.config.s3cmdExtraFlag }}
   S3CMD_EXTRA_FLAG: {{ .Values.snapshotAgent.config.s3cmdExtraFlag }}
+  {{- end }}
   S3_URI: {{ .Values.snapshotAgent.config.s3Uri }}
   S3_EXPIRE_DAYS: {{ .Values.snapshotAgent.config.s3ExpireDays | quote }}
   BAO_AUTH_PATH: {{ .Values.snapshotAgent.config.baoAuthPath }}
