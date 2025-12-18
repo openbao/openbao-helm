@@ -17,6 +17,10 @@ jobs:
           config: test/kind/config.yaml
           node_image: kindest/node:v${{ matrix.kind-k8s-version }}
           version: v0.29.0
+      - name: Deploy LocalStack on Kind
+        run: |
+          helm repo add localstack-repo https://helm.localstack.cloud
+          helm upgrade localstack -n localstack --create-namespace --install --version=0.6.27 localstack-repo/localstack
       - run: bats --tap --timing ./test/acceptance
 permissions:
   contents: read

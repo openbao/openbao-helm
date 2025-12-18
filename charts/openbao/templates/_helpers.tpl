@@ -1097,3 +1097,45 @@ config file from values
   {{- end }}
   {{- end }}
 {{- end -}}
+
+{{/*
+Create the name of the service account to use for the snasphot-agent
+*/}}
+{{- define "openbao.snapshotAgent.serviceAccount.name" -}}
+{{- if .Values.snapshotAgent.serviceAccount.create -}}
+    {{ default (printf "%s-%s" (include "openbao.fullname" .) "snapshot") .Values.snapshotAgent.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.snapshotAgent.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Sets extra service account annotations for the snapshot-agent
+*/}}
+{{- define "openbao.snapshotAgent.serviceAccount.annotations" -}}
+  {{- if and (ne .mode "dev") .Values.snapshotAgent.serviceAccount.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.snapshotAgent.serviceAccount.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.snapshotAgent.serviceAccount.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.snapshotAgent.serviceAccount.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra snapshotAgent job annotations
+*/}}
+{{- define "openbao.snapshotAgent.annotations" -}}
+  {{- if .Values.snapshotAgent.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.snapshotAgent.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.snapshotAgent.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.snapshotAgent.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
