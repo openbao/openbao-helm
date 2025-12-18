@@ -1428,7 +1428,7 @@ snapshotAgent:
   # The image settings for the snapshot agent
   image:
     repository: ghcr.io/openbao/openbao-snapshot-agent
-    tag: 0.2.3
+    tag: 0.2.4
 
   # extraVolumes for the snapshot agent cronjob
   extraVolumes: {}
