@@ -12,3 +12,7 @@ Your release is named {{ .Release.Name }}. To learn more about the release, try:
   $ helm status {{ .Release.Name }}
   $ helm get manifest {{ .Release.Name }}
 
+{{ if and (not .Values.global.tlsDisable) .Values.server.gateway.httpRoute.enabled }}
+WARNING: Terminating TLS before reaching the OpenBao Server is not recommended
+and may break things like certificate authentication. Prefer usage of `TLSRoute`.
+{{- end }}

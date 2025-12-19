@@ -487,6 +487,7 @@ server:
         #   sectionName: listener-name
 
     # Configures a HTTPRoute for the OpenBao server. This can be enabled independently of the ingress configuration to allow for side-by-side scenarios for migration.
+    # WARNING: Terminating TLS before reaching the OpenBao Server is not recommended and may break things like certificate authentication. Prefer usage of `TLSRoute`.
     httpRoute:
       enabled: false
       labels: {}
