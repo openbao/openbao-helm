@@ -709,6 +709,28 @@ Sets extra TLSRoute annotations
 {{- end -}}
 
 {{/*
+Sets extra HTTPRoute annotations
+*/}}
+{{- define "openbao.gateway.httpRoute.annotations" -}}
+  {{- $generic := .Values.server.gateway.httpRoute.annotations -}}
+  {{- if $generic }}
+  annotations:
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra BackendTLSPolicy annotations
+*/}}
+{{- define "openbao.gateway.httpRoute.tlsPolicy.annotations" -}}
+  {{- $generic := .Values.server.gateway.httpRoute.tlsPolicy.annotations -}}
+  {{- if $generic }}
+  annotations:
+    {{- include "openbao.annotations.render.4" (list . $generic) -}}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra route annotations
 */}}
 {{- define "openbao.route.annotations" -}}

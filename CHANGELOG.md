@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.24.0
+
+- feat: add support for gateway-api httproute
+
 ## 0.23.5
 
 - fix(snapshotAgent): set BAO_ADDR to active service when running a cluster
