@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.23.0
+
+- feat: add support for gateway-api httproute
+
 ## 0.22.1
 
 - fix: add snapshotAgent resources to the templating, fixing #121

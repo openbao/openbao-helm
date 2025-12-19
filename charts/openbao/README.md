@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.22.1](https://img.shields.io/badge/Version-0.22.1-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
+![Version: 0.23.0](https://img.shields.io/badge/Version-0.23.0-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -182,6 +182,21 @@ Kubernetes: `>= 1.30.0-0`
 | server.extraPorts | list | `[]` | extraPorts is a list of extra ports. Specified as a YAML list. This is useful if you need to add additional ports to the statefulset in dynamic way. |
 | server.extraSecretEnvironmentVars | list | `[]` |  |
 | server.extraVolumes | list | `[]` |  |
+| server.gateway.httpRoute.activeService | bool | `true` |  |
+| server.gateway.httpRoute.annotations | object | `{}` |  |
+| server.gateway.httpRoute.apiVersion | string | `"gateway.networking.k8s.io/v1"` |  |
+| server.gateway.httpRoute.enabled | bool | `false` |  |
+| server.gateway.httpRoute.filters | list | `[]` |  |
+| server.gateway.httpRoute.hosts[0] | string | `"chart-example.local"` |  |
+| server.gateway.httpRoute.labels | object | `{}` |  |
+| server.gateway.httpRoute.matches.path.type | string | `"PathPrefix"` |  |
+| server.gateway.httpRoute.matches.path.value | string | `"/"` |  |
+| server.gateway.httpRoute.matches.timeouts | object | `{}` |  |
+| server.gateway.httpRoute.parentRefs | list | `[]` |  |
+| server.gateway.httpRoute.tlsPolicy.annotations | object | `{}` |  |
+| server.gateway.httpRoute.tlsPolicy.apiVersion | string | `"gateway.networking.k8s.io/v1"` |  |
+| server.gateway.httpRoute.tlsPolicy.labels | object | `{}` |  |
+| server.gateway.httpRoute.tlsPolicy.validation | object | `{}` |  |
 | server.gateway.tlsRoute.activeService | bool | `true` |  |
 | server.gateway.tlsRoute.annotations | object | `{}` |  |
 | server.gateway.tlsRoute.apiVersion | string | `"gateway.networking.k8s.io/v1alpha3"` |  |
@@ -311,6 +326,7 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.image.repository | string | `"ghcr.io/openbao/openbao-snapshot-agent"` |  |
 | snapshotAgent.image.tag | string | `"0.2.4"` |  |
 | snapshotAgent.resources | object | `{}` |  |
+| snapshotAgent.image.tag | string | `"0.2.3"` |  |
 | snapshotAgent.restartPolicy | string | `"OnFailure"` |  |
 | snapshotAgent.s3CredentialsSecret | string | `"my-s3-credentials"` |  |
 | snapshotAgent.schedule | string | `"*/15 * * * *"` |  |
