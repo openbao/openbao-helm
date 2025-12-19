@@ -527,21 +527,26 @@ server:
       #       - name: X-Forwarded-Proto
       #         value: https
 
-      # If TLS is enable on server (see global.tlsDisable) the gateway must be configured
-      # with BackendTLSPolicy to correctly handles TLS connection with server
-      tlsPolicy:
-        labels: {}
-        # traffic: external
-        annotations: {}
-        # external-dns.alpha.kubernetes.io/hostname: chart-example.local
+    # If TLS is enable on server (see global.tlsDisable) the gateway must be configured
+    # with BackendTLSPolicy to correctly handles TLS connection with server in case TLS termination happens at gateway
+    tlsPolicy:
+      enabled: false
+      labels: {}
+      # traffic: external
+      annotations: {}
+      # external-dns.alpha.kubernetes.io/hostname: chart-example.local
 
-        # Allows overriding the BackendTLSPolicy apiVersion in case a different version of Gateway API is installed on the cluster.
-        apiVersion: gateway.networking.k8s.io/v1
+      # Allows overriding the BackendTLSPolicy apiVersion in case a different version of Gateway API is installed on the cluster.
+      apiVersion: gateway.networking.k8s.io/v1
 
-        validation: {}
-        # caCertificateRefs:
-        # - kind: ConfigMap
-        #   name: vault-ca
+      # When HA mode is enabled and K8s service registration is being used,
+      # configure the ingress to point to the OpenBao active service.
+      activeService: true
+
+      validation: {}
+      # caCertificateRefs:
+      # - kind: ConfigMap
+      #   name: vault-ca
 
   # hostAliases is a list of aliases to be added to /etc/hosts. Specified as a YAML list.
   hostAliases: []

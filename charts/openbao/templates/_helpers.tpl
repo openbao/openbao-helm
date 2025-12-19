@@ -722,8 +722,8 @@ Sets extra HTTPRoute annotations
 {{/*
 Sets extra BackendTLSPolicy annotations
 */}}
-{{- define "openbao.gateway.httpRoute.tlsPolicy.annotations" -}}
-  {{- $generic := .Values.server.gateway.httpRoute.tlsPolicy.annotations -}}
+{{- define "openbao.gateway.tlsPolicy.annotations" -}}
+  {{- $generic := .Values.server.gateway.tlsPolicy.annotations -}}
   {{- if $generic }}
   annotations:
     {{- include "openbao.annotations.render.4" (list . $generic) -}}

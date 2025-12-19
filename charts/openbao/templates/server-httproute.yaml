@@ -8,34 +8,6 @@
 {{- $serviceName = printf "%s-%s" $serviceName "active" -}}
 {{- end }}
 {{- $servicePort := .Values.server.service.port -}}
-{{ if eq (include "openbao.scheme" .) "https" }}
-apiVersion: {{ .Values.server.gateway.httpRoute.tlsPolicy.apiVersion }}
-kind: BackendTLSPolicy
-metadata:
-  name: {{ template "openbao.fullname" . }}
-  namespace: {{ include "openbao.namespace" . }}
-  labels:
-    helm.sh/chart: {{ include "openbao.chart" . }}
-    app.kubernetes.io/name: {{ include "openbao.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- with .Values.server.gateway.httpRoute.tlsPolicy.labels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-  {{- template "openbao.gateway.httpRoute.tlsPolicy.annotations" . }}
-spec:
-  targetRefs:
-  - group: ''
-    kind: Service
-    name: {{ $serviceName }}
-    sectionName: {{ include "openbao.scheme" . }}
-  validation:
-    {{- with .Values.server.gateway.httpRoute.tlsPolicy.validation }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-    hostname: {{ include "openbao.fullname" . }}
-{{- end }}
----
 apiVersion: {{ .Values.server.gateway.httpRoute.apiVersion }}
 kind: HTTPRoute
 metadata:
