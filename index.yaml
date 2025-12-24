@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fix
+          description: |
+            fix: added snapshot-agent cronjob resources to the chart
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2025-12-24T09:13:48.496266454Z"
+    description: Official OpenBao Chart
+    digest: e72787c838b359aafbf7c029097a11d0f5a0403c01b44db84da114b666ab3124
+    home: https://github.com/openbao/openbao-helm
+    icon: https://github.com/openbao/artwork/blob/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.22.1/openbao-0.22.1.tgz
+    version: 0.22.1
+  - annotations:
+      artifacthub.io/changes: |
         - kind: feature
           description: |
             feat: added snapshot-agent cronjob to chart
@@ -1231,4 +1265,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2025-12-18T16:47:16.920622812Z"
+generated: "2025-12-24T09:13:48.496604322Z"
