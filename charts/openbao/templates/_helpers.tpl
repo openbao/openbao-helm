@@ -880,7 +880,7 @@ Sets the container resources for CSI's Agent sidecar if the user has set any.
 {{- end -}}
 
 {{/*
-Set's the container resources for the SnapshotAGent if the user has set any.
+Set's the container resources for the SnapshotAgent if the user has set any.
 */}}
 {{- define "openbao.snapshotAgent.resources" -}}
   {{- if .Values.snapshotAgent.resources -}}
