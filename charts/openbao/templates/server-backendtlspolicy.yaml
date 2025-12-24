@@ -23,10 +23,16 @@ metadata:
   {{- template "openbao.gateway.tlsPolicy.annotations" . }}
 spec:
   targetRefs:
+  {{- if .Values.server.gateway.tlsPolicy.targetRefs }}
+  {{- with .Values.server.gateway.tlsPolicy.targetRefs }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- else }}
   - group: ''
     kind: Service
     name: {{ $serviceName }}
     sectionName: {{ include "openbao.scheme" . }}
+  {{- end }}
   validation:
     {{- with .Values.server.gateway.tlsPolicy.validation }}
       {{- toYaml . | nindent 4 }}

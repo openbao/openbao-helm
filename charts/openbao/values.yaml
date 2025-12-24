@@ -543,6 +543,10 @@ server:
       # configure the ingress to point to the OpenBao active service.
       activeService: true
 
+      # Identifies an API object to apply the policy to.
+      # If no one is specified the default is to target the OpenBao service
+      targetRefs: []
+
       validation: {}
       # caCertificateRefs:
       # - kind: ConfigMap
