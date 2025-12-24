@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.22.0
+version: 0.22.1
 appVersion: v2.4.4
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -26,9 +26,9 @@ annotations:
   charts.openshift.io/name: Openbao
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: feature
+    - kind: fix
       description: |
-        feat: added snapshot-agent cronjob to chart
+        fix: added snapshot-agent cronjob resources to the chart
 
 maintainers:
   - name: OpenBao

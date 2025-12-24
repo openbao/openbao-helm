@@ -82,6 +82,21 @@ load _helpers
   [ "${actual}" = "my-repo:my-tag" ]
 }
 
+@test "snapshot/cronjob: resources" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.resources.requests.cpu=100m' \
+    --set 'snapshotAgent.resources.requests.memory=100Mi' \
+    --set 'snapshotAgent.resources.limits.cpu=1000m' \
+    --set 'snapshotAgent.resources.limits.memory=1Gi' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu' | tee /dev/stderr)
+  [ "${actual}" = "100m" ]
+}
+
 @test "snapshot/cronjob: configuration: s3CredentialsSecret" {
   cd `chart_dir`
   local actual=$(helm template \

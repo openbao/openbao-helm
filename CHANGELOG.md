@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.22.1
+
+- fix: add snapshotAgent resources to the templating, fixing #121
+
 ## 0.22.0
 
 - feat: added [openbao-snapshot-agent](https://github.com/openbao/openbao-snapshot-agent) as cronjob to chart
