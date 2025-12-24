@@ -880,6 +880,16 @@ Sets the container resources for CSI's Agent sidecar if the user has set any.
 {{- end -}}
 
 {{/*
+Set's the container resources for the SnapshotAGent if the user has set any.
+*/}}
+{{- define "openbao.snapshotAgent.resources" -}}
+  {{- if .Values.snapshotAgent.resources -}}
+          resources:
+{{ toYaml .Values.snapshotAgent.resources | indent 14}}
+  {{ end }}
+{{- end -}}
+
+{{/*
 Sets extra CSI daemonset annotations
 */}}
 {{- define "csi.daemonSet.annotations" -}}

@@ -3,7 +3,7 @@
 load _helpers
 
 @test "snapshotagent/cronjob: disabled by default" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local
   local actual=$( (helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
@@ -13,7 +13,7 @@ load _helpers
 }
 
 @test "snapshotagent/cronjob: namespace:" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -32,7 +32,7 @@ load _helpers
 }
 
 @test "snapshotagent/cronjob: annotations:" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -44,7 +44,7 @@ load _helpers
 }
 
 @test "snapshotagent/cronjob: schedule:" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -57,7 +57,7 @@ load _helpers
 }
 
 @test "snapshot/cronjob: extraVolumes" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -70,7 +70,7 @@ load _helpers
 }
 
 @test "snapshot/cronjob: image overwrite" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -82,8 +82,23 @@ load _helpers
   [ "${actual}" = "my-repo:my-tag" ]
 }
 
+@test "snapshot/cronjob: resources" {
+  cd $(chart_dir)
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.resources.requests.cpu=100m' \
+    --set 'snapshotAgent.resources.requests.memory=100Mi' \
+    --set 'snapshotAgent.resources.limits.cpu=1000m' \
+    --set 'snapshotAgent.resources.limits.memory=1Gi' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu' | tee /dev/stderr)
+  [ "${actual}" = "100m" ]
+}
+
 @test "snapshot/cronjob: configuration: s3CredentialsSecret" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -103,7 +118,7 @@ load _helpers
 }
 
 @test "snapshot/serviceaccount: disabled" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -115,7 +130,7 @@ load _helpers
 }
 
 @test "snapshot/serviceaccount: own name" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-cronjob.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -128,7 +143,7 @@ load _helpers
 }
 
 @test "snapshot/configmap: configuration: s3Host" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -140,7 +155,7 @@ load _helpers
 }
 
 @test "snapshot/configmap: configuration: s3Bucket" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -152,7 +167,7 @@ load _helpers
 }
 
 @test "snapshot/configmap: configuration: s3Uri" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -164,7 +179,7 @@ load _helpers
 }
 
 @test "snapshot/configmap: configuration: s3ExpireDays" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -176,7 +191,7 @@ load _helpers
 }
 
 @test "snapshot/configmap: configuration: s3cmdExtraFlag" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -188,7 +203,7 @@ load _helpers
 }
 
 @test "snapshot/configmap: configuration: baoAuthPath" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -200,7 +215,7 @@ load _helpers
 }
 
 @test "snapshot/configmap: configuration: baoRole" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(
     helm template \
       --show-only templates/snapshotagent-configmap.yaml \
@@ -214,7 +229,7 @@ load _helpers
 }
 
 @test "snapshot/configmap: configuration: baoAddr" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \
@@ -225,7 +240,7 @@ load _helpers
 }
 
 @test "snapshot/configmap: configuration: externalBaoAddr" {
-  cd `chart_dir`
+  cd $(chart_dir)
   local actual=$(helm template \
     --show-only templates/snapshotagent-configmap.yaml \
     --set 'snapshotAgent.enabled=true' \

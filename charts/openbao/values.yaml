@@ -1445,3 +1445,6 @@ snapshotAgent:
     s3cmdExtraFlag: "-v"
     baoAuthPath: "kubernetes"
     baoRole: "snapshot"
+
+  # configuration of the CronJobs resources
+  resources: {}

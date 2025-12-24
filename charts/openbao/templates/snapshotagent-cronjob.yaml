@@ -46,6 +46,7 @@ spec:
                   key: AWS_ACCESS_KEY_ID
                   name: {{ .Values.snapshotAgent.s3CredentialsSecret }}
             image: {{ .Values.snapshotAgent.image.repository }}:{{ .Values.snapshotAgent.image.tag }}
+            {{ template "openbao.snapshotAgent.resources". }}
             volumeMounts:
               - name: snapshot-dir
                 mountPath: /bao-snapshots

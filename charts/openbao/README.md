@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.22.0](https://img.shields.io/badge/Version-0.22.0-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
+![Version: 0.22.1](https://img.shields.io/badge/Version-0.22.1-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -309,7 +309,8 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.enabled | bool | `false` |  |
 | snapshotAgent.extraVolumes | object | `{}` |  |
 | snapshotAgent.image.repository | string | `"ghcr.io/openbao/openbao-snapshot-agent"` |  |
-| snapshotAgent.image.tag | string | `"0.2.3"` |  |
+| snapshotAgent.image.tag | string | `"0.2.4"` |  |
+| snapshotAgent.resources | object | `{}` |  |
 | snapshotAgent.restartPolicy | string | `"OnFailure"` |  |
 | snapshotAgent.s3CredentialsSecret | string | `"my-s3-credentials"` |  |
 | snapshotAgent.schedule | string | `"*/15 * * * *"` |  |
