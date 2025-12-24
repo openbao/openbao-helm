@@ -188,3 +188,18 @@ load _helpers
   [ "${actual}" = "ca-certs" ]
 }
 
+@test "server/gateway/tlspolicy: specify target ref" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-backendtlspolicy.yaml \
+      --set 'global.tlsDisable=false' \
+      --set 'server.gateway.tlsPolicy.enabled=true' \
+      --set 'server.gateway.tlsPolicy.activeService=true' \
+      --set 'server.service.enabled=true' \
+      --set 'server.gateway.tlsPolicy.targetRefs[0].name=some-target' \
+      . | tee /dev/stderr |
+      yq -r '.spec.targetRefs[0].name' | tee /dev/stderr)
+  [ "${actual}" = "some-target" ]
+}
+
