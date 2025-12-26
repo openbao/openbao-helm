@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.23.0
+
+- feat: added extraLabels on relevant services, fixing #123
+
 ## 0.22.1
 
 - fix: add snapshotAgent resources to the templating, fixing #121
