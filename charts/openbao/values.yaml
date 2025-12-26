@@ -345,6 +345,9 @@ injector:
   service:
     # Extra annotations to attach to the injector service
     annotations: {}
+    # Extra labels for the service definition.
+    # This should be a YAML map of the labels to apply to the injector service
+    extraLabels: {}
 
   # Injector serviceAccount specific config
   serviceAccount:
@@ -724,6 +727,9 @@ server:
       # YAML-formatted multi-line templated string map of the annotations to apply
       # to the active service.
       annotations: {}
+      # Extra labels for the service definition.
+      # This should be a YAML map of the labels to apply to the active service
+      extraLabels: {}
     # Enable or disable the openbao-standby service, which selects OpenBao pods that
     # have labeled themselves as a cluster follower with `openbao-active: "false"`.
     standby:
@@ -732,6 +738,9 @@ server:
       # YAML-formatted multi-line templated string map of the annotations to apply
       # to the standby service.
       annotations: {}
+      # Extra labels for the service definition.
+      # This should be a YAML map of the labels to apply to the standby service
+      extraLabels: {}
     # If enabled, the service selectors will include `app.kubernetes.io/instance: {{ .Release.Name }}`
     # When disabled, services may select OpenBao pods not deployed from the chart.
     # Does not affect the headless openbao-internal service with `ClusterIP: None`
@@ -797,6 +806,9 @@ server:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the service.
     annotations: {}
+    # Extra labels for the service definition.
+    # This should be a YAML map of the labels to apply to the service
+    extraLabels: {}
 
   # This configures the OpenBao Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.
@@ -1113,6 +1125,10 @@ ui:
   # This can either be YAML or a YAML-formatted multi-line templated string map
   # of the annotations to apply to the ui service
   annotations: {}
+
+  # Extra labels for the service definition.
+  # This should be a YAML map of the labels to apply to the ui service
+  extraLabels: {}
 
 # openbao-csi-provider
 csi:

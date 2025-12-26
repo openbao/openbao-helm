@@ -2,6 +2,17 @@
 
 load _helpers
 
+@test "server/ha-active-Service: generic extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.active.extraLabels.openBaoIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.openBaoIsAwesome' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/ha-active-Service: generic annotations" {
   cd `chart_dir`
   local actual=$(helm template \

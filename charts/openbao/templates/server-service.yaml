@@ -18,6 +18,9 @@ metadata:
     app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- if  .Values.server.service.extraLabels -}}
+      {{- toYaml .Values.server.service.extraLabels | nindent 4 -}}
+    {{- end -}}
 {{ template "openbao.service.annotations" .}}
 spec:
   {{- if .Values.server.service.type}}
