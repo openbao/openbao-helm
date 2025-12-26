@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.22.1](https://img.shields.io/badge/Version-0.22.1-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
+![Version: 0.23.0](https://img.shields.io/badge/Version-0.23.0-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -137,6 +137,7 @@ Kubernetes: `>= 1.30.0-0`
 | injector.securityContext.container | object | `{}` |  |
 | injector.securityContext.pod | object | `{}` |  |
 | injector.service.annotations | object | `{}` |  |
+| injector.service.extraLabels | object | `{}` |  |
 | injector.serviceAccount.annotations | object | `{}` |  |
 | injector.startupProbe.failureThreshold | int | `12` | When a probe fails, Kubernetes will try failureThreshold times before giving up |
 | injector.startupProbe.initialDelaySeconds | int | `5` | Number of seconds after the container has started before probe initiates |
@@ -255,9 +256,11 @@ Kubernetes: `>= 1.30.0-0`
 | server.route.tls.termination | string | `"passthrough"` |  |
 | server.service.active.annotations | object | `{}` |  |
 | server.service.active.enabled | bool | `true` |  |
+| server.service.active.extraLabels | object | `{}` |  |
 | server.service.annotations | object | `{}` |  |
 | server.service.enabled | bool | `true` |  |
 | server.service.externalTrafficPolicy | string | `"Cluster"` |  |
+| server.service.extraLabels | object | `{}` |  |
 | server.service.instanceSelector.enabled | bool | `true` |  |
 | server.service.ipFamilies | list | `[]` |  |
 | server.service.ipFamilyPolicy | string | `""` |  |
@@ -265,6 +268,7 @@ Kubernetes: `>= 1.30.0-0`
 | server.service.publishNotReadyAddresses | bool | `true` |  |
 | server.service.standby.annotations | object | `{}` |  |
 | server.service.standby.enabled | bool | `true` |  |
+| server.service.standby.extraLabels | object | `{}` |  |
 | server.service.targetPort | int | `8200` |  |
 | server.serviceAccount.annotations | object | `{}` |  |
 | server.serviceAccount.create | bool | `true` |  |
@@ -323,6 +327,7 @@ Kubernetes: `>= 1.30.0-0`
 | ui.enabled | bool | `false` |  |
 | ui.externalPort | int | `8200` |  |
 | ui.externalTrafficPolicy | string | `"Cluster"` |  |
+| ui.extraLabels | object | `{}` |  |
 | ui.publishNotReadyAddresses | bool | `true` |  |
 | ui.serviceIPFamilies | list | `[]` |  |
 | ui.serviceIPFamilyPolicy | string | `""` |  |

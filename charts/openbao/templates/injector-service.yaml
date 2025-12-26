@@ -14,6 +14,9 @@ metadata:
     app.kubernetes.io/name: {{ include "openbao.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- if  .Values.injector.service.extraLabels -}}
+      {{- toYaml .Values.injector.service.extraLabels | nindent 4 -}}
+    {{- end -}}
   {{ template "injector.service.annotations" . }}
 spec:
   ports:
