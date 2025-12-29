@@ -250,3 +250,70 @@ load _helpers
     yq -r '.data.BAO_ADDR' | tee /dev/stderr)
   [ "${actual}" = "https://bao.example.com" ]
 }
+
+#--------------------------------------------------------------------
+# securityContext
+
+@test "snapshot/cronjob: default securityContext.pod" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.jobTemplate.spec.template.spec.securityContext' | tee /dev/stderr)
+  [ ! "${actual}" = "null" ]
+}
+
+@test "snapshot/cronjob: default securityContext.container" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.jobTemplate.spec.template.spec.containers[0].securityContext' | tee /dev/stderr)
+  [ ! "${actual}" = "null" ]
+}
+
+@test "snapshot/cronjob: specify securityContext.pod yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.securityContext.pod.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.jobTemplate.spec.template.spec.securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "snapshot/cronjob: specify securityContext.container yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.securityContext.container.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.jobTemplate.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "snapshot/cronjob: specify securityContext.pod yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.securityContext.pod=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.jobTemplate.spec.template.spec.securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "snapshot/cronjob: specify securityContext.container yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.securityContext.container=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.jobTemplate.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}

@@ -28,6 +28,7 @@ spec:
         spec:
           restartPolicy: {{ .Values.snapshotAgent.restartPolicy }}
           serviceAccountName: {{  template "openbao.snapshotAgent.serviceAccount.name" . }}
+          {{ template "snapshotAgent.securityContext.pod" .}}
           containers:
           - name: bao-snapshot
             envFrom:
@@ -47,6 +48,7 @@ spec:
                   name: {{ .Values.snapshotAgent.s3CredentialsSecret }}
             image: {{ .Values.snapshotAgent.image.repository }}:{{ .Values.snapshotAgent.image.tag }}
             {{ template "openbao.snapshotAgent.resources". }}
+            {{ template "snapshotAgent.securityContext.container" .}}
             volumeMounts:
               - name: snapshot-dir
                 mountPath: /bao-snapshots
