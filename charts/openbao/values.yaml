@@ -1439,7 +1439,7 @@ snapshotAgent:
   # configuration for the snapshot agent
   config:
     s3Host: "s3.eu-east-1.amazonaws.com"
-    s3Bucket: "openbao-snapshotis"
+    s3Bucket: "openbao-snapshots"
     s3Uri: "s3://openbao-snapshots"
     s3ExpireDays: "14"
     s3cmdExtraFlag: "-v"
@@ -1448,3 +1448,18 @@ snapshotAgent:
 
   # configuration of the CronJobs resources
   resources: {}
+
+  # Security context for the pod template and the snapshotAgent container
+  # The default pod securityContext is:
+  #   runAsNonRoot: true
+  #   runAsGroup: {{ .Values.snapshotAgent.gid | default 1000 }}
+  #   runAsUser: {{ .Values.snapshotAgent.uid | default 100 }}
+  #   fsGroup: {{ .Values.snapshotAgent.gid | default 1000 }}
+  # and for container is
+  #    allowPrivilegeEscalation: false
+  #    capabilities:
+  #      drop:
+  #        - ALL
+  securityContext:
+    pod: {}
+    container: {}

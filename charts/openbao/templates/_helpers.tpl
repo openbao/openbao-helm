@@ -609,7 +609,6 @@ securityContext for the statefulset openbao container
   {{- end }}
 {{- end -}}
 
-
 {{/*
 Sets extra injector service account annotations
 */}}
@@ -930,7 +929,6 @@ Sets CSI daemonset securityContext for container
   {{- end }}
 {{- end -}}
 
-
 {{/*
 Sets the injector toleration for pod placement
 */}}
@@ -1149,3 +1147,44 @@ Sets extra snapshotAgent job annotations
   {{- end }}
 {{- end -}}
 
+{{/*
+securityContext for the snapshotAgent pod level.
+*/}}
+{{- define "snapshotAgent.securityContext.pod" -}}
+  {{- if .Values.snapshotAgent.securityContext.pod }}
+          securityContext:
+            {{- $tp := typeOf .Values.snapshotAgent.securityContext.pod }}
+            {{- if eq $tp "string" }}
+              {{- tpl .Values.snapshotAgent.securityContext.pod . | nindent 12 }}
+            {{- else }}
+              {{- toYaml .Values.snapshotAgent.securityContext.pod | nindent 12 }}
+            {{- end }}
+  {{- else if not .Values.global.openshift }}
+          securityContext:
+            runAsNonRoot: true
+            runAsGroup: {{ .Values.snapshotAgent.gid | default 1000 }}
+            runAsUser: {{ .Values.snapshotAgent.uid | default 100 }}
+            fsGroup: {{ .Values.snapshotAgent.gid | default 1000 }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+securityContext for the snapshotAgent container level.
+*/}}
+{{- define "snapshotAgent.securityContext.container" -}}
+  {{- if .Values.snapshotAgent.securityContext.container }}
+            securityContext:
+              {{- $tp := typeOf .Values.snapshotAgent.securityContext.container }}
+              {{- if eq $tp "string" }}
+                {{- tpl .Values.snapshotAgent.securityContext.container . | nindent 14 }}
+              {{- else }}
+                {{- toYaml .Values.snapshotAgent.securityContext.container | nindent 14 }}
+              {{- end }}
+  {{- else if not .Values.global.openshift }}
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+  {{- end }}
+{{- end -}}

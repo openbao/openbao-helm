@@ -1,5 +1,10 @@
 ## Unreleased
 
+## 0.22.2
+
+- fix: add snapshotAgent security context to snapshot agent
+
+
 ## 0.22.1
 
 - fix: add snapshotAgent resources to the templating, fixing #121
