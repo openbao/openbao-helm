@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.24.0
+
+- feat: add support for gateway-api httproute
+
 ## 0.23.0
 
 - feat: added extraLabels on relevant services, fixing #123
