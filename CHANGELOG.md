@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.23.1
+
+- fix: added condition to point BAO_ADDR to active service when in HA mode, fixing #128
+
 ## 0.23.0
 
 - feat: added extraLabels on relevant services, fixing #123
