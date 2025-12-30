@@ -70,7 +70,7 @@ EOF
   # redeploy with snapshotAgent enabled
   helm upgrade --install "$(name_prefix)" . --set injector.enabled=false \
     --set server.ha.enabled=true \
-    --set server.ha.replicas=1 \
+    --set server.ha.replicas=3 \
     --set server.ha.raft.enabled=true \
     --set snapshotAgent.enabled=true \
     --set snapshotAgent.config.s3Bucket=openbao-snapshots \
@@ -113,7 +113,7 @@ initialize() {
   # install openbao
   helm install "$(name_prefix)" . --set injector.enabled=false \
     --set server.ha.enabled=true \
-    --set server.ha.replicas=1 \
+    --set server.ha.replicas=3 \
     --set server.ha.raft.enabled=true
   wait_for_running $(name_prefix)-0
 
