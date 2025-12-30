@@ -18,6 +18,9 @@ metadata:
     app.kubernetes.io/name: {{ include "openbao.name" . }}-ui
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- if  .Values.ui.extraLabels -}}
+      {{- toYaml .Values.ui.extraLabels | nindent 4 -}}
+    {{- end -}}
   {{- template "openbao.ui.annotations" . }}
 spec:
   {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}

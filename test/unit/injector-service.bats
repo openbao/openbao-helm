@@ -81,3 +81,13 @@ load _helpers
       yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+@test "injector/Service: generic extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-service.yaml \
+      --set 'injector.service.extraLabels.openBaoIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.openBaoIsAwesome' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}

@@ -21,6 +21,9 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     openbao-active: "true"
+    {{- if  .Values.server.service.active.extraLabels -}}
+      {{- toYaml .Values.server.service.active.extraLabels | nindent 4 -}}
+    {{- end -}}
 {{- template "openbao.service.active.annotations" . }}
 spec:
   {{- if .Values.server.service.type}}

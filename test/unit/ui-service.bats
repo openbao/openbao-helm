@@ -218,6 +218,19 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
+@test "ui/Service: specify extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'ui.serviceType=LoadBalancer' \
+      --set 'ui.enabled=true' \
+      --set 'ui.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "ui/Service: specify annotations" {
   cd `chart_dir`
   local actual=$(helm template \

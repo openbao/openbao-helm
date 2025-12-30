@@ -1,9 +1,12 @@
 ## Unreleased
 
+## 0.23.0
+
+- feat: added extraLabels on relevant services, fixing #123
+
 ## 0.22.2
 
 - fix: add snapshotAgent security context to snapshot agent
-
 
 ## 0.22.1
 

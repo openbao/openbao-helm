@@ -172,6 +172,16 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/Service: generic extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.extraLabels.openBaoIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.openBaoIsAwesome' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/Service: publish not ready" {
   cd `chart_dir`
   local actual=$(helm template \
