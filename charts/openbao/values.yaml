@@ -73,7 +73,7 @@ injector:
     # -- image repo to use for k8s image
     repository: "hashicorp/vault-k8s"
     # -- image tag to use for k8s image
-    tag: "1.4.2"
+    tag: "1.7.2"
     # -- image pull policy to use for k8s image. if tag is "latest", set to "Always"
     pullPolicy: IfNotPresent
 

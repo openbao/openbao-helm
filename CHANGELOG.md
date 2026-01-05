@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.23.3
+
+- fix(deps): switch injector to openbao-k8s with patched golang.org/x/crypto (CVE-2024-45337)
+
 ## 0.23.2
 
 - fix(snapshotAgent): correct envFrom structure in CronJob template
