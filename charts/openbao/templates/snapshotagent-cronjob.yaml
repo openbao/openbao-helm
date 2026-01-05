@@ -32,8 +32,7 @@ spec:
           containers:
           - name: bao-snapshot
             envFrom:
-            - name: config
-              configMapRef:
+            - configMapRef:
                 name: {{ template "openbao.fullname" . }}-snapshot
             env:
             - name: AWS_SECRET_ACCESS_KEY
