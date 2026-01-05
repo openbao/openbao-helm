@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: security
+          description: |
+            fix(deps): switch injector to openbao-k8s with patched golang.org/x/crypto (CVE-2024-45337)
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2026-01-05T20:11:56.080223635Z"
+    description: Official OpenBao Chart
+    digest: 4811c123ff3631badb675c60603041162072c64ce43848c94ada986c0b7fd321
+    home: https://github.com/openbao/openbao-helm
+    icon: https://github.com/openbao/artwork/blob/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.23.3/openbao-0.23.3.tgz
+    version: 0.23.3
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: |
             fix(snapshotAgent): correct envFrom structure in CronJob template
@@ -1401,4 +1435,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-01-05T18:28:29.363190283Z"
+generated: "2026-01-05T20:11:56.080597595Z"
