@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.23.2
+
+- fix(snapshotAgent): correct envFrom structure in CronJob template
+
 ## 0.23.1
 
 - fix(tlsroute): fix example hosts format

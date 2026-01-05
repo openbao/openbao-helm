@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.23.1
+version: 0.23.2
 appVersion: v2.4.4
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -28,7 +28,7 @@ annotations:
   artifacthub.io/changes: |
     - kind: fixed
       description: |
-        fix(tlsroute): fix example hostname format
+        fix(snapshotAgent): correct envFrom structure in CronJob template
 
 maintainers:
   - name: OpenBao
