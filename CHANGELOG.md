@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.23.1
+
+- fix(tlsroute): fix example hosts format
+
 ## 0.23.0
 
 - feat: added extraLabels on relevant services, fixing #123
