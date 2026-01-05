@@ -468,8 +468,8 @@ server:
       annotations: {}
       # external-dns.alpha.kubernetes.io/hostname: chart-example.local
 
-      hosts:
-      - host: chart-example.local
+      hosts: []
+        # - chart-example.local
 
       # Allows overriding the TLSRoutes apiVersion in case a different version of Gateway API is installed on the cluster.
       apiVersion: gateway.networking.k8s.io/v1alpha3
