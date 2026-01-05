@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: |
+            fix(tlsroute): fix example hostname format
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2026-01-05T07:46:21.727107898Z"
+    description: Official OpenBao Chart
+    digest: a2269b6b60423ba667d048a5289a106ec6dcfca449f535104c8c6957ce7d76d2
+    home: https://github.com/openbao/openbao-helm
+    icon: https://github.com/openbao/artwork/blob/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.23.1/openbao-0.23.1.tgz
+    version: 0.23.1
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: |
             feat: added extraLabels on relevant services
@@ -1333,4 +1367,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2025-12-30T10:21:01.051895183Z"
+generated: "2026-01-05T07:46:21.727360792Z"
