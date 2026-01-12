@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.23.5
+
+- fix(snapshotAgent): don't create service account if disabled
+
 ## 0.23.4
 
 - fix(snapshotAgent): don't create service account if disabled
