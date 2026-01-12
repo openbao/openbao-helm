@@ -23,6 +23,8 @@ data:
   BAO_ROLE: {{ .Values.snapshotAgent.config.baoRole }}
   {{- if include "openbao.externalAddr" . }}
   BAO_ADDR: "{{ include "openbao.externalAddr" . }}"
+  {{- else if and (eq .mode "ha") (eq (.Values.server.service.active.enabled | toString) "true")}}
+  BAO_ADDR: {{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}-active.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}
   {{- else }}
   BAO_ADDR: {{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}
   {{- end }}
