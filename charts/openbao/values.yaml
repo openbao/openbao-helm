@@ -486,6 +486,72 @@ server:
         #   # sectionName is optional to fix to a specific listener
         #   sectionName: listener-name
 
+    # Configures a HTTPRoute for the OpenBao server. This can be enabled independently of the ingress configuration to allow for side-by-side scenarios for migration.
+    # WARNING: Terminating TLS before reaching the OpenBao Server is not recommended and may break things like certificate authentication. Prefer usage of `TLSRoute`.
+    httpRoute:
+      enabled: false
+      labels: {}
+      # traffic: external
+      annotations: {}
+      # external-dns.alpha.kubernetes.io/hostname: chart-example.local
+
+      hosts:
+      - chart-example.local
+
+      # Allows overriding the HTTPRoute apiVersion in case a different version of Gateway API is installed on the cluster.
+      apiVersion: gateway.networking.k8s.io/v1
+
+      # When HA mode is enabled and K8s service registration is being used,
+      # configure the ingress to point to the OpenBao active service.
+      activeService: true
+
+      # List of ParentRefs. As the helm chart configures no gateways itself,
+      # this should be set to at least one gateway with one or more HTTP listeners
+      parentRefs: []
+        # - name: my-gw
+        #   namespace: gateway-namespace
+        #   # sectionName is optional to fix to a specific listener
+        #   sectionName: listener-name
+
+      matches:
+        path:
+          type: PathPrefix
+          value: '/'
+        timeouts: {}
+          # request: 10s  #Maximum time the Gateway waits to complete the full client request and response cycle.
+          # backendRequest: 10s # Maximum time the Gateway waits for a response from the backend service.
+      filters: []
+      # - type: RequestHeaderModifier
+      #   requestHeaderModifier:
+      #     set:
+      #       - name: X-Forwarded-Proto
+      #         value: https
+
+    # If TLS is enable on server (see global.tlsDisable) the gateway must be configured
+    # with BackendTLSPolicy to correctly handles TLS connection with server in case TLS termination happens at gateway
+    tlsPolicy:
+      enabled: false
+      labels: {}
+      # traffic: external
+      annotations: {}
+      # external-dns.alpha.kubernetes.io/hostname: chart-example.local
+
+      # Allows overriding the BackendTLSPolicy apiVersion in case a different version of Gateway API is installed on the cluster.
+      apiVersion: gateway.networking.k8s.io/v1
+
+      # When HA mode is enabled and K8s service registration is being used,
+      # configure the ingress to point to the OpenBao active service.
+      activeService: true
+
+      # Identifies an API object to apply the policy to.
+      # If no one is specified the default is to target the OpenBao service
+      targetRefs: []
+
+      validation: {}
+      # caCertificateRefs:
+      # - kind: ConfigMap
+      #   name: vault-ca
+
   # hostAliases is a list of aliases to be added to /etc/hosts. Specified as a YAML list.
   hostAliases: []
   # - ip: 127.0.0.1

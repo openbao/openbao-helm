@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.24.0
+
+- feat: add support for gateway-api httproute
+
 ## 0.23.3
 
 - fix(deps): switch injector to openbao-k8s with patched golang.org/x/crypto (CVE-2024-45337)
