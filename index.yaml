@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: |
+            fix(snapshotAgent): don't create service account if disabled
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2026-01-26T04:58:31.492959337Z"
+    description: Official OpenBao Chart
+    digest: c2922f4fa0e663203a695bf68067602b5f034f239ddecb8f6804a1a225b391a0
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.23.4/openbao-0.23.4.tgz
+    version: 0.23.4
+  - annotations:
+      artifacthub.io/changes: |
         - kind: security
           description: |
             fix(deps): switch injector to openbao-k8s with patched golang.org/x/crypto (CVE-2024-45337)
@@ -1435,4 +1469,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-01-05T20:11:56.080597595Z"
+generated: "2026-01-26T04:58:31.493492123Z"
