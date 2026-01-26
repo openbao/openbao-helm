@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.23.4
+
+- fix(snapshotAgent): don't create service account if disabled
+
 ## 0.23.3
 
 - fix(deps): switch injector to openbao-k8s with patched golang.org/x/crypto (CVE-2024-45337)
