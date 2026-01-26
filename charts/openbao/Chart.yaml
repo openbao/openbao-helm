@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.23.3
+version: 0.23.4
 appVersion: v2.4.4
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -26,9 +26,9 @@ annotations:
   charts.openshift.io/name: Openbao
   artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |
-    - kind: security
+    - kind: fixed
       description: |
-        fix(deps): switch injector to openbao-k8s with patched golang.org/x/crypto (CVE-2024-45337)
+        fix(snapshotAgent): don't create service account if disabled
 
 maintainers:
   - name: OpenBao
