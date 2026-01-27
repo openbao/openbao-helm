@@ -5,6 +5,40 @@ entries:
       artifacthub.io/changes: |
         - kind: fixed
           description: |
+            fix(snapshotAgent): set BAO_ADDR to active service when running a cluster
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2026-01-27T11:47:27.826546433Z"
+    description: Official OpenBao Chart
+    digest: 8afcf0641ef0ea067264675b967d034c52839d60f9e24a58e466c2d8bed93cf7
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.23.5/openbao-0.23.5.tgz
+    version: 0.23.5
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
+          description: |
             fix(snapshotAgent): don't create service account if disabled
       artifacthub.io/containsSecurityUpdates: "true"
       charts.openshift.io/name: Openbao
@@ -1469,4 +1503,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-01-26T04:58:31.493492123Z"
+generated: "2026-01-27T11:47:27.826902311Z"
