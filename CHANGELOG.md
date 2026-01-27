@@ -2,7 +2,7 @@
 
 ## 0.23.5
 
-- fix(snapshotAgent): don't create service account if disabled
+- fix(snapshotAgent): set BAO_ADDR to active service when running a cluster
 
 ## 0.23.4
 
