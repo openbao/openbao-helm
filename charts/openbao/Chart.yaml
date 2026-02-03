@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.23.5
+version: 0.24.0
 appVersion: v2.4.4
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -24,11 +24,11 @@ sources:
   - https://github.com/openbao/openbao-helm
 annotations:
   charts.openshift.io/name: Openbao
-  artifacthub.io/containsSecurityUpdates: "true"
+  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: fixed
+    - kind: added
       description: |
-        fix(snapshotAgent): set BAO_ADDR to active service when running a cluster
+        feat: add support for gateway-api httproute
 
 maintainers:
   - name: OpenBao
