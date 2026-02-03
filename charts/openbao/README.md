@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.24.0](https://img.shields.io/badge/Version-0.24.0-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
+![Version: 0.24.1](https://img.shields.io/badge/Version-0.24.1-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -326,6 +326,9 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.config.s3Uri | string | `"s3://openbao-snapshots"` |  |
 | snapshotAgent.config.s3cmdExtraFlag | string | `"-v"` |  |
 | snapshotAgent.enabled | bool | `false` |  |
+| snapshotAgent.extraEnvironmentVars | object | `{}` | Map of extra environment variables to set in the snapshot-agent cronjob |
+| snapshotAgent.extraSecretEnvironmentVars | list | `[]` | List of extra environment variables to set in the snapshot-agent cronjob These variables take value from existing Secret objects. |
+| snapshotAgent.extraVolumeMounts | list | `[]` | List of additional volumeMounts for the snapshot cronjob container. These are rendered via toYaml rather than pre-processed like the extraVolumes value. |
 | snapshotAgent.extraVolumes | object | `{}` |  |
 | snapshotAgent.image.repository | string | `"ghcr.io/openbao/openbao-snapshot-agent"` |  |
 | snapshotAgent.image.tag | string | `"0.2.4"` |  |
