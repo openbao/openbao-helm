@@ -17,6 +17,9 @@ jobs:
           config: test/kind/config.yaml
           node_image: kindest/node:v${{ matrix.kind-k8s-version }}
           version: v0.29.0
+      - name: Install Gateway API resources
+        run: |
+          kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/experimental-install.yaml
       - name: Deploy LocalStack on Kind
         run: |
           helm repo add localstack-repo https://helm.localstack.cloud
