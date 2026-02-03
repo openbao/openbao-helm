@@ -264,6 +264,27 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# extraEnvironmentVars
+
+@test "snapshot/cronjob: specify extraEnvironmentVar" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.extraEnvironmentVars.BAO_FOO=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.jobTemplate.spec.template.spec.containers[0].env' | tee /dev/stderr )
+
+  local actual=$(echo $object |
+     yq -r '.[2].name' | tee /dev/stderr)
+  [ "${actual}" = "BAO_FOO" ]
+
+  local actual=$(echo $object |
+      yq -r '.[2].value' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+#--------------------------------------------------------------------
 # securityContext
 
 @test "snapshot/cronjob: default securityContext.pod" {

@@ -45,6 +45,7 @@ spec:
                 secretKeyRef:
                   key: AWS_ACCESS_KEY_ID
                   name: {{ .Values.snapshotAgent.s3CredentialsSecret }}
+            {{- include "openbao.extraEnvironmentVars" .Values.snapshotAgent | nindent 12 }}
             image: {{ .Values.snapshotAgent.image.repository }}:{{ .Values.snapshotAgent.image.tag }}
             {{ template "openbao.snapshotAgent.resources". }}
             {{ template "snapshotAgent.securityContext.container" .}}

@@ -1531,6 +1531,10 @@ snapshotAgent:
   # configuration of the CronJobs resources
   resources: {}
 
+  # -- Map of extra environment variables to set in the snapshot-agent cronjob
+  extraEnvironmentVars: {}
+    # BAO_CACERT: /openbao/tls/ca.crt
+
   # Security context for the pod template and the snapshotAgent container
   # The default pod securityContext is:
   #   runAsNonRoot: true
