@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: |
+            feat: add support for gateway-api httproute
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2026-02-03T16:36:06.393549794Z"
+    description: Official OpenBao Chart
+    digest: dcffbc64a31791bf27da6dfa6597bed66dfcdf32439e61e0828f295bbdc8dc45
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.24.0/openbao-0.24.0.tgz
+    version: 0.24.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: |
             fix(snapshotAgent): set BAO_ADDR to active service when running a cluster
@@ -1503,4 +1537,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-01-27T11:47:27.826902311Z"
+generated: "2026-02-03T16:36:06.393761296Z"
