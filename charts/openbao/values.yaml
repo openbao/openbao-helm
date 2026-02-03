@@ -1515,6 +1515,14 @@ snapshotAgent:
   # extraVolumes for the snapshot agent cronjob
   extraVolumes: {}
 
+  # -- List of additional volumeMounts for the snapshot cronjob container. These are rendered
+  # via toYaml rather than pre-processed like the extraVolumes value.
+  extraVolumeMounts: []
+  #   - mountPath: /openbao/tls/ca.crt
+  #     name: openbao-tls
+  #     readOnly: true
+  #     subPath: ca.crt
+
   # s3CredentialsSecret to use
   s3CredentialsSecret: "my-s3-credentials"
 

@@ -52,6 +52,9 @@ spec:
             volumeMounts:
               - name: snapshot-dir
                 mountPath: /bao-snapshots
+              {{- with .Values.snapshotAgent.extraVolumeMounts }}
+              {{- toYaml . | nindent 14 }}
+              {{- end }}
             imagePullPolicy: IfNotPresent
           volumes:
           - name: snapshot-dir

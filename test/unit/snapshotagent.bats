@@ -285,6 +285,28 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# extraVolumeMounts
+
+@test "snapshot/cronjob: specify extraVolumeMounts" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.extraVolumeMounts[0].mountPath=/mnt' \
+      --set 'snapshotAgent.extraVolumeMounts[0].name=secret' \
+      . | tee /dev/stderr |
+      yq -r '.spec.jobTemplate.spec.template.spec.containers[0].volumeMounts' | tee /dev/stderr )
+
+  local actual=$(echo $object |
+     yq -r '.[1].mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/mnt" ]
+
+  local actual=$(echo $object |
+      yq -r '.[1].name' | tee /dev/stderr)
+  [ "${actual}" = "secret" ]
+}
+
+#--------------------------------------------------------------------
 # securityContext
 
 @test "snapshot/cronjob: default securityContext.pod" {
