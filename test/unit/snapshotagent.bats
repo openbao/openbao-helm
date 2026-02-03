@@ -285,6 +285,40 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# extraSecretEnvironmentVars
+
+@test "snapshot/cronjob: set extraSecretEnvironmentVars" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml  \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.extraSecretEnvironmentVars[0].envName=ENV_FOO_0' \
+      --set 'snapshotAgent.extraSecretEnvironmentVars[0].secretName=secret_name_0' \
+      --set 'snapshotAgent.extraSecretEnvironmentVars[0].secretKey=secret_key_0' \
+      --set 'snapshotAgent.extraSecretEnvironmentVars[1].envName=ENV_FOO_1' \
+      --set 'snapshotAgent.extraSecretEnvironmentVars[1].secretName=secret_name_1' \
+      --set 'snapshotAgent.extraSecretEnvironmentVars[1].secretKey=secret_key_1' \
+      . | tee /dev/stderr |
+      yq -r '.spec.jobTemplate.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_0")) | .[] .valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${value}" = "secret_name_0" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_0")) | .[] .valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${value}" = "secret_key_0" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_1")) | .[] .valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${value}" = "secret_name_1" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_1")) | .[] .valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${value}" = "secret_key_1" ]
+}
+
+#--------------------------------------------------------------------
 # extraVolumeMounts
 
 @test "snapshot/cronjob: specify extraVolumeMounts" {

@@ -1543,6 +1543,13 @@ snapshotAgent:
   extraEnvironmentVars: {}
     # BAO_CACERT: /openbao/tls/ca.crt
 
+  # --  List of extra environment variables to set in the snapshot-agent cronjob
+  # These variables take value from existing Secret objects.
+  extraSecretEnvironmentVars: []
+    # - envName: AWS_SECRET_ACCESS_KEY
+    #   secretName: openbao
+    #   secretKey: AWS_SECRET_ACCESS_KEY
+
   # Security context for the pod template and the snapshotAgent container
   # The default pod securityContext is:
   #   runAsNonRoot: true
