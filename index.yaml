@@ -3,6 +3,43 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: |
+            feat: Update to OpenBao 2.5.0
+          links:
+            - name: OpenBao 2.5.0 Release
+              url: https://github.com/openbao/openbao/releases/tag/v2.5.0
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.0
+    created: "2026-02-04T19:17:52.518815755Z"
+    description: Official OpenBao Chart
+    digest: bf64ec9355b1cc576d77ef4274f9469f559d417c795f562c3052296584496dda
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.25.0/openbao-0.25.0.tgz
+    version: 0.25.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: |
             fix(snapshotAgent): allow setting extraEnvironmentVars and extraVolumeMounts
@@ -1571,4 +1608,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-02-04T10:12:56.878064278Z"
+generated: "2026-02-04T19:17:52.519057435Z"
