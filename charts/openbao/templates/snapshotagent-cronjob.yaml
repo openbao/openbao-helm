@@ -45,12 +45,17 @@ spec:
                 secretKeyRef:
                   key: AWS_ACCESS_KEY_ID
                   name: {{ .Values.snapshotAgent.s3CredentialsSecret }}
+            {{- include "openbao.extraSecretEnvironmentVars" .Values.snapshotAgent | nindent 12 }}
+            {{- include "openbao.extraEnvironmentVars" .Values.snapshotAgent | nindent 12 }}
             image: {{ .Values.snapshotAgent.image.repository }}:{{ .Values.snapshotAgent.image.tag }}
             {{ template "openbao.snapshotAgent.resources". }}
             {{ template "snapshotAgent.securityContext.container" .}}
             volumeMounts:
               - name: snapshot-dir
                 mountPath: /bao-snapshots
+              {{- with .Values.snapshotAgent.extraVolumeMounts }}
+              {{- toYaml . | nindent 14 }}
+              {{- end }}
             imagePullPolicy: IfNotPresent
           volumes:
           - name: snapshot-dir

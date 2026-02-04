@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.24.1
+
+- fix(snapshotAgent): allow setting extraVolumeMounts, extraEnvironmentVars & extraSecretEnvironmentVars
+
 ## 0.24.0
 
 - feat: add support for gateway-api httproute
