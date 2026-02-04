@@ -3,8 +3,8 @@
 
 apiVersion: v2
 name: openbao
-version: 0.24.1
-appVersion: v2.4.4
+version: 0.25.0
+appVersion: v2.5.0
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
 home: https://github.com/openbao/openbao-helm
@@ -26,10 +26,12 @@ annotations:
   charts.openshift.io/name: Openbao
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: added
+    - kind: changed
       description: |
-        fix(snapshotAgent): allow setting extraEnvironmentVars and extraVolumeMounts
-
+        feat: Update to OpenBao 2.5.0
+      links:
+        - name: OpenBao 2.5.0 Release
+          url: https://github.com/openbao/openbao/releases/tag/v2.5.0
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org

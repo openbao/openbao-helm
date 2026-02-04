@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.24.1](https://img.shields.io/badge/Version-0.24.1-informational?style=flat-square) ![AppVersion: v2.4.4](https://img.shields.io/badge/AppVersion-v2.4.4-informational?style=flat-square)
+![Version: 0.25.0](https://img.shields.io/badge/Version-0.25.0-informational?style=flat-square) ![AppVersion: v2.5.0](https://img.shields.io/badge/AppVersion-v2.5.0-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -194,10 +194,13 @@ Kubernetes: `>= 1.30.0-0`
 | server.gateway.httpRoute.matches.path.value | string | `"/"` |  |
 | server.gateway.httpRoute.matches.timeouts | object | `{}` |  |
 | server.gateway.httpRoute.parentRefs | list | `[]` |  |
-| server.gateway.httpRoute.tlsPolicy.annotations | object | `{}` |  |
-| server.gateway.httpRoute.tlsPolicy.apiVersion | string | `"gateway.networking.k8s.io/v1"` |  |
-| server.gateway.httpRoute.tlsPolicy.labels | object | `{}` |  |
-| server.gateway.httpRoute.tlsPolicy.validation | object | `{}` |  |
+| server.gateway.tlsPolicy.activeService | bool | `true` |  |
+| server.gateway.tlsPolicy.annotations | object | `{}` |  |
+| server.gateway.tlsPolicy.apiVersion | string | `"gateway.networking.k8s.io/v1"` |  |
+| server.gateway.tlsPolicy.enabled | bool | `false` |  |
+| server.gateway.tlsPolicy.labels | object | `{}` |  |
+| server.gateway.tlsPolicy.targetRefs | list | `[]` |  |
+| server.gateway.tlsPolicy.validation | object | `{}` |  |
 | server.gateway.tlsRoute.activeService | bool | `true` |  |
 | server.gateway.tlsRoute.annotations | object | `{}` |  |
 | server.gateway.tlsRoute.apiVersion | string | `"gateway.networking.k8s.io/v1alpha3"` |  |
