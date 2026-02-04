@@ -1,5 +1,9 @@
 ## Unreleased
 
+### 0.25.0
+
+- Update OpenBao to version 2.5.0
+
 ## 0.24.1
 
 - fix(snapshotAgent): allow setting extraVolumeMounts, extraEnvironmentVars & extraSecretEnvironmentVars
