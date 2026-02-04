@@ -5,6 +5,40 @@ entries:
       artifacthub.io/changes: |
         - kind: added
           description: |
+            fix(snapshotAgent): allow setting extraEnvironmentVars and extraVolumeMounts
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.4.4
+    created: "2026-02-04T10:12:56.877845372Z"
+    description: Official OpenBao Chart
+    digest: 36430afc489d147624ed3b6f4d8b0a97010d9d5fd9cafb7a055c9771ec12c2e4
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.24.1/openbao-0.24.1.tgz
+    version: 0.24.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: |
             feat: add support for gateway-api httproute
       artifacthub.io/containsSecurityUpdates: "false"
       charts.openshift.io/name: Openbao
@@ -1537,4 +1571,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-02-03T16:36:06.393761296Z"
+generated: "2026-02-04T10:12:56.878064278Z"
