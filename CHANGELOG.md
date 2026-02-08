@@ -1,5 +1,9 @@
 ## Unreleased
 
+### 0.25.2
+
+- feat: Allow ServiceMonitor port and scheme change
+
 ### 0.25.1
 
 - fix(snapshotAgent): change extraVolumes to list instead of object

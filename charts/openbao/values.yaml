@@ -1414,6 +1414,12 @@ serverTelemetry:
     #  release: prometheus
     selectors: {}
 
+    # -- Port which Prometheus uses when scraping metrics. If empty will use `openbao.scheme` helper for its value
+    port: ""
+
+    # -- scheme to use when Prometheus scrapes metrics. If empty will use `openbao.scheme` helper for its value
+    scheme: ""
+
     # Interval at which Prometheus scrapes metrics
     interval: 30s
 

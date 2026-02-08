@@ -26,12 +26,9 @@ annotations:
   charts.openshift.io/name: Openbao
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: fixed
+    - kind: changed
       description: |
-        fix(snapshotAgent): change extraVolumes to list instead of object
-      links:
-        - name: OpenBao 2.5.0 Release
-          url: https://github.com/openbao/openbao/releases/tag/v2.5.0
+        feat: Allow ServiceMonitor port and scheme change
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org
