@@ -29,6 +29,9 @@ annotations:
     - kind: changed
       description: |
         feat: Allow ServiceMonitor port and scheme change
+    - kind: changed
+      description: |
+        feat: Add extraPorts to server Service
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org

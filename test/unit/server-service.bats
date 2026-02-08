@@ -421,6 +421,37 @@ load _helpers
   [ "${actual}" = "https" ]
 }
 
+@test "server/Service: extraPorts assert is empty by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      . | tee /dev/stderr)
+  [ "$(echo "$actual" | yq -r '.spec.ports | length')" = "2" ]
+}
+
+@test "server/Service: adds extra ports" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.extraPorts[0].port=9101' \
+      --set 'server.service.extraPorts[0].targetPort=9101' \
+      --set 'server.service.extraPorts[0].name=metrics' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[] | select(.name == "metrics")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.port' | tee /dev/stderr)
+  [ "${actual}" = "9101" ]
+
+  local actual=$(echo $object |
+      yq -r '.targetPort' | tee /dev/stderr)
+  [ "${actual}" = "9101" ]
+
+  local actual=$(echo $object |
+      yq -r '.name' | tee /dev/stderr)
+  [ "${actual}" = "metrics" ]
+}
+
 # duplicated in server-ha-active-service.bats
 @test "server/Service: NodePort assert externalTrafficPolicy" {
   cd `chart_dir`

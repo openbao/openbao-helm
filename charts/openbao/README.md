@@ -279,6 +279,7 @@ Kubernetes: `>= 1.30.0-0`
 | server.service.enabled | bool | `true` |  |
 | server.service.externalTrafficPolicy | string | `"Cluster"` |  |
 | server.service.extraLabels | object | `{}` |  |
+| server.service.extraPorts | list | `[]` | extraPorts is a list of extra ports. Specified as a YAML list. This is useful if you need to add additional ports to the server service in dynamic way. |
 | server.service.instanceSelector.enabled | bool | `true` |  |
 | server.service.ipFamilies | list | `[]` |  |
 | server.service.ipFamilyPolicy | string | `""` |  |

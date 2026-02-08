@@ -868,6 +868,14 @@ server:
     port: 8200
     # Target port to which the service should be mapped to
     targetPort: 8200
+
+    # -- extraPorts is a list of extra ports. Specified as a YAML list.
+    # This is useful if you need to add additional ports to the server service in dynamic way.
+    extraPorts: []
+    # - name: metrics
+    #   port: 9101
+    #   targetPort: 9101
+
     # Extra annotations for the service definition. This can either be YAML or a
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the service.
