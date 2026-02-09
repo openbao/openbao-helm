@@ -202,6 +202,39 @@ load _helpers
   [ "${actual}" = "80" ]
 }
 
+@test "server/ha-standby-Service: extraPorts assert is empty by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr)
+  [ "$(echo "$actual" | yq -r '.spec.ports | length')" = "2" ]
+}
+
+@test "server/ha-standby-Service: adds extra ports" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.extraPorts[0].port=9101' \
+      --set 'server.service.extraPorts[0].targetPort=9101' \
+      --set 'server.service.extraPorts[0].name=metrics' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[] | select(.name == "metrics")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.port' | tee /dev/stderr)
+  [ "${actual}" = "9101" ]
+
+  local actual=$(echo $object |
+      yq -r '.targetPort' | tee /dev/stderr)
+  [ "${actual}" = "9101" ]
+
+  local actual=$(echo $object |
+      yq -r '.name' | tee /dev/stderr)
+  [ "${actual}" = "metrics" ]
+}
+
 @test "server/ha-standby-Service: nodeport can set" {
   cd `chart_dir`
   local actual=$(helm template \
