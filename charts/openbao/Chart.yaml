@@ -26,7 +26,7 @@ annotations:
   charts.openshift.io/name: Openbao
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: changed
+    - kind: fixed
       description: |
         fix(snapshotAgent): change extraVolumes to list instead of object
       links:
