@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.25.0
+version: 0.25.1
 appVersion: v2.5.0
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -28,7 +28,7 @@ annotations:
   artifacthub.io/changes: |
     - kind: changed
       description: |
-        feat: Update to OpenBao 2.5.0
+        fix(snapshotAgent): change extraVolumes to list instead of object
       links:
         - name: OpenBao 2.5.0 Release
           url: https://github.com/openbao/openbao/releases/tag/v2.5.0
