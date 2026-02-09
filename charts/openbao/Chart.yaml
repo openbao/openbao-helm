@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.25.1
+version: 0.25.2
 appVersion: v2.5.0
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -26,12 +26,12 @@ annotations:
   charts.openshift.io/name: Openbao
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: fixed
+    - kind: changed
       description: |
-        fix(snapshotAgent): change extraVolumes to list instead of object
-      links:
-        - name: OpenBao 2.5.0 Release
-          url: https://github.com/openbao/openbao/releases/tag/v2.5.0
+        feat: Allow ServiceMonitor port and scheme change
+    - kind: changed
+      description: |
+        feat: Add extraPorts to server Service
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org

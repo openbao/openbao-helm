@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.25.1](https://img.shields.io/badge/Version-0.25.1-informational?style=flat-square) ![AppVersion: v2.5.0](https://img.shields.io/badge/AppVersion-v2.5.0-informational?style=flat-square)
+![Version: 0.25.2](https://img.shields.io/badge/Version-0.25.2-informational?style=flat-square) ![AppVersion: v2.5.0](https://img.shields.io/badge/AppVersion-v2.5.0-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -279,6 +279,7 @@ Kubernetes: `>= 1.30.0-0`
 | server.service.enabled | bool | `true` |  |
 | server.service.externalTrafficPolicy | string | `"Cluster"` |  |
 | server.service.extraLabels | object | `{}` |  |
+| server.service.extraPorts | list | `[]` | extraPorts is a list of extra ports. Specified as a YAML list. This is useful if you need to add additional ports to the server service in dynamic way. |
 | server.service.instanceSelector.enabled | bool | `true` |  |
 | server.service.ipFamilies | list | `[]` |  |
 | server.service.ipFamilyPolicy | string | `""` |  |
@@ -316,6 +317,8 @@ Kubernetes: `>= 1.30.0-0`
 | serverTelemetry.serviceMonitor.authorization | object | `{}` |  |
 | serverTelemetry.serviceMonitor.enabled | bool | `false` |  |
 | serverTelemetry.serviceMonitor.interval | string | `"30s"` |  |
+| serverTelemetry.serviceMonitor.port | string | `""` | Port which Prometheus uses when scraping metrics. If empty will use `openbao.scheme` helper for its value |
+| serverTelemetry.serviceMonitor.scheme | string | `""` | scheme to use when Prometheus scrapes metrics. If empty will use `openbao.scheme` helper for its value |
 | serverTelemetry.serviceMonitor.scrapeClass | string | `""` |  |
 | serverTelemetry.serviceMonitor.scrapeTimeout | string | `"10s"` |  |
 | serverTelemetry.serviceMonitor.selectors | object | `{}` |  |

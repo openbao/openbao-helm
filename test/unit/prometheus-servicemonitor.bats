@@ -110,6 +110,7 @@ load _helpers
 
   [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].port')" = "http" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].scheme')" = "http" ]
 }
 
 @test "prometheus/ServiceMonitor-server: assertEndpoints TLS" {
@@ -122,6 +123,31 @@ load _helpers
 
   [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].port')" = "https" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].scheme')" = "https" ]
+}
+
+@test "prometheus/ServiceMonitor-server: assertEndpointsPort update" {
+  cd `chart_dir`
+  local output=$( (helm template \
+    --show-only templates/prometheus-servicemonitor.yaml \
+    --set 'serverTelemetry.serviceMonitor.enabled=true' \
+    --set 'serverTelemetry.serviceMonitor.port=metrics-tls' \
+    .) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].port')" = "metrics-tls" ]
+}
+
+@test "prometheus/ServiceMonitor-server: assertEndpointsScheme update" {
+  cd `chart_dir`
+  local output=$( (helm template \
+    --show-only templates/prometheus-servicemonitor.yaml \
+    --set 'serverTelemetry.serviceMonitor.enabled=true' \
+    --set 'global.tlsDisable=false' \
+    --set 'serverTelemetry.serviceMonitor.scheme=http' \
+    .) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].port')" = "https" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].scheme')" = "http" ]
 }
 
 @test "prometheus/ServiceMonitor-server: tlsConfig default" {

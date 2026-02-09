@@ -37,10 +37,10 @@ spec:
       openbao-internal: "true"
       {{- end }}
   endpoints:
-  - port: {{ include "openbao.scheme" . }}
+  - port: {{ .Values.serverTelemetry.serviceMonitor.port | default (include "openbao.scheme" .) }}
     interval: {{ .Values.serverTelemetry.serviceMonitor.interval }}
     scrapeTimeout: {{ .Values.serverTelemetry.serviceMonitor.scrapeTimeout }}
-    scheme: {{ include "openbao.scheme" . | lower }}
+    scheme: {{ .Values.serverTelemetry.serviceMonitor.scheme | default (include "openbao.scheme" .) | lower }}
     path: /v1/sys/metrics
     params:
       format:
