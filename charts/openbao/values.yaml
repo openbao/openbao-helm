@@ -1512,8 +1512,13 @@ snapshotAgent:
     repository: ghcr.io/openbao/openbao-snapshot-agent
     tag: 0.2.4
 
-  # extraVolumes for the snapshot agent cronjob
-  extraVolumes: {}
+  # -- List of extraVolumes made available to the snapshot cronjob container. These are rendered
+  # via toYaml rather than pre-processed like the extraVolumes value.
+  extraVolumes: []
+  #   - name: openbao-tls
+  #     secret:
+  #       defaultMode: 420
+  #       secretName: openbao-tls
 
   # -- List of additional volumeMounts for the snapshot cronjob container. These are rendered
   # via toYaml rather than pre-processed like the extraVolumes value.

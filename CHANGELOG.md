@@ -1,5 +1,9 @@
 ## Unreleased
 
+### 0.25.1
+
+- fix(snapshotAgent): change extraVolumes to list instead of object
+
 ### 0.25.0
 
 - Update OpenBao to version 2.5.0
