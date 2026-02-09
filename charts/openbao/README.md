@@ -332,7 +332,7 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.extraEnvironmentVars | object | `{}` | Map of extra environment variables to set in the snapshot-agent cronjob |
 | snapshotAgent.extraSecretEnvironmentVars | list | `[]` | List of extra environment variables to set in the snapshot-agent cronjob These variables take value from existing Secret objects. |
 | snapshotAgent.extraVolumeMounts | list | `[]` | List of additional volumeMounts for the snapshot cronjob container. These are rendered via toYaml rather than pre-processed like the extraVolumes value. |
-| snapshotAgent.extraVolumes | object | `{}` |  |
+| snapshotAgent.extraVolumes | list | `[]` |  |
 | snapshotAgent.image.repository | string | `"ghcr.io/openbao/openbao-snapshot-agent"` |  |
 | snapshotAgent.image.tag | string | `"0.2.4"` |  |
 | snapshotAgent.resources | object | `{}` |  |
