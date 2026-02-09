@@ -1,5 +1,9 @@
 ## Unreleased
 
+### 0.25.3
+
+- fix: Add extraPorts to server Service in ha
+
 ### 0.25.2
 
 - feat: Allow ServiceMonitor port and scheme change
