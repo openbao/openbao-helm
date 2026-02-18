@@ -74,3 +74,57 @@ load _helpers
       yq '.spec.ipFamilies' -c | tee /dev/stderr)
   [ "${actual}" = '["IPv4","IPv6"]' ]
 }
+
+@test "server/headless-Service: generic annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-headless-service.yaml \
+      --set 'server.service.headless.annotations=openBaoIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/headless-Service: generic annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-headless-service.yaml \
+      --set 'server.service.headless.annotations.openBaoIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/headless-Service: with headless annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-headless-service.yaml \
+      --set 'server.service.headless.annotations=openBaoIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/headless-Service: with headless annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-headless-service.yaml \
+      --set 'server.service.headless.annotations.openBaoIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+@test "server/headless-Service: with both annotations set" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-headless-service.yaml \
+      --set 'server.service.headless.annotations=openBaoIsAwesome: true' \
+      --set 'server.service.annotations=openbaoIsNotAwesome: false' \
+      . | tee /dev/stderr |
+      yq -r '.metadata' | tee /dev/stderr)
+
+  local actual=$(echo "$object" | yq '.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+  actual=$(echo "$object" | yq '.annotations["openbaoIsNotAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
