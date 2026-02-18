@@ -1,5 +1,9 @@
 ## Unreleased
 
+### 0.25.4
+
+- fix: Add annotations for headless service
+
 ### 0.25.3
 
 - fix: Add extraPorts to server Service in ha
