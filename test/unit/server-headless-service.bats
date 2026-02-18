@@ -79,7 +79,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-headless-service.yaml \
-      --set 'server.service.headless.annotations=openBaoIsAwesome: true' \
+      --set 'server.service.annotations=openBaoIsAwesome: true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -89,7 +89,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-headless-service.yaml \
-      --set 'server.service.headless.annotations.openBaoIsAwesome=true' \
+      --set 'server.service.annotations.openBaoIsAwesome=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["openBaoIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
