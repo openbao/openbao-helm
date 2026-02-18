@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.25.3](https://img.shields.io/badge/Version-0.25.3-informational?style=flat-square) ![AppVersion: v2.5.0](https://img.shields.io/badge/AppVersion-v2.5.0-informational?style=flat-square)
+![Version: 0.25.4](https://img.shields.io/badge/Version-0.25.4-informational?style=flat-square) ![AppVersion: v2.5.0](https://img.shields.io/badge/AppVersion-v2.5.0-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -280,6 +280,7 @@ Kubernetes: `>= 1.30.0-0`
 | server.service.externalTrafficPolicy | string | `"Cluster"` |  |
 | server.service.extraLabels | object | `{}` |  |
 | server.service.extraPorts | list | `[]` | extraPorts is a list of extra ports. Specified as a YAML list. This is useful if you need to add additional ports to the server service in dynamic way. |
+| server.service.headless.annotations | object | `{}` |  |
 | server.service.instanceSelector.enabled | bool | `true` |  |
 | server.service.ipFamilies | list | `[]` |  |
 | server.service.ipFamilyPolicy | string | `""` |  |

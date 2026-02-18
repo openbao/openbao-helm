@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.25.3
+version: 0.25.4
 appVersion: v2.5.0
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -28,7 +28,7 @@ annotations:
   artifacthub.io/changes: |
     - kind: changed
       description: |
-        fix: Add extraPorts to server Service in ha
+        fix: Add annotations for headless service
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org
