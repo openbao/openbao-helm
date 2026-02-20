@@ -1,5 +1,9 @@
 ## Unreleased
 
+### 0.25.5
+
+- chore: update openbao-snapshot-agent
+
 ### 0.25.4
 
 - fix: Add annotations for headless service
