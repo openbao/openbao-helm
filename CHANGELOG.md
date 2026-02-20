@@ -1,5 +1,9 @@
 ## Unreleased
 
+### 0.25.6
+
+- fix: Add job selector in Grafana dashboard
+
 ### 0.25.5
 
 - chore: update openbao-snapshot-agent
