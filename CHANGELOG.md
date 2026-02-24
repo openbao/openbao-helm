@@ -1,5 +1,9 @@
 ## Unreleased
 
+### 0.25.6
+
+- Update OpenBao to version 2.5.1
+
 ### 0.25.5
 
 - chore: update openbao-snapshot-agent

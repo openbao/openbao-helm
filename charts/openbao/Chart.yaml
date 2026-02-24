@@ -3,8 +3,8 @@
 
 apiVersion: v2
 name: openbao
-version: 0.25.5
-appVersion: v2.5.0
+version: 0.25.6
+appVersion: v2.5.1
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
 home: https://github.com/openbao/openbao-helm
@@ -28,7 +28,10 @@ annotations:
   artifacthub.io/changes: |
     - kind: changed
       description: |
-        fix: Add annotations for headless service
+        feat: Update to OpenBao 2.5.1
+      links:
+        - name: OpenBao 2.5.1 Release
+          url: https://github.com/openbao/openbao/releases/tag/v2.5.1
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org
