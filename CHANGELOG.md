@@ -1,27 +1,31 @@
 ## Unreleased
 
-### 0.25.5
+## 0.25.6
+
+- Update OpenBao to version 2.5.1
+
+## 0.25.5
 
 - chore: update openbao-snapshot-agent
 
-### 0.25.4
+## 0.25.4
 
 - fix: Add annotations for headless service
 
-### 0.25.3
+## 0.25.3
 
 - fix: Add extraPorts to server Service in ha
 
-### 0.25.2
+## 0.25.2
 
 - feat: Allow ServiceMonitor port and scheme change
 - feat: Add extraPorts to server Service
 
-### 0.25.1
+## 0.25.1
 
 - fix(snapshotAgent): change extraVolumes to list instead of object
 
-### 0.25.0
+## 0.25.0
 
 - Update OpenBao to version 2.5.0
 
