@@ -5,6 +5,43 @@ entries:
       artifacthub.io/changes: |
         - kind: changed
           description: |
+            feat: Update to OpenBao 2.5.1
+          links:
+            - name: OpenBao 2.5.1 Release
+              url: https://github.com/openbao/openbao/releases/tag/v2.5.1
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.1
+    created: "2026-02-24T12:27:18.768262021Z"
+    description: Official OpenBao Chart
+    digest: b3bc047ff7b9396a20827f37e392248dea7a45a1476926129e6c7ba0dbd97102
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.25.6/openbao-0.25.6.tgz
+    version: 0.25.6
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
+          description: |
             fix: Add annotations for headless service
       artifacthub.io/containsSecurityUpdates: "false"
       charts.openshift.io/name: Openbao
@@ -1747,4 +1784,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-02-20T14:57:05.556431626Z"
+generated: "2026-02-24T12:27:18.768508662Z"
