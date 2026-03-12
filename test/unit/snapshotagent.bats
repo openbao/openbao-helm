@@ -406,3 +406,39 @@ load _helpers
       yq -r '.spec.jobTemplate.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 }
+
+#--------------------------------------------------------------------
+# tolerations
+
+@test "snapshot/cronjob: tolerations not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.spec.jobTemplate.spec.template.spec | .tolerations? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "snapshot/cronjob: tolerations can be set as string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.tolerations=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.jobTemplate.spec.template.spec.tolerations == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "snapshot/cronjob: tolerations can be set as YAML" {
+  cd `chart_dir`
+  echo $PWD | tee /dev/stderr
+  local actual=$(helm template --debug \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set "snapshotAgent.tolerations[0].foo=bar,snapshotAgent.tolerations[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.jobTemplate.spec.template.spec.tolerations == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}

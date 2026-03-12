@@ -1227,3 +1227,18 @@ securityContext for the snapshotAgent container level.
                   - ALL
   {{- end }}
 {{- end -}}
+
+{{/*
+tolerations for the snapshotAgent cronjob pod
+*/}}
+{{- define "snapshotAgent.tolerations" -}}
+  {{- if .Values.snapshotAgent.tolerations }}
+          tolerations:
+      {{- $tp := typeOf .Values.snapshotAgent.tolerations }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.snapshotAgent.tolerations . | nindent 12 | trim }}
+      {{- else }}
+        {{- toYaml .Values.snapshotAgent.tolerations | nindent 12 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
