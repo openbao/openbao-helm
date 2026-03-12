@@ -1,8 +1,12 @@
 ## Unreleased
 
-## 0.25.7
+## 0.25.8
 
 - feat: Allow setting tolerations for snapshot-agent cronjob pod
+
+## 0.25.7
+
+- fix: Add job selector in Grafana dashboard
 
 ## 0.25.6
 
