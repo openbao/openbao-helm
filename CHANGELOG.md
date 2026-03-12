@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.25.7
+
+- fix(snapshotagent): allow setting tolerations
+
 ## 0.25.6
 
 - Update OpenBao to version 2.5.1

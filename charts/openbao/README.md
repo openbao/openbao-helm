@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.25.6](https://img.shields.io/badge/Version-0.25.6-informational?style=flat-square) ![AppVersion: v2.5.1](https://img.shields.io/badge/AppVersion-v2.5.1-informational?style=flat-square)
+![Version: 0.25.7](https://img.shields.io/badge/Version-0.25.7-informational?style=flat-square) ![AppVersion: v2.5.1](https://img.shields.io/badge/AppVersion-v2.5.1-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -349,6 +349,7 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.serviceAccount.create | bool | `true` |  |
 | snapshotAgent.serviceAccount.extraLabels | object | `{}` |  |
 | snapshotAgent.serviceAccount.name | string | `""` |  |
+| snapshotAgent.tolerations | list | `[]` |  |
 | ui.activeOpenbaoPodOnly | bool | `false` |  |
 | ui.annotations | object | `{}` |  |
 | ui.enabled | bool | `false` |  |
