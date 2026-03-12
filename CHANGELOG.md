@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.25.7
+
+- fix: Add job selector in Grafana dashboard
+
 ## 0.25.6
 
 - Update OpenBao to version 2.5.1
