@@ -28,7 +28,7 @@ annotations:
   artifacthub.io/changes: |
     - kind: added
       description: |
-        fix(snapshotAgent): allow setting tolerations for snapshot-agent cronjob pod
+        feat: Allow setting tolerations for snapshot-agent cronjob pod
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org

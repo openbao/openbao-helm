@@ -2,7 +2,7 @@
 
 ## 0.25.7
 
-- fix(snapshotagent): allow setting tolerations
+- feat: Allow setting tolerations for snapshot-agent cronjob pod
 
 ## 0.25.6
 
