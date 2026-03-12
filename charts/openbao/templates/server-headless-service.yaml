@@ -35,6 +35,7 @@ spec:
     - name: "{{ include "openbao.scheme" . }}"
       port: {{ .Values.server.service.port }}
       targetPort: {{ .Values.server.service.targetPort }}
+      appProtocol: {{ include "openbao.scheme" . | upper }}
     - name: https-internal
       port: 8201
       targetPort: 8201

@@ -49,6 +49,7 @@ spec:
       {{- if and (.Values.server.service.activeNodePort) (eq (.Values.server.service.type | toString) "NodePort") }}
       nodePort: {{ .Values.server.service.activeNodePort }}
       {{- end }}
+      appProtocol: {{ include "openbao.scheme" . | upper }}
     - name: https-internal
       port: 8201
       targetPort: 8201
