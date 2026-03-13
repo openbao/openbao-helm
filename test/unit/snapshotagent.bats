@@ -433,8 +433,7 @@ load _helpers
 
 @test "snapshot/cronjob: tolerations can be set as YAML" {
   cd `chart_dir`
-  echo $PWD | tee /dev/stderr
-  local actual=$(helm template --debug \
+  local actual=$(helm template \
       --show-only templates/snapshotagent-cronjob.yaml \
       --set 'snapshotAgent.enabled=true' \
       --set "snapshotAgent.tolerations[0].foo=bar,snapshotAgent.tolerations[1].baz=qux" \
