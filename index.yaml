@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: |
+            feat: Allow setting tolerations for snapshot-agent cronjob pod
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.1
+    created: "2026-03-13T09:16:52.146186308Z"
+    description: Official OpenBao Chart
+    digest: f3fa20b7988cd73d7599973724211d1075bf00f2f5bc44e0587c3711805180e6
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.26.0/openbao-0.26.0.tgz
+    version: 0.26.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: |
             fix: Add job selector in Grafana dashboard
@@ -1817,4 +1851,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-03-12T07:27:09.708116301Z"
+generated: "2026-03-13T09:16:52.146438568Z"
