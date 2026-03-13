@@ -1586,3 +1586,8 @@ snapshotAgent:
   securityContext:
     pod: {}
     container: {}
+
+  # Toleration Settings for snapshot-agent cronjob pod
+  # This should be either a multi-line string or YAML matching the Toleration array
+  # in a PodSpec.
+  tolerations: []

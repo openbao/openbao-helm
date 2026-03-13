@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.25.7
+version: 0.26.0
 appVersion: v2.5.1
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -24,10 +24,11 @@ sources:
   - https://github.com/openbao/openbao-helm
 annotations:
   charts.openshift.io/name: Openbao
+  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: changed
+    - kind: added
       description: |
-        fix: Add job selector in Grafana dashboard
+        feat: Allow setting tolerations for snapshot-agent cronjob pod
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org

@@ -29,6 +29,7 @@ spec:
           restartPolicy: {{ .Values.snapshotAgent.restartPolicy }}
           serviceAccountName: {{  template "openbao.snapshotAgent.serviceAccount.name" . }}
           {{ template "snapshotAgent.securityContext.pod" .}}
+          {{ template "snapshotAgent.tolerations" . }}
           containers:
           - name: bao-snapshot
             envFrom:
