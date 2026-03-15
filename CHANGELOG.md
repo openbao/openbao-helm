@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.26.2
+
+- feat: Default to `runtimeDefault` Seccomp profile
+
 ## 0.26.1
 
 - fix: add appProtocol on Service ports
