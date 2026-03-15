@@ -542,6 +542,8 @@ securityContext for the injector pod level.
         {{- end }}
   {{- else if not .Values.global.openshift }}
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
@@ -584,6 +586,8 @@ securityContext for the statefulset pod template.
         {{- end }}
   {{- else if not .Values.global.openshift }}
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
         runAsUser: {{ .Values.server.uid | default 100 }}
@@ -1200,6 +1204,8 @@ securityContext for the snapshotAgent pod level.
             {{- end }}
   {{- else if not .Values.global.openshift }}
           securityContext:
+            seccompProfile:
+              type: RuntimeDefault
             runAsNonRoot: true
             runAsGroup: {{ .Values.snapshotAgent.gid | default 1000 }}
             runAsUser: {{ .Values.snapshotAgent.uid | default 100 }}
