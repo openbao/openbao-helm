@@ -1223,7 +1223,7 @@ csi:
   # With the driver and provider installed, you can mount OpenBao secrets into volumes
   # similar to the OpenBao Agent injector, and you can also sync those secrets into
   # Kubernetes secrets.
-  enabled: true
+  enabled: false
 
   image:
     # -- image registry to use for csi image
