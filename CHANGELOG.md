@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.26.3
+
+- feat: Default to `runtimeDefault` Seccomp profile
+
 ## 0.26.2
 
 - chore: Update OpenBao to version 2.5.2

@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.26.2
+version: 0.26.3
 appVersion: v2.5.2
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -24,14 +24,11 @@ sources:
   - https://github.com/openbao/openbao-helm
 annotations:
   charts.openshift.io/name: Openbao
-  artifacthub.io/containsSecurityUpdates: "true"
+  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: changed
+    - kind: added
       description: |
-        chore: update OpenBao to 2.5.2
-      links:
-        - name: OpenBao 2.5.2 Release
-          url: https://github.com/openbao/openbao/releases/tag/v2.5.2
+        fix: add appProtocol on Service ports
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org
