@@ -21,7 +21,7 @@ global:
   tlsDisable: true
 
   # -- External openbao server address for the injector and CSI provider to use.
-  # Setting this will disable deployment of a openbao server.
+  # Setting this will disable deployment of an OpenBao server.
   externalBaoAddr: ""
   # -- Deprecated: Please use global.externalBaoAddr instead.
   externalVaultAddr: ""
@@ -270,6 +270,8 @@ injector:
   #   runAsGroup: {{ .Values.injector.gid | default 1000 }}
   #   runAsUser: {{ .Values.injector.uid | default 100 }}
   #   fsGroup: {{ .Values.injector.gid | default 1000 }}
+  #   seccompProfile:
+  #     type: RuntimeDefault
   # and for container is
   #    allowPrivilegeEscalation: false
   #    capabilities:
@@ -1144,6 +1146,8 @@ server:
     #   runAsGroup: {{ .Values.server.gid | default 1000 }}
     #   runAsUser: {{ .Values.server.uid | default 100 }}
     #   fsGroup: {{ .Values.server.gid | default 1000 }}
+    #   seccompProfile:
+    #     type: RuntimeDefault
     # container:
     #   allowPrivilegeEscalation: false
     #
@@ -1219,7 +1223,7 @@ csi:
   # With the driver and provider installed, you can mount OpenBao secrets into volumes
   # similar to the OpenBao Agent injector, and you can also sync those secrets into
   # Kubernetes secrets.
-  enabled: false
+  enabled: true
 
   image:
     # -- image registry to use for csi image
@@ -1574,6 +1578,8 @@ snapshotAgent:
 
   # Security context for the pod template and the snapshotAgent container
   # The default pod securityContext is:
+  #   seccompProfile
+  #     type: RuntimeDefault
   #   runAsNonRoot: true
   #   runAsGroup: {{ .Values.snapshotAgent.gid | default 1000 }}
   #   runAsUser: {{ .Values.snapshotAgent.uid | default 100 }}

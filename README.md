@@ -16,7 +16,7 @@ this README. Please refer to the Kubernetes and Helm documentation.
 
 The versions required are:
 
-- **Helm 3.12+** - Earliest verison tested
+- **Helm 3.12+** - Earliest version tested
 - **Kubernetes 1.30+** - This is the earliest version of Kubernetes tested.
   It is possible that this chart works with earlier versions but it is
   untested.
