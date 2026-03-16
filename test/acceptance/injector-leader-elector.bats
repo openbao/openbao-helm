@@ -22,7 +22,7 @@ load _helpers
   tries=0
   until [ $tries -ge 60 ]
   do
-    owner=$(kubectl get configmaps vault-k8s-leader -o json | jq -r .metadata.ownerReferences\[0\].name)
+    owner=$(kubectl get configmaps openbao-k8s-leader -o json | jq -r .metadata.ownerReferences\[0\].name)
     leader=$(kubectl get pods $owner -o json | jq -r .metadata.name)
     [ -n "${leader}" ] && [ "${leader}" != "null" ] && break
     ((++tries))
