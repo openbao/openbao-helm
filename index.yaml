@@ -5,6 +5,40 @@ entries:
       artifacthub.io/changes: |
         - kind: added
           description: |
+            fix: add appProtocol on Service ports
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.1
+    created: "2026-03-16T06:24:17.47017352Z"
+    description: Official OpenBao Chart
+    digest: 3550498b264c63054543ba2972562b338dbba4a5a460c829fb4a5f689268f660
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.26.1/openbao-0.26.1.tgz
+    version: 0.26.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: |
             feat: Allow setting tolerations for snapshot-agent cronjob pod
       artifacthub.io/containsSecurityUpdates: "false"
       charts.openshift.io/name: Openbao
@@ -1851,4 +1885,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-03-13T09:16:52.146438568Z"
+generated: "2026-03-16T06:24:17.471595705Z"
