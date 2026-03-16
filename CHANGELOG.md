@@ -1,6 +1,10 @@
 ## Unreleased
 
-## 0.25.8
+## 0.26.1
+
+- fix: add appProtocol on Service ports
+
+## 0.26.0
 
 - feat: Allow setting tolerations for snapshot-agent cronjob pod
 
