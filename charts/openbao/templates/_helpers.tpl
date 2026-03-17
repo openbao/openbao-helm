@@ -542,6 +542,8 @@ securityContext for the injector pod level.
         {{- end }}
   {{- else if not .Values.global.openshift }}
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
@@ -584,6 +586,8 @@ securityContext for the statefulset pod template.
         {{- end }}
   {{- else if not .Values.global.openshift }}
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
         runAsUser: {{ .Values.server.uid | default 100 }}
@@ -950,6 +954,14 @@ Sets CSI daemonset securityContext for pod template
     {{- else }}
       {{- toYaml .Values.csi.daemonSet.securityContext.pod | nindent 8 }}
     {{- end }}
+  {{- else if not .Values.global.openshift }}
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 1000
+        runAsUser: 100
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
   {{- end }}
 {{- end -}}
 
@@ -965,6 +977,12 @@ Sets CSI daemonset securityContext for container
     {{- else }}
       {{- toYaml .Values.csi.daemonSet.securityContext.container | nindent 12 }}
     {{- end }}
+  {{- else if not .Values.global.openshift }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
   {{- end }}
 {{- end -}}
 
@@ -1200,6 +1218,8 @@ securityContext for the snapshotAgent pod level.
             {{- end }}
   {{- else if not .Values.global.openshift }}
           securityContext:
+            seccompProfile:
+              type: RuntimeDefault
             runAsNonRoot: true
             runAsGroup: {{ .Values.snapshotAgent.gid | default 1000 }}
             runAsUser: {{ .Values.snapshotAgent.uid | default 100 }}

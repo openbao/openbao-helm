@@ -122,6 +122,8 @@ spec:
             - name: BAO_LOG_FORMAT
               value: "{{ .Values.csi.agent.logFormat }}"
           securityContext:
+            seccompProfile:
+              type: RuntimeDefault
             runAsNonRoot: true
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
