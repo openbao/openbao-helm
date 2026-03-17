@@ -1215,7 +1215,7 @@ ui:
 
 # openbao-csi-provider
 csi:
-  # -- True if you want to install a openbao-csi-provider daemonset.
+  # -- True if you want to install an openbao-csi-provider daemonset.
   #
   # Requires installing the secrets-store-csi-driver separately, see:
   # https://secrets-store-csi-driver.sigs.k8s.io/getting-started/installation
@@ -1223,7 +1223,7 @@ csi:
   # With the driver and provider installed, you can mount OpenBao secrets into volumes
   # similar to the OpenBao Agent injector, and you can also sync those secrets into
   # Kubernetes secrets.
-  enabled: false
+  enabled: true
 
   image:
     # -- image registry to use for csi image
@@ -1284,6 +1284,16 @@ csi:
     # This should be a YAML map of the labels to apply to the csi provider daemonSet
     extraLabels: {}
     # security context for the pod template and container in the csi provider daemonSet
+    # If not set, these will default to, and for *not* OpenShift:
+    # pod:
+    #   runAsNonRoot: true
+    #   runAsGroup: 1000
+    #   runAsUser: 100
+    #   fsGroup: 1000
+    #   seccompProfile:
+    #     type: RuntimeDefault
+    # container:
+    #   allowPrivilegeEscalation: false
     securityContext:
       pod: {}
       container: {}
