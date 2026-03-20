@@ -45,13 +45,13 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/gateway/tlspolicy: disable by injector.externalVaultAddr" {
+@test "server/gateway/tlspolicy: disable by global.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-backendtlspolicy.yaml  \
       --set 'global.tlsDisable=false' \
       --set 'server.gateway.tlsPolicy.enabled=true' \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]

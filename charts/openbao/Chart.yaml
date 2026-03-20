@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.26.1
+version: 0.27.0
 appVersion: v2.5.1
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -26,9 +26,9 @@ annotations:
   charts.openshift.io/name: Openbao
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: added
+    - kind: changed
       description: |
-        fix: add appProtocol on Service ports
+        feat: Make injector.external(Bao|Vault)Addr take precendence over global.external(Bao|Vault)Addr
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org

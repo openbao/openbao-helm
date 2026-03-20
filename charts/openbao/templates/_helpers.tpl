@@ -53,6 +53,20 @@ Compute if the csi driver is enabled.
 {{- end -}}
 
 {{/*
+Resolve the external OpenBao/Vault address if the injector in order of precedence:
+1. injector.externalBaoAddr
+2. injector.externalVaultAddr
+*/}}
+
+{{- define "openbao.injector.externalAddr" -}}
+  {{- if .Values.injector.externalBaoAddr -}}
+    {{- .Values.injector.externalBaoAddr -}}
+  {{- else -}}
+    {{- .Values.injector.externalVaultAddr -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
 Compute if the injector is enabled.
 */}}
 {{- define "openbao.injectorEnabled" -}}
@@ -145,7 +159,7 @@ Resolve the external OpenBao/Vault address by checking global and injector value
 2. global.externalVaultAddr 
 */}}
 
-{{- define "openbao.externalAddr" -}}
+{{- define "openbao.global.externalAddr" -}}
   {{- if .Values.global.externalBaoAddr -}}
     {{- .Values.global.externalBaoAddr -}}
   {{- else -}}
@@ -159,7 +173,7 @@ template logic.
 */}}
 {{- define "openbao.mode" -}}
   {{- template "openbao.serverEnabled" . -}}
-  {{- if or (.Values.injector.externalVaultAddr) (.Values.global.externalVaultAddr) (.Values.global.externalBaoAddr) -}}
+  {{- if or (.Values.global.externalVaultAddr) (.Values.global.externalBaoAddr) -}}
     {{- $_ := set . "mode" "external" -}}
   {{- else if not .serverEnabled -}}
     {{- $_ := set . "mode" "external" -}}

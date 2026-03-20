@@ -40,12 +40,12 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "server/gateway/httproute: disable by injector.externalVaultAddr" {
+@test "server/gateway/httproute: disable by global.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-httproute.yaml  \
       --set 'server.gateway.httpRoute.enabled=true' \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]

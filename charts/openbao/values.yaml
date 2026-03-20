@@ -63,8 +63,10 @@ injector:
   metrics:
     enabled: false
 
-  # -- Deprecated: Please use global.externalBaoAddr instead.
+  # -- Deprecated: Please use injector.externalBaoAddr instead.
   externalVaultAddr: ""
+  # -- External openbao server address for the injector to use.
+  externalBaoAddr: ""
 
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
