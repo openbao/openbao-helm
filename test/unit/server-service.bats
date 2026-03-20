@@ -132,12 +132,12 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
-@test "server/Service: disable with injector.externalVaultAddr" {
+@test "server/Service: disable with global.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-service.yaml  \
       --set 'server.dev.enabled=true' \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       --set 'server.service.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -146,7 +146,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-service.yaml  \
       --set 'server.ha.enabled=true' \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       --set 'server.service.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -155,7 +155,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-service.yaml  \
       --set 'server.standalone.enabled=true' \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       --set 'server.service.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)

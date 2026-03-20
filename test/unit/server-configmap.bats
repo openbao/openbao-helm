@@ -130,11 +130,11 @@ load _helpers
   [ ! -z "${actual}" ]
 }
 
-@test "server/ConfigMap: disabled by injector.externalVaultAddr" {
+@test "server/ConfigMap: disabled by global.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-config-configmap.yaml \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]

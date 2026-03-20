@@ -30,12 +30,12 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
-@test "server/gateway/tlsroute: disable by injector.externalVaultAddr" {
+@test "server/gateway/tlsroute: disable by global.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-tlsroute.yaml  \
       --set 'server.gateway.tlsRoute.enabled=true' \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
