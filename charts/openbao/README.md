@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.26.0](https://img.shields.io/badge/Version-0.26.0-informational?style=flat-square) ![AppVersion: v2.5.1](https://img.shields.io/badge/AppVersion-v2.5.1-informational?style=flat-square)
+![Version: 0.27.0](https://img.shields.io/badge/Version-0.27.0-informational?style=flat-square) ![AppVersion: v2.5.1](https://img.shields.io/badge/AppVersion-v2.5.1-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -102,7 +102,8 @@ Kubernetes: `>= 1.30.0-0`
 | injector.certs.keyName | string | `"tls.key"` |  |
 | injector.certs.secretName | string | `nil` |  |
 | injector.enabled | string | `"-"` | True if you want to enable openbao agent injection. @default: global.enabled |
-| injector.externalVaultAddr | string | `""` | Deprecated: Please use global.externalBaoAddr instead. |
+| injector.externalBaoAddr | string | `""` | External openbao server address for the injector to use. |
+| injector.externalVaultAddr | string | `""` | Deprecated: Please use injector.externalBaoAddr instead. |
 | injector.extraEnvironmentVars | object | `{}` |  |
 | injector.extraLabels | object | `{}` |  |
 | injector.failurePolicy | string | `"Ignore"` |  |
