@@ -9,13 +9,19 @@ load _helpers
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
+  # deploy ministack
+  kubectl create ns ministack
+  kubectl -n ministack run --image=nahuelnucera/ministack:1.0.1 --port=4566 ministack
+  kubectl -n ministack expose pod ministack
+  kubectl -n ministack wait --for=condition=Ready pod/ministack
+
   # create s3 bucket for testing
-  kubectl run -n localstack aws-cli --image=amazon/aws-cli --restart=Never \
+  kubectl run -n ministack aws-cli --image=amazon/aws-cli --restart=Never \
     --env="AWS_ACCESS_KEY_ID=test" --env="AWS_SECRET_ACCESS_KEY=test" \
-    --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=http://localstack:4566" \
+    --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=http://ministack:4566" \
     -- s3 mb s3://openbao-snapshots
-  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n localstack --timeout=60s || true
-  kubectl delete po aws-cli -n localstack
+  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n ministack --timeout=60s || true
+  kubectl delete po aws-cli -n ministack
 
   # create secret to be used by cronjob
   kubectl create secret generic s3-creds --from-literal=AWS_ACCESS_KEY_ID=test --from-literal=AWS_SECRET_ACCESS_KEY=test
@@ -75,7 +81,7 @@ EOF
     --set snapshotAgent.enabled=true \
     --set snapshotAgent.config.s3Bucket=openbao-snapshots \
     --set snapshotAgent.config.s3Uri=s3://openbao-snapshots \
-    --set snapshotAgent.config.s3Host=localstack.localstack.svc:4566 \
+    --set snapshotAgent.config.s3Host=ministack.ministack.svc:4566 \
     --set snapshotAgent.config.s3cmdExtraFlag=--no-check-certificate \
     --set snapshotAgent.s3CredentialsSecret=s3-creds \
     --set snapshotAgent.config.baoAddr=http://$(name_prefix):8200
@@ -89,22 +95,22 @@ EOF
   [ "${cronjob_status}" == "1" ]
 
   # check for s3 bucket containing snapshot
-  kubectl run -n localstack aws-cli --image=amazon/aws-cli --restart=Never \
+  kubectl run -n ministack aws-cli --image=amazon/aws-cli --restart=Never \
     --env="AWS_ACCESS_KEY_ID=test" --env="AWS_SECRET_ACCESS_KEY=test" \
-    --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=http://localstack:4566" \
+    --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=http://ministack:4566" \
     -- s3 ls s3://openbao-snapshots
-  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n localstack --timeout=60s || true
+  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n ministack --timeout=60s || true
 
   # check if snapshot is there
-  local s3_ls=$(kubectl logs -n localstack aws-cli | grep -c snapshot)
+  local s3_ls=$(kubectl logs -n ministack aws-cli | grep -c snapshot)
   [ "${s3_ls}" -gt 0 ]
 
   # check if snapshot has some size
-  local s3_size=$(kubectl logs -n localstack aws-cli | grep snapshot | head -1 | awk '{print $3}')
+  local s3_size=$(kubectl logs -n ministack aws-cli | grep snapshot | head -1 | awk '{print $3}')
   [ "${s3_size}" -gt 0 ]
 
   # delete aws-cli pod
-  kubectl delete po aws-cli -n localstack
+  kubectl delete po aws-cli -n ministack
 
 }
 
