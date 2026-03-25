@@ -3,6 +3,43 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: |
+            chore: update OpenBao to 2.5.2
+          links:
+            - name: OpenBao 2.5.2 Release
+              url: https://github.com/openbao/openbao/releases/tag/v2.5.2
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.2
+    created: "2026-03-25T20:28:58.681866834Z"
+    description: Official OpenBao Chart
+    digest: 3cfb061ae2c71e7086ae6a2c13c11c61b841137a52773723524da8524a24695d
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.26.2/openbao-0.26.2.tgz
+    version: 0.26.2
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: |
             fix: add appProtocol on Service ports
@@ -1885,4 +1922,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-03-16T06:24:17.471595705Z"
+generated: "2026-03-25T20:28:58.68207338Z"
