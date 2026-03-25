@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.27.0
+
+- feat: Support bearerTokenFile for ServiceMonitor
+
 ## 0.26.1
 
 - fix: add appProtocol on Service ports
