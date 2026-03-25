@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.26.2
+
+- chore: Update OpenBao to version 2.5.2
+
 ## 0.26.1
 
 - fix: add appProtocol on Service ports
