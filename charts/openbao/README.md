@@ -318,6 +318,7 @@ Kubernetes: `>= 1.30.0-0`
 | serverTelemetry.prometheusRules.rules | list | `[]` |  |
 | serverTelemetry.prometheusRules.selectors | object | `{}` |  |
 | serverTelemetry.serviceMonitor.authorization | object | `{}` |  |
+| serverTelemetry.serviceMonitor.bearerTokenFile | string | `nil` | bearerTokenFile defines the file to read bearer token for scraping the target. |
 | serverTelemetry.serviceMonitor.enabled | bool | `false` |  |
 | serverTelemetry.serviceMonitor.interval | string | `"30s"` |  |
 | serverTelemetry.serviceMonitor.port | string | `""` | Port which Prometheus uses when scraping metrics. If empty will use `openbao.scheme` helper for its value |
