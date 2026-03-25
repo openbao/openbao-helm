@@ -9,19 +9,19 @@ load _helpers
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
-  # deploy ministack
-  kubectl create ns ministack
-  kubectl -n ministack run --image=nahuelnucera/ministack:1.0.1 --port=4566 ministack
-  kubectl -n ministack expose pod ministack
-  kubectl -n ministack wait --for=condition=Ready pod/ministack
+  # deploy s3mock
+  kubectl create ns s3mock
+  kubectl -n s3mock run --image=adobe/s3mock:4.11.0 --port=9191 s3mock
+  kubectl -n s3mock expose pod s3mock
+  kubectl -n s3mock wait --for=condition=Ready pod/s3mock
 
   # create s3 bucket for testing
-  kubectl run -n ministack aws-cli --image=amazon/aws-cli --restart=Never \
+  kubectl run -n s3mock aws-cli --image=amazon/aws-cli --restart=Never \
     --env="AWS_ACCESS_KEY_ID=test" --env="AWS_SECRET_ACCESS_KEY=test" \
-    --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=http://ministack:4566" \
-    -- s3 mb s3://openbao-snapshots
-  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n ministack --timeout=60s || true
-  kubectl delete po aws-cli -n ministack
+    --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=https://s3mock:9191" \
+    -- --no-verify-ssl s3 mb s3://openbao-snapshots
+  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n s3mock --timeout=60s || true
+  kubectl delete po aws-cli -n s3mock
 
   # create secret to be used by cronjob
   kubectl create secret generic s3-creds --from-literal=AWS_ACCESS_KEY_ID=test --from-literal=AWS_SECRET_ACCESS_KEY=test
@@ -81,7 +81,7 @@ EOF
     --set snapshotAgent.enabled=true \
     --set snapshotAgent.config.s3Bucket=openbao-snapshots \
     --set snapshotAgent.config.s3Uri=s3://openbao-snapshots \
-    --set snapshotAgent.config.s3Host=ministack.ministack.svc:4566 \
+    --set snapshotAgent.config.s3Host=s3mock.s3mock.svc:9191 \
     --set snapshotAgent.config.s3cmdExtraFlag=--no-check-certificate \
     --set snapshotAgent.s3CredentialsSecret=s3-creds \
     --set snapshotAgent.config.baoAddr=http://$(name_prefix):8200
@@ -95,22 +95,22 @@ EOF
   [ "${cronjob_status}" == "1" ]
 
   # check for s3 bucket containing snapshot
-  kubectl run -n ministack aws-cli --image=amazon/aws-cli --restart=Never \
+  kubectl run -n s3mock aws-cli --image=amazon/aws-cli --restart=Never \
     --env="AWS_ACCESS_KEY_ID=test" --env="AWS_SECRET_ACCESS_KEY=test" \
-    --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=http://ministack:4566" \
-    -- s3 ls s3://openbao-snapshots
-  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n ministack --timeout=60s || true
+    --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=https://s3mock:9191" \
+    -- --no-verify-ssl s3 ls s3://openbao-snapshots
+  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n s3mock --timeout=60s || true
 
   # check if snapshot is there
-  local s3_ls=$(kubectl logs -n ministack aws-cli | grep -c snapshot)
+  local s3_ls=$(kubectl logs -n s3mock aws-cli | grep -c snapshot)
   [ "${s3_ls}" -gt 0 ]
 
   # check if snapshot has some size
-  local s3_size=$(kubectl logs -n ministack aws-cli | grep snapshot | head -1 | awk '{print $3}')
+  local s3_size=$(kubectl logs -n s3mock aws-cli | grep snapshot | head -1 | awk '{print $3}')
   [ "${s3_size}" -gt 0 ]
 
   # delete aws-cli pod
-  kubectl delete po aws-cli -n ministack
+  kubectl delete po aws-cli -n s3mock
 
 }
 
@@ -160,10 +160,10 @@ initialize() {
 # Clean up
 teardown() {
   if [[ ${CLEANUP:-true} == "true" ]]; then
-    echo "helm/pvc teardown"
+    echo "helm/pvc/s3mock teardown"
     helm delete openbao
     kubectl delete --all pvc
-    kubectl delete namespace acceptance --ignore-not-found=true
+    kubectl delete namespace acceptance s3mock --ignore-not-found=true
     rm root.json
   fi
 }
