@@ -296,6 +296,20 @@ load _helpers
   [ "${value}" = "http://injector-openbao-outside" ]
 }
 
+@test "injector/deployment: injector.externalBaoAddr takes precendence over injector.externalVaultAddr" {
+  cd $(chart_dir)
+  local object=$(helm template \
+    --show-only templates/injector-deployment.yaml \
+    --set 'injector.externalBaoAddr=http://injector-openbao-outside' \
+    --set 'injector.externalVaultAddr=http://injector-vault-outside' \
+    . | tee /dev/stderr |
+    yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+    yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://injector-openbao-outside" ]
+}
+
 @test "injector/deployment: without externalBaoAddr" {
   cd `chart_dir`
   local object=$(helm template \
