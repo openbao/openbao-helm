@@ -37,4 +37,4 @@ Alternatively you can use the OCI based helm chart as well:
 helm install oci://ghcr.io/openbao/charts/openbao
 ```
 
-Please see the many options supported in the [`values.yaml`](./charts/openbao/values.yaml) file. These are also fully documented directly in the [openbao README](./charts/openbao/README.md) along with more detailed installation instructions.
+Please see the many options supported in the [`values.yaml`](https://github.com/openbao/openbao-helm/blob/main/charts/openbao/values.yaml) file. These are also fully documented directly in the [openbao README](https://github.com/openbao/openbao-helm/blob/main/charts/openbao/README.md) along with more detailed installation instructions.
