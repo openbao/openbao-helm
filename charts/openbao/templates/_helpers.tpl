@@ -981,6 +981,8 @@ Sets CSI daemonset securityContext for container
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
+              add:
+                - NET_BIND_SERVICE
               drop:
                 - ALL
   {{- end }}

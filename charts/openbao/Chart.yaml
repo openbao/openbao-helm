@@ -28,7 +28,7 @@ annotations:
   artifacthub.io/changes: |
     - kind: added
       description: |
-        fix: add appProtocol on Service ports
+        feat: Default to `runtimeDefault` Seccomp profile
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org

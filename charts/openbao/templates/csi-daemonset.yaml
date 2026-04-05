@@ -71,7 +71,7 @@ spec:
             {{- else if include "openbao.externalAddr" . }}
               value: "{{ include "openbao.externalAddr" . }}"
             {{- else }}
-              value: {{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}
+              value: "{{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}"
             {{- end }}
           volumeMounts:
             - name: providervol
