@@ -956,10 +956,6 @@ Sets CSI daemonset securityContext for pod template
     {{- end }}
   {{- else if not .Values.global.openshift }}
       securityContext:
-        runAsNonRoot: true
-        runAsGroup: 1000
-        runAsUser: 100
-        fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
   {{- end }}
@@ -981,8 +977,6 @@ Sets CSI daemonset securityContext for container
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
-              add:
-                - NET_BIND_SERVICE
               drop:
                 - ALL
   {{- end }}
