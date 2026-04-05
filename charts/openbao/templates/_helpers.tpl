@@ -954,10 +954,6 @@ Sets CSI daemonset securityContext for pod template
     {{- else }}
       {{- toYaml .Values.csi.daemonSet.securityContext.pod | nindent 8 }}
     {{- end }}
-  {{- else if not .Values.global.openshift }}
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
   {{- end }}
 {{- end -}}
 
@@ -973,12 +969,6 @@ Sets CSI daemonset securityContext for container
     {{- else }}
       {{- toYaml .Values.csi.daemonSet.securityContext.container | nindent 12 }}
     {{- end }}
-  {{- else if not .Values.global.openshift }}
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
   {{- end }}
 {{- end -}}
 
