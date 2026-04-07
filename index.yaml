@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: |
+            feat: Default to `runtimeDefault` Seccomp profile
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.2
+    created: "2026-04-07T17:50:53.9022649Z"
+    description: Official OpenBao Chart
+    digest: 92d086902b7747313cf374c6531b0ebe252449b27a785b467d7311cb00a81460
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.26.3/openbao-0.26.3.tgz
+    version: 0.26.3
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: |
             chore: update OpenBao to 2.5.2
@@ -1922,4 +1956,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-03-25T20:28:58.68207338Z"
+generated: "2026-04-07T17:50:53.902503916Z"
