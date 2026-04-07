@@ -71,7 +71,7 @@ spec:
             {{- else if include "openbao.externalAddr" . }}
               value: "{{ include "openbao.externalAddr" . }}"
             {{- else }}
-              value: {{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}
+              value: "{{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}"
             {{- end }}
           volumeMounts:
             - name: providervol
@@ -122,6 +122,8 @@ spec:
             - name: BAO_LOG_FORMAT
               value: "{{ .Values.csi.agent.logFormat }}"
           securityContext:
+            seccompProfile:
+              type: RuntimeDefault
             runAsNonRoot: true
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
