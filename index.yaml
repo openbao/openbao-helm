@@ -5,6 +5,40 @@ entries:
       artifacthub.io/changes: |
         - kind: added
           description: |
+            feat: Make injector.external(Bao|Vault)Addr take precendence over global.external(Bao|Vault)Addr
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.2
+    created: "2026-04-10T05:40:34.621621004Z"
+    description: Official OpenBao Chart
+    digest: 09aa89e061d5d253d942456d1b743f388d42317d7274f9f73dfc0f28d89b9d3e
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.27.0/openbao-0.27.0.tgz
+    version: 0.27.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: |
             feat: Default to `runtimeDefault` Seccomp profile
       artifacthub.io/containsSecurityUpdates: "false"
       charts.openshift.io/name: Openbao
@@ -1956,4 +1990,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-04-07T17:50:53.902503916Z"
+generated: "2026-04-10T05:40:34.621878493Z"
