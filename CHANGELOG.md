@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.28.0
+
+- feat: Support bearerTokenFile for ServiceMonitor
+
 ## 0.27.0
 
 - feat: Make injector.external(Bao|Vault)Addr take precendence over global.external(Bao|Vault)Addr
