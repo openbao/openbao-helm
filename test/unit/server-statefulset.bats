@@ -67,11 +67,11 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/standalone-StatefulSet: disable with injector.externalVaultAddr" {
+@test "server/standalone-StatefulSet: disable with global.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-statefulset.yaml  \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       --set 'server.standalone.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)

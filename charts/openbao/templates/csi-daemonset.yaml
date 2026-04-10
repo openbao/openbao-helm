@@ -68,8 +68,8 @@ spec:
             - name: VAULT_ADDR
             {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
               value: "unix:///var/run/vault/agent.sock"
-            {{- else if include "openbao.externalAddr" . }}
-              value: "{{ include "openbao.externalAddr" . }}"
+            {{- else if include "openbao.global.externalAddr" . }}
+              value: "{{ include "openbao.global.externalAddr" . }}"
             {{- else }}
               value: "{{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}"
             {{- end }}

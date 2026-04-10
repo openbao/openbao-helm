@@ -115,11 +115,11 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/standalone-server-test-Pod: disable with injector.externalVaultAddr" {
+@test "server/standalone-server-test-Pod: disable with global.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/tests/server-test.yaml  \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       --set 'server.standalone.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)

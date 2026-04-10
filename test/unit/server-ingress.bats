@@ -30,12 +30,12 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
-@test "server/ingress: disable by injector.externalVaultAddr" {
+@test "server/ingress: disable by global.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-ingress.yaml  \
       --set 'server.ingress.enabled=true' \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]

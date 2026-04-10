@@ -12,13 +12,13 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/route: OpenShift -disable by injector.externalVaultAddr" {
+@test "server/route: OpenShift -disable by global.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-route.yaml  \
       --set 'global.openshift=true' \
       --set 'server.route.enabled=true' \
-      --set 'injector.externalVaultAddr=http://openbao-outside' \
+      --set 'global.externalVaultAddr=http://openbao-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]

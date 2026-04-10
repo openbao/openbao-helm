@@ -268,7 +268,7 @@ load _helpers
   [ "${value}" = "http://global-openbao-outside" ]
 }
 
-@test "injector/deployment: global.externalVaultAddr takes precendence over injector.externalVaultAddr" {
+@test "injector/deployment: injector.externalVaultAddr takes precendence over global.externalVaultAddr" {
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/injector-deployment.yaml  \
@@ -279,21 +279,35 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "http://global-openbao-outside" ]
+  [ "${value}" = "http://injector-openbao-outside" ]
 }
 
-@test "injector/deployment: global.externalBaoAddr takes precendence over injector.externalVaultAddr" {
+@test "injector/deployment: injector.externalBaoAddr takes precendence over global.externalBaoAddr" {
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'global.externalBaoAddr=http://global-openbao-outside' \
-      --set 'injector.externalVaultAddr=http://injector-openbao-outside' \
+      --set 'injector.externalBaoAddr=http://injector-openbao-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "http://global-openbao-outside" ]
+  [ "${value}" = "http://injector-openbao-outside" ]
+}
+
+@test "injector/deployment: injector.externalBaoAddr takes precendence over injector.externalVaultAddr" {
+  cd $(chart_dir)
+  local object=$(helm template \
+    --show-only templates/injector-deployment.yaml \
+    --set 'injector.externalBaoAddr=http://injector-openbao-outside' \
+    --set 'injector.externalVaultAddr=http://injector-vault-outside' \
+    . | tee /dev/stderr |
+    yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+    yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://injector-openbao-outside" ]
 }
 
 @test "injector/deployment: without externalBaoAddr" {
