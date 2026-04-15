@@ -313,6 +313,7 @@ Kubernetes: `>= 1.30.0-0`
 | serverTelemetry.grafanaDashboard.enabled | bool | `false` |  |
 | serverTelemetry.grafanaDashboard.extraAnnotations | object | `{}` |  |
 | serverTelemetry.grafanaDashboard.extraLabel | object | `{}` |  |
+| serverTelemetry.grafanaDashboard.namespace | string | `""` |  |
 | serverTelemetry.prometheusRules.enabled | bool | `false` |  |
 | serverTelemetry.prometheusRules.rules | list | `[]` |  |
 | serverTelemetry.prometheusRules.selectors | object | `{}` |  |

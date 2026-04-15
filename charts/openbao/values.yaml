@@ -1490,6 +1490,10 @@ serverTelemetry:
     # https://grafana.com/grafana/dashboards/23725-openbao
     enabled: false
 
+    # Namespace to deploy the dashboard ConfigMap to.
+    # Defaults to this chart's namespace.
+    namespace: ""
+
     # Add `grafana_dashboard: "1"` default label
     defaultLabel: true
 

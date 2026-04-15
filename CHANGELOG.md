@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.27.1
+
+- feat: Allow configuring Grafana dashboard namespace
+
 ## 0.27.0
 
 - feat: Make injector.external(Bao|Vault)Addr take precendence over global.external(Bao|Vault)Addr
