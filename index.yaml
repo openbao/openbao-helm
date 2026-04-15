@@ -5,6 +5,40 @@ entries:
       artifacthub.io/changes: |
         - kind: added
           description: |
+            feat: Allow configuring Grafana dashboard namespace
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.2
+    created: "2026-04-15T06:33:06.059129972Z"
+    description: Official OpenBao Chart
+    digest: 3c577d36b666354e9f43e9b65fada6dbc867862e29d9bc34746c1eb7361921e4
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.27.1/openbao-0.27.1.tgz
+    version: 0.27.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: |
             feat: Make injector.external(Bao|Vault)Addr take precendence over global.external(Bao|Vault)Addr
       artifacthub.io/containsSecurityUpdates: "false"
       charts.openshift.io/name: Openbao
@@ -1990,4 +2024,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-04-10T05:40:34.621878493Z"
+generated: "2026-04-15T06:33:06.059392751Z"
