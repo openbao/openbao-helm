@@ -500,7 +500,7 @@ server:
       # external-dns.alpha.kubernetes.io/hostname: chart-example.local
 
       hosts:
-      - chart-example.local
+        - chart-example.local
 
       # Allows overriding the HTTPRoute apiVersion in case a different version of Gateway API is installed on the cluster.
       apiVersion: gateway.networking.k8s.io/v1
@@ -513,6 +513,7 @@ server:
       # this should be set to at least one gateway with one or more HTTP listeners
       parentRefs: []
         # - name: my-gw
+        #   group: gateway.networking.k8s.io
         #   namespace: gateway-namespace
         #   # sectionName is optional to fix to a specific listener
         #   sectionName: listener-name
@@ -520,7 +521,7 @@ server:
       matches:
         path:
           type: PathPrefix
-          value: '/'
+          value: "/"
         timeouts: {}
           # request: 10s  #Maximum time the Gateway waits to complete the full client request and response cycle.
           # backendRequest: 10s # Maximum time the Gateway waits for a response from the backend service.
