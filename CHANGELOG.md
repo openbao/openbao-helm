@@ -1,5 +1,10 @@
 ## Unreleased
 
+## 0.27.2
+
+- chore: update to openbao 2.5.3
+- chore: update to openbao-csi-provider 2.0.2
+
 ## 0.27.1
 
 - feat: Allow configuring Grafana dashboard namespace
