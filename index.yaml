@@ -3,6 +3,43 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: |
+            chore: bump openbao to v2.5.3
+        - kind: changed
+          description: |
+            chore: bump openbao-csi-provider to v2.0.2
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.3
+    created: "2026-04-21T08:40:46.20080737Z"
+    description: Official OpenBao Chart
+    digest: 62dfa907568d5ec3261e34e9edc31df5e573f613b5a87ccae9b29a333b131eab
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.27.2/openbao-0.27.2.tgz
+    version: 0.27.2
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: |
             feat: Allow configuring Grafana dashboard namespace
@@ -2024,4 +2061,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-04-15T06:33:06.059392751Z"
+generated: "2026-04-21T08:40:46.20108974Z"
