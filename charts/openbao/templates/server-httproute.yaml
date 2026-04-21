@@ -34,6 +34,7 @@ spec:
   rules:
   - backendRefs:
     - kind: Service
+      group: gateway.networking.k8s.io
       name: {{ $serviceName }}
       port: {{ $servicePort }}
     matches:
