@@ -1,5 +1,7 @@
 ## Unreleased
 
+- fix: add global imagePullSecret to Snapshot CronJob
+
 ## 0.27.2
 
 - chore: update to openbao 2.5.3
