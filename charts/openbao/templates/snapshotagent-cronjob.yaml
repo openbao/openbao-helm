@@ -64,5 +64,5 @@ spec:
           {{- if .Values.snapshotAgent.extraVolumes }}
             {{- toYaml .Values.snapshotAgent.extraVolumes | nindent 10 }}
           {{- end }}
-          {{- include "imagePullSecrets" . | nindent 6 }}
+          {{- include "imagePullSecrets" . | nindent 10 }}
 {{ end }}
