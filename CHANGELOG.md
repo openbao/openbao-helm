@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.28.0
+
+- feat(server): template `extraContainers` and `extraInitContainers`
+
 ## 0.27.2
 
 - chore: update to openbao 2.5.3
