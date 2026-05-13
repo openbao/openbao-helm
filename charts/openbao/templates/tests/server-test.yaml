@@ -48,7 +48,7 @@ spec:
         {{- if .Values.server.volumeMounts }}
           {{- toYaml .Values.server.volumeMounts | nindent 8}}
         {{- end }}
-      {{- template "server.statefulSet.securityContext.pod" . }}
+      {{- template "server.statefulSet.securityContext.container" . }}
   volumes:
     {{- if .Values.server.volumes }}
       {{- toYaml .Values.server.volumes | nindent 4}}
