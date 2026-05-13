@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat: apply server.statefulset.securityContext on helm test pod
+
 ## 0.28.2
 
 - fix: Switch to certified Red Hat registry images for OpenShift
