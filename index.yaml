@@ -5,6 +5,40 @@ entries:
       artifacthub.io/changes: |
         - kind: changed
           description: |
+            fix: Switch to certified Red Hat registry images for OpenShift
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.3
+    created: "2026-05-13T14:33:32.65428687Z"
+    description: Official OpenBao Chart
+    digest: ddf5d7e7089bed6e3cf9cac71177d9fab3d59cf2f9b6f4997bfa37a58a0e01c1
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.28.2/openbao-0.28.2.tgz
+    version: 0.28.2
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
+          description: |
             chore: Update to openbao-ubi 2.5.3 for OpenShift
         - kind: changed
           description: |
@@ -2132,4 +2166,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-05-13T11:31:19.942585579Z"
+generated: "2026-05-13T14:33:32.654544608Z"
