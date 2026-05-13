@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.28.2
+
+- fix: Switch to certified Red Hat registry images for OpenShift
+
 ## 0.28.1
 
 - chore: Update to openbao-ubi 2.5.3 for OpenShift
