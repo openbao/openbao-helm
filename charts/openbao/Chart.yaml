@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.28.1
+version: 0.28.2
 appVersion: v2.5.3
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -24,14 +24,11 @@ sources:
   - https://github.com/openbao/openbao-helm
 annotations:
   charts.openshift.io/name: Openbao
-  artifacthub.io/containsSecurityUpdates: "true"
+  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: changed
       description: |
-        chore: Update to openbao-ubi 2.5.3 for OpenShift
-    - kind: changed
-      description: |
-        chore: Update to vault-k8s 1.7.2-ubi for OpenShift
+        fix: Switch to certified Red Hat registry images for OpenShift
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org
