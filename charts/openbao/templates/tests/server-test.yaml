@@ -15,10 +15,11 @@ metadata:
     "helm.sh/hook": test
 spec:
   {{- include "imagePullSecrets" . | nindent 2 }}
-  {{- template "server.statefulSet.securityContext.pod" . }}
+  {{- template "serverTest.statefulSet.securityContext.pod" .}}
   containers:
     - name: {{ .Release.Name }}-server-test
       image: {{ .Values.server.image.registry | default "docker.io" }}/{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default (trimPrefix "v" .Chart.AppVersion) }}
+      {{- template "serverTest.statefulSet.securityContext.container" .}}
       imagePullPolicy: {{ .Values.server.image.pullPolicy }}
       env:
         - name: VAULT_ADDR
@@ -48,7 +49,6 @@ spec:
         {{- if .Values.server.volumeMounts }}
           {{- toYaml .Values.server.volumeMounts | nindent 8}}
         {{- end }}
-      {{- template "server.statefulSet.securityContext.container" . }}
   volumes:
     {{- if .Values.server.volumes }}
       {{- toYaml .Values.server.volumes | nindent 4}}
