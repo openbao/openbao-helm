@@ -5,6 +5,43 @@ entries:
       artifacthub.io/changes: |
         - kind: changed
           description: |
+            chore: Update to openbao-ubi 2.5.3 for OpenShift
+        - kind: changed
+          description: |
+            chore: Update to vault-k8s 1.7.2-ubi for OpenShift
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: Openbao
+    apiVersion: v2
+    appVersion: v2.5.3
+    created: "2026-05-13T11:31:19.942353356Z"
+    description: Official OpenBao Chart
+    digest: 0f9624fc35f165aca2bf2dac832ae0cf55292c3651677742789bd2c9d4258995
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.28.1/openbao-0.28.1.tgz
+    version: 0.28.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
+          description: |
             feat(server): template `extraContainers` and `extraInitContainers`
       artifacthub.io/containsSecurityUpdates: "false"
       charts.openshift.io/name: Openbao
@@ -2095,4 +2132,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-05-13T06:02:42.889098622Z"
+generated: "2026-05-13T11:31:19.942585579Z"
