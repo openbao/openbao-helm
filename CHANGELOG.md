@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.28.3
+
+- chore: Improve OpenShift annotations
+
 ## 0.28.2
 
 - fix: Switch to certified Red Hat registry images for OpenShift
