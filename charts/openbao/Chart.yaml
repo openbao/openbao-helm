@@ -30,6 +30,9 @@ annotations:
     - kind: changed
       description: |
         chore: Improve OpenShift annotations
+    - kind: changed
+      description: |
+        chore: Add complete OpenShift reference values for charts.openshift.io
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org

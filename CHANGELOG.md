@@ -3,6 +3,7 @@
 ## 0.28.3
 
 - chore: Improve OpenShift annotations
+- chore: Add complete OpenShift reference values for charts.openshift.io
 
 ## 0.28.2
 
