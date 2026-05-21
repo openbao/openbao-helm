@@ -23,12 +23,13 @@ keywords:
 sources:
   - https://github.com/openbao/openbao-helm
 annotations:
-  charts.openshift.io/name: Openbao
+  charts.openshift.io/name: OpenBao
+  charts.openshift.io/provider: OpenBao
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: changed
       description: |
-        fix: Switch to certified Red Hat registry images for OpenShift
+        chore: Improve OpenShift annotations
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org
