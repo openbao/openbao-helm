@@ -1,6 +1,9 @@
 ## Unreleased
 
+## 0.28.3
+
 - chore: Improve OpenShift annotations
+- chore: bump OpenBao to v2.5.4
 
 ## 0.28.2
 

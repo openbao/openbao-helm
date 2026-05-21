@@ -3,8 +3,8 @@
 
 apiVersion: v2
 name: openbao
-version: 0.28.2
-appVersion: v2.5.3
+version: 0.28.3
+appVersion: v2.5.4
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
 home: https://github.com/openbao/openbao-helm
@@ -25,11 +25,14 @@ sources:
 annotations:
   charts.openshift.io/name: OpenBao
   charts.openshift.io/provider: OpenBao
-  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |
     - kind: changed
       description: |
         chore: Improve OpenShift annotations
+    - kind: changed
+      description: |
+        chore: bump OpenBao to v2.5.4
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org
