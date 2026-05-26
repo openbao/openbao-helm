@@ -37,7 +37,9 @@ spec:
     {{- with .Values.server.gateway.tlsPolicy.validation }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
+    {{- if not .Values.server.gateway.tlsPolicy.validation.hostname }}
     hostname: {{ include "openbao.fullname" . }}
+    {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
