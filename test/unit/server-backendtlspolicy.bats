@@ -173,6 +173,21 @@ load _helpers
   [ "${actual}" = "release-name-openbao" ]
 }
 
+@test "server/gateway/tlspolicy: validation hostname can be overridden" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-backendtlspolicy.yaml \
+      --set 'global.tlsDisable=false' \
+      --set 'server.gateway.tlsPolicy.enabled=true' \
+      --set 'server.gateway.tlsPolicy.activeService=true' \
+      --set 'server.service.enabled=true' \
+      --set 'server.gateway.tlsPolicy.validation.hostname=custom.example.com' \
+      . | tee /dev/stderr |
+      yq -r '.spec.validation.hostname' | tee /dev/stderr)
+  [ "${actual}" = "custom.example.com" ]
+}
+
 @test "server/gateway/tlspolicy: validation settings" {
   cd `chart_dir`
 
@@ -202,4 +217,3 @@ load _helpers
       yq -r '.spec.targetRefs[0].name' | tee /dev/stderr)
   [ "${actual}" = "some-target" ]
 }
-
