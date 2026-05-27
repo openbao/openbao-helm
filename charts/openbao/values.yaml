@@ -1286,7 +1286,18 @@ csi:
     # Extra labels to attach to the openbao-csi-provider daemonSet
     # This should be a YAML map of the labels to apply to the csi provider daemonSet
     extraLabels: {}
-    # security context for the pod template and container in the csi provider daemonSet
+    # Security context for the pod template and container in the csi provider daemonSet.
+    # The default container securityContext is:
+    #   allowPrivilegeEscalation: false
+    #   readOnlyRootFilesystem: true
+    #   runAsGroup: 1000
+    #   seccompProfile:
+    #     type: RuntimeDefault
+    #   capabilities:
+    #     drop:
+    #       - ALL
+    # The provider container does not default to runAsNonRoot because it writes
+    # its socket into the shared providers hostPath.
     securityContext:
       pod: {}
       container: {}

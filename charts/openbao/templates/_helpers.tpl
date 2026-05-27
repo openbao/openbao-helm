@@ -983,6 +983,18 @@ Sets CSI daemonset securityContext for container
     {{- else }}
       {{- toYaml .Values.csi.daemonSet.securityContext.container | nindent 12 }}
     {{- end }}
+  {{- else }}
+          securityContext:
+            {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
+            runAsGroup: 1000
+            {{- end }}
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
   {{- end }}
 {{- end -}}
 
