@@ -217,3 +217,4 @@ load _helpers
       yq -r '.spec.targetRefs[0].name' | tee /dev/stderr)
   [ "${actual}" = "some-target" ]
 }
+
