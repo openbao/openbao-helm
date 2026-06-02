@@ -1,5 +1,7 @@
 ## Unreleased
 
+- fix(openshift): update readinessProbe to support horizontal scalability
+
 ## 0.28.3
 
 - chore: Improve OpenShift annotations
