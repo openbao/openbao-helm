@@ -554,6 +554,7 @@ server:
       validation: {}
       # caCertificateRefs:
       # - kind: ConfigMap
+      #   group: ""
       #   name: vault-ca
 
   # hostAliases is a list of aliases to be added to /etc/hosts. Specified as a YAML list.

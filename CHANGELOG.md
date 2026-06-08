@@ -1,5 +1,7 @@
 ## Unreleased
 
+- docs: Update commented example with missing field
+
 ## 0.28.3
 
 - chore: Improve OpenShift annotations
