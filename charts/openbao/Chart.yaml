@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.28.5
+version: 0.28.4
 appVersion: v2.5.5
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
