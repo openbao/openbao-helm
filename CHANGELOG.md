@@ -1,6 +1,9 @@
 ## Unreleased
 
+## 0.28.4
+
 - docs: Update commented example with missing field
+- chore: bump OpenBao to v2.5.5
 
 ## 0.28.3
 
