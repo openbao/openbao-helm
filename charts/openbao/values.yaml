@@ -953,6 +953,54 @@ server:
     # Set VAULT_DEV_ROOT_TOKEN_ID value
     devRootToken: "root"
 
+  # Configure OpenBao declarative self-initialization.
+  #
+  # Self-initialization stores native OpenBao initialize stanzas in a
+  # separate ConfigMap consumed by a temporary Raft bootstrap Job. The
+  # StatefulSet joins that bootstrap server through retry_join and does not
+  # mount the self-init ConfigMap itself, keeping all StatefulSet pods identical.
+  #
+  # This requires HA Raft and auto-unseal. Auto-unseal is an OpenBao
+  # self-initialization requirement, and the chart sets StatefulSet
+  # podManagementPolicy to Parallel while self-init is enabled so pod-0 can be
+  # recreated without blocking other pods from starting.
+  #
+  # When using a custom server.ha.raft.config, include
+  # {{ include "openbao.selfInit.raftRetryJoin" . }} inside the storage "raft"
+  # block.
+  #
+  # This config must be HCL.
+  selfInit:
+    # -- Enable OpenBao declarative self-initialization configuration.
+    enabled: false
+    # -- Configure OpenBao declarative self-initialization HCL.
+    config: ""
+    job:
+      # -- Annotations to apply to the self-init bootstrap Job.
+      annotations: {}
+      # -- Annotations to apply to the self-init bootstrap Job pod.
+      podAnnotations: {}
+      # -- Number of seconds the bootstrap Job keeps OpenBao running after it
+      # observes initialization, giving StatefulSet pods time to retry_join.
+      holdSeconds: 120
+      # -- Job backoff limit.
+      backoffLimit: 6
+      # -- Optional Job activeDeadlineSeconds.
+      activeDeadlineSeconds: null
+      # -- Optional Job ttlSecondsAfterFinished. Leave unset for GitOps so the
+      # completed bootstrap Job remains part of observed cluster state.
+      ttlSecondsAfterFinished: null
+      autopilot:
+        # -- Generate an autopilot cleanup request with the self-init configuration.
+        enabled: true
+        # -- Dead-server last-contact threshold for the generated autopilot cleanup request.
+        deadServerLastContactThreshold: 1m
+        # -- Server stabilization time for the generated autopilot cleanup request.
+        serverStabilizationTime: 10s
+        # -- Minimum Raft quorum for autopilot dead-server cleanup. Defaults to
+        # max(3, server.ha.replicas) when unset.
+        minQuorum: null
+
   # Run OpenBao in "standalone" mode. This is the default mode that will deploy if
   # no arguments are given to helm. This requires a PVC for data storage to use
   # the "file" backend.  This mode is not highly available and should not be scaled
@@ -1053,6 +1101,7 @@ server:
 
         storage "raft" {
           path = "/openbao/data"
+          {{- include "openbao.selfInit.raftRetryJoin" . | nindent 10 }}
         }
 
         service_registration "kubernetes" {}

@@ -54,6 +54,31 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/ConfigMap: selfInit is disabled by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.data["extraconfig-from-values.hcl"] | contains("initialize")' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/ConfigMap: selfInit does not append templated config" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.selfInit.enabled=true' \
+      --set-string 'server.selfInit.config=initialize "{{ .Release.Name }}_platform_access" {}' \
+      . | tee /dev/stderr |
+      yq -r '.data["extraconfig-from-values.hcl"]' | tee /dev/stderr)
+  [[ "${actual}" == *'storage "raft"'* ]]
+  [[ "${actual}" != *'initialize "release-name_platform_access" {}'* ]]
+}
+
 
 @test "server/ConfigMap: disabled by server.dev.enabled true" {
   cd `chart_dir`

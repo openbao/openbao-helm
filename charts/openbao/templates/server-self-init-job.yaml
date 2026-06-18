@@ -1,0 +1,163 @@
+{{ template "openbao.mode" . }}
+{{- include "openbao.selfInit.validate" . }}
+{{- if include "openbao.selfInit.job.enabled" . -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "openbao.selfInit.job.name" . }}
+  namespace: {{ include "openbao.namespace" . }}
+  labels:
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    component: self-init
+    openbao.org/self-init-generation: {{ include "openbao.selfInit.job.generation" . }}
+  {{- with .Values.server.selfInit.job.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  backoffLimit: {{ .Values.server.selfInit.job.backoffLimit }}
+  {{- if .Values.server.selfInit.job.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ .Values.server.selfInit.job.activeDeadlineSeconds }}
+  {{- end }}
+  {{- if .Values.server.selfInit.job.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ .Values.server.selfInit.job.ttlSecondsAfterFinished }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: {{ include "openbao.chart" . }}
+        app.kubernetes.io/name: {{ include "openbao.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        component: self-init
+        openbao.org/self-init-generation: {{ include "openbao.selfInit.job.generation" . }}
+      {{- with .Values.server.selfInit.job.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ template "openbao.serviceAccount.name" . }}
+      {{ template "openbao.affinity" . }}
+      {{ template "openbao.topologySpreadConstraints" . }}
+      {{ template "openbao.tolerations" . }}
+      {{ template "openbao.nodeselector" . }}
+      {{- if .Values.server.priorityClassName }}
+      priorityClassName: {{ .Values.server.priorityClassName }}
+      {{- end }}
+      {{- template "server.statefulSet.securityContext.pod" . }}
+      {{- if .Values.server.hostAliases }}
+      hostAliases:
+        {{ toYaml .Values.server.hostAliases | nindent 8}}
+      {{- end }}
+      containers:
+        - name: openbao-self-init
+          {{ template "openbao.resources" . }}
+          image: "{{ .Values.server.image.registry | default "docker.io" }}/{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default (trimPrefix "v" .Chart.AppVersion) }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          command:
+            - "/bin/sh"
+            - "-ec"
+          args:
+            {{- include "openbao.selfInit.job.args" . | nindent 12 }}
+          {{- template "server.statefulSet.securityContext.container" . }}
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: BAO_K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: BAO_K8S_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: BAO_ADDR
+              value: "{{ include "openbao.scheme" . }}://127.0.0.1:8200"
+            - name: BAO_API_ADDR
+              value: "{{ include "openbao.scheme" . }}://$(POD_IP):8200"
+            - name: SKIP_CHOWN
+              value: "true"
+            - name: SKIP_SETCAP
+              value: "true"
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: BAO_CLUSTER_ADDR
+              value: "{{ include "openbao.scheme" . }}://$(POD_IP):8201"
+            {{- if and (eq (.Values.server.ha.raft.enabled | toString) "true") (eq (.Values.server.ha.raft.setNodeId | toString) "true") }}
+            - name: BAO_RAFT_NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            {{- end }}
+            - name: HOME
+              value: "/home/openbao"
+            {{- if .Values.server.logLevel }}
+            - name: BAO_LOG_LEVEL
+              value: "{{ .Values.server.logLevel }}"
+            {{- end }}
+            {{- if .Values.server.logFormat }}
+            - name: BAO_LOG_FORMAT
+              value: "{{ .Values.server.logFormat }}"
+            {{- end }}
+            {{- include "openbao.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
+            {{- include "openbao.extraEnvironmentVars" .Values.server | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /openbao/config
+            - name: self-init-config
+              mountPath: /openbao/self-init
+              readOnly: true
+            - name: data
+              mountPath: {{ .Values.server.dataStorage.mountPath }}
+            - name: home
+              mountPath: /home/openbao
+            {{- range .Values.server.extraVolumes }}
+            - name: userconfig-{{ .name }}
+              readOnly: true
+              mountPath: {{ .path | default "/openbao/userconfig" }}/{{ .name }}
+            {{- end }}
+            {{- if .Values.server.volumeMounts }}
+            {{- toYaml .Values.server.volumeMounts | nindent 12 }}
+            {{- end }}
+          ports:
+            - containerPort: 8200
+              name: {{ include "openbao.scheme" . }}
+            - containerPort: 8201
+              name: https-internal
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "openbao.fullname" . }}-self-init-job-config
+        - name: self-init-config
+          configMap:
+            name: {{ template "openbao.fullname" . }}-self-init-config
+        - name: data
+          emptyDir: {}
+        - name: home
+          emptyDir: {}
+        {{- range .Values.server.extraVolumes }}
+        - name: userconfig-{{ .name }}
+          {{ .type }}:
+          {{- if (eq .type "configMap") }}
+            name: {{ .name }}
+          {{- else if (eq .type "secret") }}
+            secretName: {{ .name }}
+          {{- end }}
+            defaultMode: {{ .defaultMode | default 420 }}
+        {{- end }}
+        {{- if .Values.server.volumes }}
+          {{- toYaml .Values.server.volumes | nindent 8}}
+        {{- end }}
+      {{- include "imagePullSecrets" . | nindent 6 }}
+{{- end }}

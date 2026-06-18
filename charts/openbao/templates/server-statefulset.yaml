@@ -4,6 +4,7 @@ SPDX-License-Identifier: MPL-2.0
 */}}
 
 {{ template "openbao.mode" . }}
+{{- include "openbao.selfInit.validate" . }}
 {{- if ne .mode "external" }}
 {{- if ne .mode "" }}
 {{- if .serverEnabled -}}
@@ -20,7 +21,7 @@ metadata:
   {{- template "openbao.statefulSet.annotations" . }}
 spec:
   serviceName: {{ template "openbao.fullname" . }}-internal
-  podManagementPolicy: {{ .Values.server.podManagementPolicy }}
+  podManagementPolicy: {{ include "openbao.serverPodManagementPolicy" . }}
   replicas: {{ template "openbao.replicas" . }}
   updateStrategy:
     type: {{ .Values.server.updateStrategyType }}

@@ -206,6 +206,19 @@ Set's the replica count based on the different modes configured by user
 {{- end -}}
 
 {{/*
+Set's the StatefulSet pod management policy. Self-init uses a temporary
+bootstrap Job, so server pods must start in parallel to avoid blocking on
+ordinal 0 while joining the bootstrap server.
+*/}}
+{{- define "openbao.serverPodManagementPolicy" -}}
+{{- if include "openbao.selfInit.job.enabled" . -}}
+Parallel
+{{- else -}}
+{{ .Values.server.podManagementPolicy }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Set's up configmap mounts if this isn't a dev deployment and the user
 defined a custom configuration.  Additionally iterates over any
 extra volumes the user may have specified (such as a secret with TLS).
@@ -1140,9 +1153,201 @@ Supported inputs are Values.ui
 {{- end -}}
 
 {{/*
+Returns true when declarative self-initialization config should be rendered.
+*/}}
+{{- define "openbao.selfInit.enabled" -}}
+{{- if and .Values.server.selfInit.enabled .Values.server.selfInit.config -}}true{{- end -}}
+{{- end -}}
+
+{{/*
+Returns true when self-init config is delivered through the bootstrap Job.
+*/}}
+{{- define "openbao.selfInit.job.enabled" -}}
+{{- if and (include "openbao.selfInit.enabled" .) (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") -}}true{{- end -}}
+{{- end -}}
+
+{{/*
+Name of the temporary self-init bootstrap Service.
+*/}}
+{{- define "openbao.selfInit.job.serviceName" -}}
+{{ template "openbao.fullname" . }}-self-init
+{{- end -}}
+
+{{/*
+Generation hash for the self-init bootstrap Job. The hash is based on inputs
+that affect the Job pod template so immutable Job template changes produce a
+new Job instead of patching the old one.
+*/}}
+{{- define "openbao.selfInit.job.generation" -}}
+{{- $source := dict
+  "args" (include "openbao.selfInit.job.args" .)
+  "config" (include "openbao.selfInit.job.config" .)
+  "containerSecurityContext" (include "server.statefulSet.securityContext.container" .)
+  "dataStorageMountPath" .Values.server.dataStorage.mountPath
+  "extraArgs" .Values.server.extraArgs
+  "extraEnvironmentVars" .Values.server.extraEnvironmentVars
+  "extraSecretEnvironmentVars" .Values.server.extraSecretEnvironmentVars
+  "extraVolumes" .Values.server.extraVolumes
+  "hostAliases" .Values.server.hostAliases
+  "image" .Values.server.image
+  "imagePullSecrets" (include "imagePullSecrets" .)
+  "logFormat" .Values.server.logFormat
+  "logLevel" .Values.server.logLevel
+  "openbaoScheme" (include "openbao.scheme" .)
+  "placement" (dict "affinity" .Values.server.affinity "nodeSelector" .Values.server.nodeSelector "priorityClassName" .Values.server.priorityClassName "tolerations" .Values.server.tolerations "topologySpreadConstraints" .Values.server.topologySpreadConstraints)
+  "podAnnotations" .Values.server.selfInit.job.podAnnotations
+  "podSecurityContext" (include "server.statefulSet.securityContext.pod" .)
+  "raftSetNodeId" .Values.server.ha.raft.setNodeId
+  "resources" .Values.server.resources
+  "selfInitConfig" (include "openbao.selfInit.config" .)
+  "serviceAccountName" (include "openbao.serviceAccount.name" .)
+  "servicePort" .Values.server.service.port
+  "serviceTargetPort" .Values.server.service.targetPort
+  "volumeMounts" .Values.server.volumeMounts
+  "volumes" .Values.server.volumes
+-}}
+{{- toJson $source | sha256sum | trunc 10 -}}
+{{- end -}}
+
+{{/*
+Name of the self-init bootstrap Job. The suffix avoids immutable Job template
+patches during Helm or GitOps reconciliation.
+*/}}
+{{- define "openbao.selfInit.job.name" -}}
+{{- $prefix := printf "%s-self-init" (include "openbao.fullname" .) | trunc 52 | trimSuffix "-" -}}
+{{- printf "%s-%s" $prefix (include "openbao.selfInit.job.generation" .) -}}
+{{- end -}}
+
+{{/*
+Generated Raft retry_join stanzas for self-init bootstrap Job mode.
+
+This helper must be rendered inside the storage "raft" block.
+*/}}
+{{- define "openbao.selfInit.raftRetryJoin" -}}
+{{- $root := . -}}
+{{- if include "openbao.selfInit.job.enabled" $root }}
+retry_join {
+  leader_api_addr = "{{ include "openbao.scheme" $root }}://{{ include "openbao.selfInit.job.serviceName" $root }}.{{ include "openbao.namespace" $root }}.svc:{{ $root.Values.server.service.port }}"
+}
+{{- $replicas := int (include "openbao.replicas" $root) }}
+{{- range $i := until $replicas }}
+retry_join {
+  leader_api_addr = "{{ include "openbao.scheme" $root }}://{{ include "openbao.fullname" $root }}-{{ $i }}.{{ include "openbao.fullname" $root }}-internal.{{ include "openbao.namespace" $root }}.svc:{{ $root.Values.server.service.port }}"
+}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Render the bootstrap Job's base server config without generated retry_join
+stanzas. The Job initializes an empty temporary Raft data directory; StatefulSet
+pods join the Job, not the other way around.
+*/}}
+{{- define "openbao.selfInit.job.config" -}}
+{{- $jobCtx := deepCopy . -}}
+{{- $_ := set $jobCtx.Values.server.selfInit "enabled" false -}}
+{{ tpl .Values.server.ha.raft.config $jobCtx | nindent 4 | trim }}
+{{- end -}}
+
+{{/*
+Set's the args for the self-init bootstrap Job.
+*/}}
+{{- define "openbao.selfInit.job.args" -}}
+- |
+  {{- $replicas := int (include "openbao.replicas" .) }}
+  {{- range $i := until $replicas }}
+  if BAO_ADDR="{{ include "openbao.scheme" $ }}://{{ include "openbao.fullname" $ }}-{{ $i }}.{{ include "openbao.fullname" $ }}-internal.{{ include "openbao.namespace" $ }}.svc:{{ $.Values.server.service.port }}" bao status -tls-skip-verify -format=json 2>/dev/null | grep -Eq '"initialized"[[:space:]]*:[[:space:]]*true'; then
+    echo "OpenBao is already initialized; skipping self-init bootstrap.";
+    exit 0;
+  fi;
+  {{- end }}
+  cp /openbao/config/extraconfig-from-values.hcl /tmp/storageconfig.hcl;
+  [ -s /openbao/self-init/self-init.hcl ] && cat /openbao/self-init/self-init.hcl >> /tmp/storageconfig.hcl;
+  [ -n "${HOST_IP}" ] && sed -Ei "s|HOST_IP|${HOST_IP?}|g" /tmp/storageconfig.hcl;
+  [ -n "${POD_IP}" ] && sed -Ei "s|POD_IP|${POD_IP?}|g" /tmp/storageconfig.hcl;
+  [ -n "${HOSTNAME}" ] && sed -Ei "s|HOSTNAME|${HOSTNAME?}|g" /tmp/storageconfig.hcl;
+  [ -n "${API_ADDR}" ] && sed -Ei "s|API_ADDR|${API_ADDR?}|g" /tmp/storageconfig.hcl;
+  [ -n "${TRANSIT_ADDR}" ] && sed -Ei "s|TRANSIT_ADDR|${TRANSIT_ADDR?}|g" /tmp/storageconfig.hcl;
+  [ -n "${RAFT_ADDR}" ] && sed -Ei "s|RAFT_ADDR|${RAFT_ADDR?}|g" /tmp/storageconfig.hcl;
+  /usr/local/bin/docker-entrypoint.sh bao server -config=/tmp/storageconfig.hcl {{ .Values.server.extraArgs }} &
+  pid="$!";
+  trap 'kill -TERM "${pid}" 2>/dev/null || true; wait "${pid}" 2>/dev/null || true' TERM INT;
+  until BAO_ADDR="{{ include "openbao.scheme" . }}://127.0.0.1:8200" bao status -tls-skip-verify -format=json 2>/dev/null | grep -Eq '"initialized"[[:space:]]*:[[:space:]]*true'; do
+    if ! kill -0 "${pid}" 2>/dev/null; then
+      wait "${pid}";
+      exit $?;
+    fi;
+    sleep 2;
+  done;
+  sleep {{ .Values.server.selfInit.job.holdSeconds }};
+  kill -TERM "${pid}" 2>/dev/null || true;
+  wait "${pid}" 2>/dev/null || true;
+{{- end -}}
+
+{{/*
+Validate declarative self-initialization configuration.
+*/}}
+{{- define "openbao.selfInit.validate" -}}
+  {{- if and .Values.server.selfInit.enabled .Values.server.selfInit.config (ne .mode "dev") (ne .mode "external") }}
+    {{- if not (and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true")) }}
+      {{- fail "server.selfInit.enabled requires server.ha.enabled=true and server.ha.raft.enabled=true" }}
+    {{- end }}
+    {{- if .Values.server.selfInit.job.autopilot.enabled }}
+      {{- $minQuorum := int (include "openbao.selfInit.autopilotMinQuorum" .) -}}
+      {{- if lt $minQuorum 3 }}
+        {{- fail "server.selfInit.job.autopilot.minQuorum must be at least 3" }}
+      {{- end }}
+      {{- $replicas := int (include "openbao.replicas" .) -}}
+      {{- if lt $replicas $minQuorum }}
+        {{- fail "server.selfInit.job.autopilot.minQuorum must be less than or equal to server.ha.replicas" }}
+      {{- end }}
+    {{- end }}
+    {{- if ne (typeOf .Values.server.ha.raft.config) "string" }}
+      {{- fail "server.selfInit.config requires server.ha.raft.config to be a string" }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{- define "openbao.selfInit.autopilotMinQuorum" -}}
+{{- $configured := .Values.server.selfInit.job.autopilot.minQuorum -}}
+{{- if kindIs "invalid" $configured -}}
+  {{- $replicas := int (include "openbao.replicas" .) -}}
+  {{- if lt $replicas 3 -}}3{{- else -}}{{ $replicas }}{{- end -}}
+{{- else -}}
+{{- $configured -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "openbao.selfInit.autopilotConfig" -}}
+initialize "openbao_self_init_autopilot" {
+  request "configure-autopilot" {
+    operation = "update"
+    path = "sys/storage/raft/autopilot/configuration"
+    data = {
+      cleanup_dead_servers = true
+      dead_server_last_contact_threshold = "{{ .Values.server.selfInit.job.autopilot.deadServerLastContactThreshold }}"
+      server_stabilization_time = "{{ .Values.server.selfInit.job.autopilot.serverStabilizationTime }}"
+      min_quorum = {{ include "openbao.selfInit.autopilotMinQuorum" . }}
+    }
+  }
+}
+{{- end -}}
+
+{{- define "openbao.selfInit.config" -}}
+  {{- if and .Values.server.selfInit.enabled .Values.server.selfInit.config }}
+{{- if .Values.server.selfInit.job.autopilot.enabled }}
+{{ include "openbao.selfInit.autopilotConfig" . | trim }}
+
+{{- end }}
+{{ tpl .Values.server.selfInit.config . | trim }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 config file from values
 */}}
 {{- define "openbao.config" -}}
+  {{- include "openbao.selfInit.validate" . }}
   {{- if or (eq .mode "ha") (eq .mode "standalone") }}
   {{- $type := typeOf (index .Values.server .mode).config }}
   {{- if eq $type "string" }}

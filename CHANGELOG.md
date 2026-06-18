@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.29.0
+
+- feat(server): add self-init bootstrap job mode
+
 ## 0.28.4
 
 - docs: Update commented example with missing field
