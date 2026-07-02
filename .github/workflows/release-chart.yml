@@ -2,29 +2,6 @@ name: Release
 
 on:
   workflow_dispatch:
-    inputs:
-      # Defaults to publishing draft releases.
-      # Review draft before formally releasing!
-      draft:
-        description: "Create a release draft"
-        required: false
-        default: true
-        type: boolean
-      prerelease:
-        description: "Mark this release as a prerelease"
-        required: false
-        default: "auto"
-        type: choice
-        # auto follows semver. Prerelease versions are hyphenated with a label. ex. 0.0.0-alpha, 1.0.0-rc1
-        options:
-          - auto
-          - "true"
-          - "false"
-      make-latest:
-        description: "Latest release"
-        required: false
-        default: true
-        type: boolean
 
 jobs:
   check-versions:
