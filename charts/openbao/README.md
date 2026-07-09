@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.28.4](https://img.shields.io/badge/Version-0.28.4-informational?style=flat-square) ![AppVersion: v2.5.5](https://img.shields.io/badge/AppVersion-v2.5.5-informational?style=flat-square)
+![Version: 0.29.0](https://img.shields.io/badge/Version-0.29.0-informational?style=flat-square) ![AppVersion: v2.5.5](https://img.shields.io/badge/AppVersion-v2.5.5-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -215,7 +215,7 @@ Kubernetes: `>= 1.30.0-0`
 | server.ha.disruptionBudget.enabled | bool | `true` |  |
 | server.ha.disruptionBudget.maxUnavailable | string | `nil` |  |
 | server.ha.enabled | bool | `false` |  |
-| server.ha.raft.config | string | `"ui = true\n\nlistener \"tcp\" {\n  tls_disable = 1\n  address = \"[::]:8200\"\n  cluster_address = \"[::]:8201\"\n  # Enable unauthenticated metrics access (necessary for Prometheus Operator)\n  #telemetry {\n  #  unauthenticated_metrics_access = \"true\"\n  #}\n}\n\nstorage \"raft\" {\n  path = \"/openbao/data\"\n}\n\nservice_registration \"kubernetes\" {}\n"` |  |
+| server.ha.raft.config | string | `"ui = true\n\nlistener \"tcp\" {\n  tls_disable = 1\n  address = \"[::]:8200\"\n  cluster_address = \"[::]:8201\"\n  # Enable unauthenticated metrics access (necessary for Prometheus Operator)\n  #telemetry {\n  #  unauthenticated_metrics_access = \"true\"\n  #}\n}\n\nstorage \"raft\" {\n  path = \"/openbao/data\"\n  {{- include \"openbao.selfInit.raftRetryJoin\" . | nindent 10 }}\n}\n\nservice_registration \"kubernetes\" {}\n"` |  |
 | server.ha.raft.enabled | bool | `false` |  |
 | server.ha.raft.setNodeId | bool | `false` |  |
 | server.ha.replicas | int | `3` |  |
@@ -273,6 +273,18 @@ Kubernetes: `>= 1.30.0-0`
 | server.route.host | string | `"chart-example.local"` |  |
 | server.route.labels | object | `{}` |  |
 | server.route.tls.termination | string | `"passthrough"` |  |
+| server.selfInit.config | string | `""` | Configure OpenBao declarative self-initialization HCL. |
+| server.selfInit.enabled | bool | `false` | Enable OpenBao declarative self-initialization configuration. |
+| server.selfInit.job.activeDeadlineSeconds | string | `nil` | Optional Job activeDeadlineSeconds. |
+| server.selfInit.job.annotations | object | `{}` | Annotations to apply to the self-init bootstrap Job. |
+| server.selfInit.job.autopilot.deadServerLastContactThreshold | string | `"1m"` | Dead-server last-contact threshold for the generated autopilot cleanup request. |
+| server.selfInit.job.autopilot.enabled | bool | `true` | Generate an autopilot cleanup request with the self-init configuration. |
+| server.selfInit.job.autopilot.minQuorum | string | `nil` | Minimum Raft quorum for autopilot dead-server cleanup. Defaults to max(3, server.ha.replicas) when unset. |
+| server.selfInit.job.autopilot.serverStabilizationTime | string | `"10s"` | Server stabilization time for the generated autopilot cleanup request. |
+| server.selfInit.job.backoffLimit | int | `6` | Job backoff limit. |
+| server.selfInit.job.holdSeconds | int | `120` | Number of seconds the bootstrap Job keeps OpenBao running after it observes initialization, giving StatefulSet pods time to retry_join. |
+| server.selfInit.job.podAnnotations | object | `{}` | Annotations to apply to the self-init bootstrap Job pod. |
+| server.selfInit.job.ttlSecondsAfterFinished | string | `nil` | Optional Job ttlSecondsAfterFinished. Leave unset for GitOps so the completed bootstrap Job remains part of observed cluster state. |
 | server.service.active.annotations | object | `{}` |  |
 | server.service.active.enabled | bool | `true` |  |
 | server.service.active.extraLabels | object | `{}` |  |

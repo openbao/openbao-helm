@@ -1,0 +1,17 @@
+{{ template "openbao.mode" . }}
+{{- include "openbao.selfInit.validate" . }}
+{{- if include "openbao.selfInit.job.enabled" . -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "openbao.fullname" . }}-self-init-job-config
+  namespace: {{ include "openbao.namespace" . }}
+  labels:
+    helm.sh/chart: {{ include "openbao.chart" . }}
+    app.kubernetes.io/name: {{ include "openbao.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  extraconfig-from-values.hcl: |-
+    {{ include "openbao.selfInit.job.config" . }}
+{{- end }}

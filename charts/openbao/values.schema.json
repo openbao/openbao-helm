@@ -656,6 +656,69 @@
                         }
                     }
                 },
+                "selfInit": {
+                    "type": "object",
+                    "properties": {
+                        "config": {
+                            "type": "string"
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "job": {
+                            "type": "object",
+                            "properties": {
+                                "activeDeadlineSeconds": {
+                                    "type": [
+                                        "null",
+                                        "integer"
+                                    ]
+                                },
+                                "annotations": {
+                                    "type": "object"
+                                },
+                                "backoffLimit": {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                },
+                                "holdSeconds": {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                },
+                                "autopilot": {
+                                    "type": "object",
+                                    "properties": {
+                                        "deadServerLastContactThreshold": {
+                                            "type": "string"
+                                        },
+                                        "enabled": {
+                                            "type": "boolean"
+                                        },
+                                        "minQuorum": {
+                                            "minimum": 3,
+                                            "type": [
+                                                "null",
+                                                "integer"
+                                            ]
+                                        },
+                                        "serverStabilizationTime": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "podAnnotations": {
+                                    "type": "object"
+                                },
+                                "ttlSecondsAfterFinished": {
+                                    "type": [
+                                        "null",
+                                        "integer"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
                 "enabled": {
                     "type": [
                         "boolean",

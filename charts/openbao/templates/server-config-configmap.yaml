@@ -4,6 +4,7 @@ SPDX-License-Identifier: MPL-2.0
 */}}
 
 {{ template "openbao.mode" . }}
+{{- include "openbao.selfInit.validate" . }}
 {{- if ne .mode "external" }}
 {{- if .serverEnabled -}}
 {{- if ne .mode "dev" -}}
