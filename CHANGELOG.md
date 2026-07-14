@@ -1,5 +1,7 @@
 ## Unreleased
 
+- fix: allow using custom Secret keys for Snapshot Agent S3 credentials.
+
 ## 0.28.5
 
 - chore: bump OpenBao to v2.6.0
