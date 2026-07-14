@@ -5,6 +5,41 @@ entries:
       artifacthub.io/changes: |
         - kind: changed
           description: |
+            chore: bump OpenBao to v2.6.0
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.6.0
+    created: "2026-07-14T17:25:57.301914435Z"
+    description: Official OpenBao Chart
+    digest: c87ecb13b208908b91746637ead5e5f8425cad99b73deb1c6035e99f9ad3c1a4
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.28.5/openbao-0.28.5.tgz
+    version: 0.28.5
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
+          description: |
             docs: Update commented example with missing field
         - kind: changed
           description: |
@@ -2242,4 +2277,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-06-17T12:50:11.853850055Z"
+generated: "2026-07-14T17:25:57.30224882Z"
