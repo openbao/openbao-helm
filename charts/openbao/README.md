@@ -343,7 +343,9 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.image.tag | string | `"0.3.0"` |  |
 | snapshotAgent.resources | object | `{}` |  |
 | snapshotAgent.restartPolicy | string | `"OnFailure"` |  |
-| snapshotAgent.s3CredentialsSecret | string | `"my-s3-credentials"` |  |
+| snapshotAgent.s3CredentialsSecret | string | `"my-s3-credentials"` | Existing Kubernetes secret with S3 Credentials. |
+| snapshotAgent.s3CredentialsSecretKeys.awsAccessKeyID | string | `"AWS_ACCESS_KEY_ID"` | key in secret containing the S3 access key ID |
+| snapshotAgent.s3CredentialsSecretKeys.awsSecretAccessKey | string | `"AWS_SECRET_ACCESS_KEY"` | key in secret containing the S3 secret access key |
 | snapshotAgent.schedule | string | `"*/15 * * * *"` |  |
 | snapshotAgent.securityContext.container | object | `{}` |  |
 | snapshotAgent.securityContext.pod | object | `{}` |  |

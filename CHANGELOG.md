@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat(snapshotAgent): add configurable `snapshotAgent.s3CredentialsSecretKeys`
+
 ## 0.28.5
 
 - chore: bump OpenBao to v2.6.0

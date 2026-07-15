@@ -39,12 +39,12 @@ spec:
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  key: AWS_SECRET_ACCESS_KEY
+                  key: {{ .Values.snapshotAgent.s3CredentialsSecretKeys.awsSecretAccessKey }}
                   name: {{ .Values.snapshotAgent.s3CredentialsSecret }}
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  key: AWS_ACCESS_KEY_ID
+                  key: {{ .Values.snapshotAgent.s3CredentialsSecretKeys.awsAccessKeyID }}
                   name: {{ .Values.snapshotAgent.s3CredentialsSecret }}
             {{- include "openbao.extraSecretEnvironmentVars" .Values.snapshotAgent | nindent 12 }}
             {{- include "openbao.extraEnvironmentVars" .Values.snapshotAgent | nindent 12 }}

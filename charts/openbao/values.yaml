@@ -1556,8 +1556,13 @@ snapshotAgent:
   #     readOnly: true
   #     subPath: ca.crt
 
-  # s3CredentialsSecret to use
+  # -- Existing Kubernetes secret with S3 Credentials.
   s3CredentialsSecret: "my-s3-credentials"
+  s3CredentialsSecretKeys:
+    # -- key in secret containing the S3 access key ID
+    awsAccessKeyID: "AWS_ACCESS_KEY_ID"
+    # -- key in secret containing the S3 secret access key
+    awsSecretAccessKey: "AWS_SECRET_ACCESS_KEY"
 
   # configuration for the snapshot agent
   config:
