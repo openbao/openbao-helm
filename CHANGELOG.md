@@ -1,8 +1,10 @@
 ## Unreleased
 
-## 0.28.x
-
 - fix: add global imagePullSecret to Snapshot CronJob
+
+## 0.28.5
+
+- chore: bump OpenBao to v2.6.0
 
 ## 0.28.4
 
