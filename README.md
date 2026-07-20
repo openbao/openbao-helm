@@ -21,6 +21,9 @@ The versions required are:
   It is possible that this chart works with earlier versions but it is
   untested.
 
+In general, the latest versions of widely adopted Kubernetes distributions such
+as SUSE Rancher or Red Hat OpenShift are supported.
+
 ## Usage
 
 To install the latest version of this chart, add the OpenBao helm repository and run `helm install`:

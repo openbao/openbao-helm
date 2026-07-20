@@ -1,5 +1,37 @@
 ## Unreleased
 
+## 0.28.5
+
+- chore: bump OpenBao to v2.6.0
+
+## 0.28.4
+
+- docs: Update commented example with missing field
+- chore: bump OpenBao to v2.5.5
+
+## 0.28.3
+
+- chore: Improve OpenShift annotations
+- chore: bump OpenBao to v2.5.4
+
+## 0.28.2
+
+- fix: Switch to certified Red Hat registry images for OpenShift
+
+## 0.28.1
+
+- chore: Update to openbao-ubi 2.5.3 for OpenShift
+- chore: Update to vault-k8s 1.7.2-ubi for OpenShift
+
+## 0.28.0
+
+- feat(server): template `extraContainers` and `extraInitContainers`
+
+## 0.27.2
+
+- chore: update to openbao 2.5.3
+- chore: update to openbao-csi-provider 2.0.2
+
 ## 0.27.1
 
 - feat: Allow configuring Grafana dashboard namespace
