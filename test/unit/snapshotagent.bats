@@ -117,6 +117,26 @@ load _helpers
   [ "${actual}" = "creds" ]
 }
 
+@test "snapshot/cronjob: configuration: s3CredentialsSecretKeys" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.s3CredentialsSecretKeys.awsAccessKeyID=username' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.jobTemplate.spec.template.spec.containers[0].env[] | select(.name == "AWS_ACCESS_KEY_ID") | .valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${actual}" = "username" ]
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.s3CredentialsSecretKeys.awsSecretAccessKey=password' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.jobTemplate.spec.template.spec.containers[0].env[] | select(.name == "AWS_SECRET_ACCESS_KEY") | .valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${actual}" = "password" ]
+}
+
 @test "snapshot/serviceaccount: disabled" {
   cd `chart_dir`
   local actual=$(helm template \
