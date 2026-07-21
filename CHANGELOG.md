@@ -1,5 +1,7 @@
 ## Unreleased
 
+- ci(tests): update kubernetees version
+
 ## 0.28.5
 
 - chore: bump OpenBao to v2.6.0
