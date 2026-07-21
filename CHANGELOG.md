@@ -1,6 +1,7 @@
 ## Unreleased
 
 - fix: add global imagePullSecret to Snapshot CronJob
+- ci(tests): update kubernetees version
 
 ## 0.28.5
 
