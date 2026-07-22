@@ -35,7 +35,7 @@ annotations:
         fix(csi): harden CSI provider security context
     - kind: changed
       description: |
-        ci(tests): update kubernetees version
+        ci(tests): update kubernetes version
 maintainers:
   - name: OpenBao
     email: openbao-security@lists.openssf.org
