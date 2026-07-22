@@ -4,7 +4,7 @@
 
 - chore: bump OpenBao to v2.6.1
 - fix(csi): harden CSI provider security context
-- ci(tests): update kubernetees version
+- ci(tests): update kubernetes version
 
 ## 0.28.5
 
