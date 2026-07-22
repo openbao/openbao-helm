@@ -2,6 +2,7 @@
 
 - fix: add global imagePullSecret to Snapshot CronJob
 - ci(tests): update kubernetees version
+- fix(csi): harden CSI provider security context
 
 ## 0.28.5
 
