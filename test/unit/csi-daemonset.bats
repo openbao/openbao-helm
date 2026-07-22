@@ -770,8 +770,49 @@ load _helpers
       --show-only templates/csi-daemonset.yaml \
       --set 'csi.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].securityContext' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
+      yq -r '.spec.template.spec.containers[0].securityContext == {
+        "runAsGroup": 1000,
+        "allowPrivilegeEscalation": false,
+        "readOnlyRootFilesystem": true,
+        "seccompProfile": {
+          "type": "RuntimeDefault"
+        },
+        "capabilities": {
+          "drop": [
+            "ALL"
+          ]
+        }
+      }' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local run_as_non_root=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.runAsNonRoot' | tee /dev/stderr)
+  [ "${run_as_non_root}" = "null" ]
+}
+
+@test "csi/daemonset: default csi provider securityContext without agent" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.enabled=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext == {
+        "allowPrivilegeEscalation": false,
+        "readOnlyRootFilesystem": true,
+        "seccompProfile": {
+          "type": "RuntimeDefault"
+        },
+        "capabilities": {
+          "drop": [
+            "ALL"
+          ]
+        }
+      }' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 @test "csi/daemonset: specify csi.daemonSet.securityContext.pod yaml" {
@@ -820,6 +861,28 @@ load _helpers
   [ "${actual}" = "2" ]
 }
 
+@test "csi/daemonset: Agent sidecar makes socket group writable" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1]' | tee /dev/stderr)
+
+  local command=$(echo "${object}" |
+      yq -r '.command' | tee /dev/stderr)
+  echo "${command}" | grep "/bin/sh"
+  echo "${command}" | grep -- "-ec"
+
+  local umask_script=$(echo "${object}" |
+      yq -r '.args[0]' | tee /dev/stderr)
+  echo "${umask_script}" | grep "umask 0007"
+
+  local lifecycle=$(echo "${object}" |
+      yq -r '.lifecycle' | tee /dev/stderr)
+  [ "${lifecycle}" = "null" ]
+}
+
 @test "csi/daemonset: Agent sidecar can pass extra args" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -827,7 +890,7 @@ load _helpers
       --set 'csi.enabled=true' \
       --set 'csi.agent.extraArgs[0]=-config=extra-config.hcl' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[1].args[2]' | tee /dev/stderr)
+      yq -r '.spec.template.spec.containers[1].args[4]' | tee /dev/stderr)
   [ "${actual}" = "-config=extra-config.hcl" ]
 }
 
@@ -896,3 +959,4 @@ load _helpers
       yq -r '.limits.cpu' | tee /dev/stderr)
   [ "${value}" = "500m" ]
 }
+

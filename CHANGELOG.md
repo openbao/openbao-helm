@@ -1,6 +1,7 @@
 ## Unreleased
 
 - ci(tests): update kubernetees version
+- fix(csi): harden CSI provider security context
 
 ## 0.28.5
 
