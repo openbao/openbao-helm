@@ -30,7 +30,7 @@ annotations:
     - kind: changed
       description: |
         chore: bump OpenBao to v2.6.1
-    - kind: changed
+    - kind: fixed
       description: |
         fix(csi): harden CSI provider security context
     - kind: changed
