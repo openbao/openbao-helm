@@ -5,6 +5,47 @@ entries:
       artifacthub.io/changes: |
         - kind: changed
           description: |
+            chore: bump OpenBao to v2.6.1
+        - kind: fixed
+          description: |
+            fix(csi): harden CSI provider security context
+        - kind: changed
+          description: |
+            ci(tests): update kubernetes version
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.6.1
+    created: "2026-07-22T15:51:24.903265339Z"
+    description: Official OpenBao Chart
+    digest: 175c5cea2d36b68d348eca872044656bd8740c4dbe26b7dc8eb7c7438474a8b3
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.28.6/openbao-0.28.6.tgz
+    version: 0.28.6
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
+          description: |
             chore: bump OpenBao to v2.6.0
       artifacthub.io/containsSecurityUpdates: "true"
       charts.openshift.io/name: OpenBao
@@ -2277,4 +2318,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-07-14T17:25:57.30224882Z"
+generated: "2026-07-22T15:51:24.903496735Z"
