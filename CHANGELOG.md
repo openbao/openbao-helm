@@ -2,6 +2,7 @@
 
 - fix: add global imagePullSecret to Snapshot CronJob
 - fix(openshift): update readinessProbe to support horizontal scalability
+- fix(chart): preserve custom BackendTLSPolicy validation hostname
 
 ## 0.28.6
 
