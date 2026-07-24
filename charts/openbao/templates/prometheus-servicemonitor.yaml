@@ -52,6 +52,9 @@ spec:
     tlsConfig:
       insecureSkipVerify: true
     {{- end }}
+    {{- if .Values.serverTelemetry.serviceMonitor.bearerTokenFile }}
+    bearerTokenFile: {{ .Values.serverTelemetry.serviceMonitor.bearerTokenFile }}
+    {{- end }}
     {{- with .Values.serverTelemetry.serviceMonitor.authorization }}
     authorization:
     {{- toYaml . | nindent 6 }}

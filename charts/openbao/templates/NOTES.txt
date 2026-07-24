@@ -16,3 +16,6 @@ Your release is named {{ .Release.Name }}. To learn more about the release, try:
 WARNING: Terminating TLS before reaching the OpenBao Server is not recommended
 and may break things like certificate authentication. Prefer usage of `TLSRoute`.
 {{- end }}
+{{- if and .Values.serverTelemetry.serviceMonitor.enabled .Values.serverTelemetry.serviceMonitor.bearerTokenFile }}
+WARNING: serverTelemetry.serviceMonitor.bearerTokenFile is deprecated, use 'serverTelemetry.serviceMonitor.authorization' instead.
+{{- end }}

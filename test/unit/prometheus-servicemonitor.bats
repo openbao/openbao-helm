@@ -194,6 +194,17 @@ load _helpers
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].authorization.credentials.name')" = "secretname" ]
 }
 
+@test "prometheus/ServiceMonitor-server: bearerTokenFile set" {
+  cd `chart_dir`
+  local output=$( (helm template \
+    --show-only templates/prometheus-servicemonitor.yaml \
+    --set 'serverTelemetry.serviceMonitor.enabled=true' \
+    --set 'serverTelemetry.serviceMonitor.bearerTokenFile=secureToken' \
+    .) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].bearerTokenFile')" = "secureToken" ]
+}
+
 @test "prometheus/ServiceMonitor-server: scrapeClass set" {
   cd `chart_dir`
   local output=$( (helm template \
