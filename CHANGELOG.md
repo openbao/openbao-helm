@@ -1,6 +1,7 @@
 ## Unreleased
 
 - fix: add global imagePullSecret to Snapshot CronJob
+- fix(openshift): update readinessProbe to support horizontal scalability
 
 ## 0.28.6
 
