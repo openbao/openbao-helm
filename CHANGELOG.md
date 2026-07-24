@@ -2,6 +2,7 @@
 
 - fix: add global imagePullSecret to Snapshot CronJob
 - fix(openshift): update readinessProbe to support horizontal scalability
+- feat: apply server.statefulset.securityContext on helm test pod
 
 ## 0.28.6
 
