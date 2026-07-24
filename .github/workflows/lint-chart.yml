@@ -38,12 +38,13 @@ jobs:
         id: lint
         if: steps.list-changed.outputs.changed == 'true'
         run: |
-          ct lint --target-branch ${{ github.event.repository.default_branch }}
+          CHECK_VERSION_INCREMENT=${{ contains(github.event.pull_request.labels.*.name, 'release') }}
+          ct lint --target-branch ${{ github.event.repository.default_branch }} --check-version-increment=${CHECK_VERSION_INCREMENT}
 
       - name: Create kind cluster
         uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
         with:
-          node_image: kindest/node:v1.35.1
+          node_image: kindest/node:v1.36.1
           version: v0.29.0
         if: steps.list-changed.outputs.changed == 'true'
 
