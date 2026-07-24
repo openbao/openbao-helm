@@ -26,4 +26,4 @@ server:
     # See: https://openbao.org/docs/install/#container-registries
 
   readinessProbe:
-    path: "/v1/sys/health?uninitcode=204"
+    path: "/v1/sys/health?standbyok=true&uninitcode=204"

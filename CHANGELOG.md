@@ -1,5 +1,7 @@
 ## Unreleased
 
+- fix(openshift): update readinessProbe to support horizontal scalability
+
 ## 0.28.6
 
 - chore: bump OpenBao to v2.6.1
