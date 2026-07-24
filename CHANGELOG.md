@@ -2,6 +2,21 @@
 
 - fix(openshift): update readinessProbe to support horizontal scalability
 
+## 0.28.6
+
+- chore: bump OpenBao to v2.6.1
+- fix(csi): harden CSI provider security context
+- ci(tests): update kubernetes version
+
+## 0.28.5
+
+- chore: bump OpenBao to v2.6.0
+
+## 0.28.4
+
+- docs: Update commented example with missing field
+- chore: bump OpenBao to v2.5.5
+
 ## 0.28.3
 
 - chore: Improve OpenShift annotations

@@ -107,8 +107,13 @@ spec:
           imagePullPolicy: {{ .Values.csi.agent.image.pullPolicy }}
           {{ template "csi.agent.resources" . }}
           command:
-            - bao
+            - /bin/sh
+            - -ec
           args:
+            - |
+              umask 0007
+              exec bao "$@"
+            - bao
             - agent
             - -config=/etc/vault/config.hcl
             {{- if .Values.csi.agent.extraArgs }}
