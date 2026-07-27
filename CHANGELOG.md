@@ -4,6 +4,7 @@
 - fix(openshift): update readinessProbe to support horizontal scalability
 - feat: apply server.statefulset.securityContext on helm test pod
 - feat: Support bearerTokenFile for ServiceMonitor
+- fix(openshift): use non certified quay.io ubi container image
 
 ## 0.28.6
 
