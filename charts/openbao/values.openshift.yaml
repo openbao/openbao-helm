@@ -13,16 +13,14 @@ injector:
     tag: "1.7.2-ubi"
 
   agentImage:
-    registry: "registry.connect.redhat.com"
     repository: "openbao/openbao-ubi"
-    # Use the certified OpenBao UBI image for better OpenShift compatibility
+    # Use the OpenBao UBI image for better OpenShift compatibility
     # See: https://openbao.org/docs/install/#container-registries
 
 server:
   image:
-    registry: "registry.connect.redhat.com"
     repository: "openbao/openbao-ubi"
-    # Use the certified OpenBao UBI image for better OpenShift compatibility
+    # Use the OpenBao UBI image for better OpenShift compatibility
     # See: https://openbao.org/docs/install/#container-registries
 
   readinessProbe:
