@@ -1,5 +1,6 @@
 ## Unreleased
 
+- fix: allow using custom Secret keys for Snapshot Agent S3 credentials.
 - fix: add global imagePullSecret to Snapshot CronJob
 - fix(openshift): update readinessProbe to support horizontal scalability
 - feat: apply server.statefulset.securityContext on helm test pod
