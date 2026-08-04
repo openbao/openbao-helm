@@ -36,16 +36,18 @@ spec:
             - configMapRef:
                 name: {{ template "openbao.fullname" . }}-snapshot
             env:
+            {{- with .Values.snapshotAgent.s3CredentialsSecret }}
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   key: AWS_SECRET_ACCESS_KEY
-                  name: {{ .Values.snapshotAgent.s3CredentialsSecret }}
+                  name: {{ . }}
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
                   key: AWS_ACCESS_KEY_ID
-                  name: {{ .Values.snapshotAgent.s3CredentialsSecret }}
+                  name: {{ . }}
+            {{- end }}
             {{- include "openbao.extraSecretEnvironmentVars" .Values.snapshotAgent | nindent 12 }}
             {{- include "openbao.extraEnvironmentVars" .Values.snapshotAgent | nindent 12 }}
             image: {{ .Values.snapshotAgent.image.repository }}:{{ .Values.snapshotAgent.image.tag }}

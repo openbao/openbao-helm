@@ -276,11 +276,11 @@ load _helpers
       yq -r '.spec.jobTemplate.spec.template.spec.containers[0].env' | tee /dev/stderr )
 
   local actual=$(echo $object |
-     yq -r '.[2].name' | tee /dev/stderr)
+     yq -r '.[0].name' | tee /dev/stderr)
   [ "${actual}" = "BAO_FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[2].value' | tee /dev/stderr)
+      yq -r '.[0].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 }
 
