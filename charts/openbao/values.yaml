@@ -1585,9 +1585,13 @@ snapshotAgent:
     s3cmdExtraFlag: "-v"
     baoAuthPath: "kubernetes"
     baoRole: "snapshot"
+    # The path of the Kubernetes authentication backend in OpenBao (e.g. `kubernetes`)
     baoNamespace: ""
+    #  Namespace for bao authentication. If authentication namespace needs to be different to `BAO_NAMESPACE`.
     baoAuthNamepace: ""
+    # Secret path to retrieve S3 credentials from. Expects the secret to have two fields: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
     baoSecretPath: ""
+    #  The path of the Kubernetes service account token. If unset defaults to `/var/run/secrets/kubernetes.io/serviceaccount/token`.
     tokenPath: ""
 
   # configuration of the CronJobs resources
