@@ -7,6 +7,7 @@
 - feat: Support bearerTokenFile for ServiceMonitor
 - fix(openshift): use non certified quay.io ubi container image
 - chore: update to openbao-csi-provider 2.0.3
+- fix(chart): preserve custom BackendTLSPolicy validation hostname
 
 ## 0.28.6
 
