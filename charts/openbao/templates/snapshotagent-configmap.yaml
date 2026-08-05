@@ -20,6 +20,18 @@ data:
   S3_URI: {{ .Values.snapshotAgent.config.s3Uri }}
   S3_EXPIRE_DAYS: {{ .Values.snapshotAgent.config.s3ExpireDays | quote }}
   BAO_AUTH_PATH: {{ .Values.snapshotAgent.config.baoAuthPath }}
+  {{- if .Values.snapshotAgent.config.baoNamespace }}
+  BAO_NAMESPACE: {{ .Values.snapshotAgent.config.baoNamespace }}
+  {{- end }}
+  {{- if .Values.snapshotAgent.config.baoAuthPath }}
+  BAO_AUTH_NAMESPACE: {{ .Values.snapshotAgent.config.baoAuthNamespace }}
+  {{- end }}
+  {{- if .Values.snapshotAgent.config.baoSecretPath }}
+  BAO_SECRET_PATH: {{ .Values.snapshotAgent.config.baoSecretPath }}
+  {{- end }}
+  {{- if .Values.snapshotAgent.config.baoTokenPath }}
+  TOKEN_PATH: {{ .Values.snapshotAgent.config.tokenPath }}
+  {{- end }}
   BAO_ROLE: {{ .Values.snapshotAgent.config.baoRole }}
   {{- if include "openbao.global.externalAddr" . }}
   BAO_ADDR: "{{ include "openbao.global.externalAddr" . }}"

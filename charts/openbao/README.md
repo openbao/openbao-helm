@@ -49,7 +49,7 @@ Kubernetes: `>= 1.30.0-0`
 | csi.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for csi image. if tag is "latest", set to "Always" |
 | csi.image.registry | string | `"quay.io"` | image registry to use for csi image |
 | csi.image.repository | string | `"openbao/openbao-csi-provider"` | image repo to use for csi image |
-| csi.image.tag | string | `"2.0.2"` | image tag to use for csi image |
+| csi.image.tag | string | `"2.0.3"` | image tag to use for csi image |
 | csi.livenessProbe.failureThreshold | int | `2` |  |
 | csi.livenessProbe.initialDelaySeconds | int | `5` |  |
 | csi.livenessProbe.periodSeconds | int | `5` |  |
@@ -318,7 +318,7 @@ Kubernetes: `>= 1.30.0-0`
 | serverTelemetry.prometheusRules.rules | list | `[]` |  |
 | serverTelemetry.prometheusRules.selectors | object | `{}` |  |
 | serverTelemetry.serviceMonitor.authorization | object | `{}` |  |
-| serverTelemetry.serviceMonitor.bearerTokenFile | string | `nil` | bearerTokenFile defines the file to read bearer token for scraping the target. |
+| serverTelemetry.serviceMonitor.bearerTokenFile | string | `nil` | bearerTokenFile defines the file to read bearer token for scraping the target. Deprecated: Use 'serverTelemetry.serviceMonitor.authorization' |
 | serverTelemetry.serviceMonitor.enabled | bool | `false` |  |
 | serverTelemetry.serviceMonitor.interval | string | `"30s"` |  |
 | serverTelemetry.serviceMonitor.port | string | `""` | Port which Prometheus uses when scraping metrics. If empty will use `openbao.scheme` helper for its value |
@@ -328,20 +328,24 @@ Kubernetes: `>= 1.30.0-0`
 | serverTelemetry.serviceMonitor.selectors | object | `{}` |  |
 | serverTelemetry.serviceMonitor.tlsConfig | object | `{}` |  |
 | snapshotAgent.annotations | object | `{}` |  |
+| snapshotAgent.config.baoAuthNamepace | string | `""` |  |
 | snapshotAgent.config.baoAuthPath | string | `"kubernetes"` |  |
+| snapshotAgent.config.baoNamespace | string | `""` |  |
 | snapshotAgent.config.baoRole | string | `"snapshot"` |  |
+| snapshotAgent.config.baoSecretPath | string | `""` |  |
 | snapshotAgent.config.s3Bucket | string | `"openbao-snapshots"` |  |
 | snapshotAgent.config.s3ExpireDays | string | `"14"` |  |
 | snapshotAgent.config.s3Host | string | `"s3.eu-east-1.amazonaws.com"` |  |
 | snapshotAgent.config.s3Uri | string | `"s3://openbao-snapshots"` |  |
 | snapshotAgent.config.s3cmdExtraFlag | string | `"-v"` |  |
+| snapshotAgent.config.tokenPath | string | `""` |  |
 | snapshotAgent.enabled | bool | `false` |  |
 | snapshotAgent.extraEnvironmentVars | object | `{}` | Map of extra environment variables to set in the snapshot-agent cronjob |
 | snapshotAgent.extraSecretEnvironmentVars | list | `[]` | List of extra environment variables to set in the snapshot-agent cronjob These variables take value from existing Secret objects. |
 | snapshotAgent.extraVolumeMounts | list | `[]` | List of additional volumeMounts for the snapshot cronjob container. |
 | snapshotAgent.extraVolumes | list | `[]` | List of extraVolumes made available to the snapshot cronjob container. |
 | snapshotAgent.image.repository | string | `"ghcr.io/openbao/openbao-snapshot-agent"` |  |
-| snapshotAgent.image.tag | string | `"0.3.0"` |  |
+| snapshotAgent.image.tag | string | `"0.4.0"` |  |
 | snapshotAgent.resources | object | `{}` |  |
 | snapshotAgent.restartPolicy | string | `"OnFailure"` |  |
 | snapshotAgent.s3CredentialsSecret | string | `""` | Existing Kubernetes secret with S3 Credentials. Must contain keys called AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY. If not provided, you must provide `snapshotAgent.extraSecretEnvironmentVars` |
