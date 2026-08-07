@@ -234,10 +234,10 @@ load _helpers
   [ "${actual_value}" = "/" ]
 }
 
-@test "server/gateway/httproute: has matches with timeouts" {
+@test "server/gateway/httproute: has timeouts" {
   cd `chart_dir`
 
-  local path=$(helm template \
+  local actual=$(helm template \
     --show-only templates/server-httproute.yaml \
     --set 'server.gateway.httpRoute.enabled=true' \
     --set 'server.gateway.httpRoute.timeouts.request=10s' \
