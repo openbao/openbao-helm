@@ -521,9 +521,9 @@ server:
         path:
           type: PathPrefix
           value: '/'
-        timeouts: {}
-          # request: 10s  #Maximum time the Gateway waits to complete the full client request and response cycle.
-          # backendRequest: 10s # Maximum time the Gateway waits for a response from the backend service.
+      timeouts: {}
+        # request: 10s  #Maximum time the Gateway waits to complete the full client request and response cycle.
+        # backendRequest: 10s # Maximum time the Gateway waits for a response from the backend service.
       filters: []
       # - type: RequestHeaderModifier
       #   requestHeaderModifier:
