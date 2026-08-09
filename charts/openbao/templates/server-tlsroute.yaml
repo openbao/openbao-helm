@@ -8,7 +8,6 @@
 {{- $serviceName = printf "%s-%s" $serviceName "active" -}}
 {{- end }}
 {{- $servicePort := .Values.server.service.port -}}
-{{- $kubeVersion := .Capabilities.KubeVersion.Version }}
 apiVersion: {{ .Values.server.gateway.tlsRoute.apiVersion }}
 kind: TLSRoute
 metadata:
