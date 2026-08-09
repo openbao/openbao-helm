@@ -5,11 +5,7 @@ SPDX-License-Identifier: MPL-2.0
 
 {{ template "openbao.serverAuthDelegator" . }}
 {{- if .serverAuthDelegator -}}
-{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" -}}
 apiVersion: rbac.authorization.k8s.io/v1
-{{- else }}
-apiVersion: rbac.authorization.k8s.io/v1beta1
-{{- end }}
 kind: ClusterRoleBinding
 metadata:
   name: {{ template "openbao.fullname" . }}-server-binding
