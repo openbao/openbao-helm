@@ -24,7 +24,7 @@ spec:
   replicas: {{ template "openbao.replicas" . }}
   updateStrategy:
     type: {{ .Values.server.updateStrategyType }}
-  {{- if and (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) (.Values.server.persistentVolumeClaimRetentionPolicy) }}
+  {{- if .Values.server.persistentVolumeClaimRetentionPolicy }}
   persistentVolumeClaimRetentionPolicy: {{ toYaml .Values.server.persistentVolumeClaimRetentionPolicy | nindent 4 }}
   {{- end }}
   selector:
