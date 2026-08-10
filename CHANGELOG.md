@@ -1,6 +1,7 @@
 ## Unreleased
 
 - fix: ConcurrencyPolicy for snapshot-agent's CronJob
+- fix(chart): remove obsolete PodSecurityPolicy support
 
 ## 0.29.2
 
