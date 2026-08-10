@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.29.0
+
 - fix(httpRoute): template timeouts in rule
 - chore: update openbao-snapshot-agent to version 0.4.0 and add additional configuration
 - fix: allow using custom Secret keys for Snapshot Agent S3 credentials.

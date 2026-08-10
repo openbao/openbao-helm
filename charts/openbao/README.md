@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.28.6](https://img.shields.io/badge/Version-0.28.6-informational?style=flat-square) ![AppVersion: v2.6.1](https://img.shields.io/badge/AppVersion-v2.6.1-informational?style=flat-square)
+![Version: 0.29.0](https://img.shields.io/badge/Version-0.29.0-informational?style=flat-square) ![AppVersion: v2.6.1](https://img.shields.io/badge/AppVersion-v2.6.1-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -193,8 +193,8 @@ Kubernetes: `>= 1.30.0-0`
 | server.gateway.httpRoute.labels | object | `{}` |  |
 | server.gateway.httpRoute.matches.path.type | string | `"PathPrefix"` |  |
 | server.gateway.httpRoute.matches.path.value | string | `"/"` |  |
-| server.gateway.httpRoute.matches.timeouts | object | `{}` |  |
 | server.gateway.httpRoute.parentRefs | list | `[]` |  |
+| server.gateway.httpRoute.timeouts | object | `{}` |  |
 | server.gateway.tlsPolicy.activeService | bool | `true` |  |
 | server.gateway.tlsPolicy.annotations | object | `{}` |  |
 | server.gateway.tlsPolicy.apiVersion | string | `"gateway.networking.k8s.io/v1"` |  |
