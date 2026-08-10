@@ -3,6 +3,71 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: |
+           fix(openshift): update readinessProbe to support horizontal scalability
+        - kind: fixed
+          description: |
+            fix: Add global imagePullSecrets to Snapshot CronJob
+        - kind: fixed
+          description: |
+            fix(openshift): use non certified quay.io ubi container image
+        - kind: fixed
+          description: |
+            fix(chart): preserve custom BackendTLSPolicy validation hostname
+        - kind: fixed
+          description: |
+            fix(httpRoute): template timeouts in rule
+        - kind: fixed
+          description: |
+            fix: allow using custom Secret keys for Snapshot Agent S3 credentials.
+        - kind: changed
+          description: |
+            feat: apply server.statefulset.securityContext on helm test pod
+        - kind: changed
+          description: |
+            feat: Support bearerTokenFile for ServiceMonitor
+        - kind: changed
+          description: |
+            chore: update openbao-snapshot-agent to version 0.4.0 and add additional configuration
+        - kind: changed
+          description: |
+            chore: update to openbao-csi-provider 2.0.3
+        - kind: changed
+          description: |
+            chore(chart): remove obsolete Kubernetes API and version compatibility checks
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.6.1
+    created: "2026-08-10T10:59:42.144575417Z"
+    description: Official OpenBao Chart
+    digest: 301dfae32057326be7ea36efa4cca93991667b2e1a2619f9131a7ab09f661854
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.29.0/openbao-0.29.0.tgz
+    version: 0.29.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: |
             chore: bump OpenBao to v2.6.1
@@ -2318,4 +2383,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-07-22T15:51:24.903496735Z"
+generated: "2026-08-10T10:59:42.144697985Z"
