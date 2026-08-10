@@ -863,17 +863,6 @@ Sets extra openbao server Service (headless) annotations
 {{- end -}}
 
 {{/*
-Sets PodSecurityPolicy annotations
-*/}}
-{{- define "openbao.psp.annotations" -}}
-  {{- $generic := .Values.global.psp.annotations -}}
-  {{- if $generic }}
-  annotations:
-    {{- include "openbao.annotations.render.4" (list . $generic) -}}
-  {{- end }}
-{{- end -}}
-
-{{/*
 Sets extra statefulset annotations
 */}}
 {{- define "openbao.statefulSet.annotations" -}}
