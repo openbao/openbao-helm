@@ -202,6 +202,18 @@ load _helpers
   [ "${actual}" = "-q" ]
 }
 
+@test "snapshot/configmap: configuration: baoNamespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.config.baoNamespace=bar' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.BAO_NAMESPACE' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "snapshot/configmap: configuration: baoAuthPath" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -212,6 +224,29 @@ load _helpers
     . | tee /dev/stderr |
     yq -r '.data.BAO_AUTH_PATH' | tee /dev/stderr)
   [ "${actual}" = "jwt" ]
+}
+
+@test "snapshot/configmap: configuration: baoAuthNamespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.config.baoAuthNamespace=bar' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.BAO_AUTH_NAMESPACE' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "snapshot/configmap: configuration: baoAuthNamespace omitted when empty" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data | has("BAO_AUTH_NAMESPACE")' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 }
 
 @test "snapshot/configmap: configuration: baoRole" {
@@ -226,6 +261,18 @@ load _helpers
       yq -r '.data.BAO_ROLE' | tee /dev/stderr
   )
   [ "${actual}" = "backup" ]
+}
+
+@test "snapshot/configmap: configuration: tokenPath" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.config.tokenPath=/custom/token' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.TOKEN_PATH' | tee /dev/stderr)
+  [ "${actual}" = "/custom/token" ]
 }
 
 @test "snapshot/configmap: configuration: baoAddr" {

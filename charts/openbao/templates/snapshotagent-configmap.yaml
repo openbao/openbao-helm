@@ -23,13 +23,13 @@ data:
   {{- if .Values.snapshotAgent.config.baoNamespace }}
   BAO_NAMESPACE: {{ .Values.snapshotAgent.config.baoNamespace }}
   {{- end }}
-  {{- if .Values.snapshotAgent.config.baoAuthPath }}
+  {{- if .Values.snapshotAgent.config.baoAuthNamespace }}
   BAO_AUTH_NAMESPACE: {{ .Values.snapshotAgent.config.baoAuthNamespace }}
   {{- end }}
   {{- if .Values.snapshotAgent.config.baoSecretPath }}
   BAO_SECRET_PATH: {{ .Values.snapshotAgent.config.baoSecretPath }}
   {{- end }}
-  {{- if .Values.snapshotAgent.config.baoTokenPath }}
+  {{- if .Values.snapshotAgent.config.tokenPath }}
   TOKEN_PATH: {{ .Values.snapshotAgent.config.tokenPath }}
   {{- end }}
   BAO_ROLE: {{ .Values.snapshotAgent.config.baoRole }}
