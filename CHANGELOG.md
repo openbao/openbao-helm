@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.29.1
+
 - fix(snapshot-agent): fix namespace and token path configuration
 
 ## 0.29.0
