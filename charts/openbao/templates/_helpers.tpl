@@ -1217,7 +1217,7 @@ config file from values
 {{- end -}}
 
 {{/*
-Create the name of the service account to use for the snasphot-agent
+Create the name of the service account to use for the snapshot-agent
 */}}
 {{- define "openbao.snapshotAgent.serviceAccount.name" -}}
 {{- if .Values.snapshotAgent.serviceAccount.create -}}

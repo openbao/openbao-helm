@@ -1,5 +1,7 @@
 ## Unreleased
 
+- fix(snapshot-agent): fix namespace and token path configuration
+
 ## 0.29.0
 
 - fix(httpRoute): template timeouts in rule

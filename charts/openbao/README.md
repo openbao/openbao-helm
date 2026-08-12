@@ -328,7 +328,7 @@ Kubernetes: `>= 1.30.0-0`
 | serverTelemetry.serviceMonitor.selectors | object | `{}` |  |
 | serverTelemetry.serviceMonitor.tlsConfig | object | `{}` |  |
 | snapshotAgent.annotations | object | `{}` |  |
-| snapshotAgent.config.baoAuthNamepace | string | `""` |  |
+| snapshotAgent.config.baoAuthNamespace | string | `""` |  |
 | snapshotAgent.config.baoAuthPath | string | `"kubernetes"` |  |
 | snapshotAgent.config.baoNamespace | string | `""` |  |
 | snapshotAgent.config.baoRole | string | `"snapshot"` |  |
