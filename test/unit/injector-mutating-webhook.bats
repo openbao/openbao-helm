@@ -332,3 +332,36 @@ load _helpers
 
   [ "${actual}" = "true" ]
 }
+
+#--------------------------------------------------------------------
+# matchConditions
+
+@test "injector/MutatingWebhookConfiguration: webhook.matchConditions empty by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.webhooks[0].matchConditions' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set webhook.matchConditions" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook.matchConditions[0].name=has-annotation' \
+      --set 'injector.webhook.matchConditions[0].expression=has(object.metadata.annotations)' \
+      . | tee /dev/stderr |
+      yq -r '.webhooks[0].matchConditions[] | select(.name == "has-annotation")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.name' | tee /dev/stderr)
+  [ "${actual}" = "has-annotation" ]
+
+  local actual=$(echo $object |
+      yq -r '.expression' | tee /dev/stderr)
+  [ "${actual}" = "has(object.metadata.annotations)" ]
+}

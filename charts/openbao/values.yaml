@@ -210,6 +210,16 @@ injector:
         values:
         - {{ template "openbao.name" . }}-agent-injector
 
+    # matchConditions is a list of CEL expressions for restricting the webhook to only
+    # specific requests.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-matchconditions
+    # for more details.
+    # Example:
+    # matchConditions:
+    #   - name: has-agent-inject-annotation
+    #     expression: 'has(object.metadata.annotations) && "openbao.org/agent-inject" in object.metadata.annotations'
+    matchConditions: []
+
     # Extra annotations to attach to the webhook
     annotations: {}
 

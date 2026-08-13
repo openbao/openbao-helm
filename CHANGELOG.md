@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat: Support matchConditions for agent-injector webhook
+
 ## 0.29.1
 
 - fix(snapshot-agent): fix namespace and token path configuration

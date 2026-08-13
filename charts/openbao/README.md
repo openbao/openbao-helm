@@ -150,6 +150,7 @@ Kubernetes: `>= 1.30.0-0`
 | injector.topologySpreadConstraints | list | `[]` |  |
 | injector.webhook.annotations | object | `{}` |  |
 | injector.webhook.failurePolicy | string | `"Ignore"` |  |
+| injector.webhook.matchConditions | list | `[]` |  |
 | injector.webhook.matchPolicy | string | `"Exact"` |  |
 | injector.webhook.namespaceSelector | object | `{}` |  |
 | injector.webhook.objectSelector | string | `"matchExpressions:\n- key: app.kubernetes.io/name\n  operator: NotIn\n  values:\n  - {{ template \"openbao.name\" . }}-agent-injector\n"` |  |
