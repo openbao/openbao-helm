@@ -1,6 +1,7 @@
 ## Unreleased
 
 - feat: Support matchConditions for agent-injector webhook
+- chore: update OpenBao Snapshot Agent to 0.4.1
 
 ## 0.29.1
 
