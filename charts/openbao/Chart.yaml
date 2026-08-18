@@ -25,9 +25,9 @@ sources:
 annotations:
   charts.openshift.io/name: OpenBao
   charts.openshift.io/provider: OpenBao
-  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |
-    - kind: changed
+    - kind: security
       description: |
        chore: bump OpenBao to v2.6.2
     - kind: changed
