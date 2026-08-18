@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.29.2
+
+- chore: bump OpenBao to v2.6.2
 - feat: Support matchConditions for agent-injector webhook
 - chore: update OpenBao Snapshot Agent to 0.4.1
 
