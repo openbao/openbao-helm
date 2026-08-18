@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.29.1](https://img.shields.io/badge/Version-0.29.1-informational?style=flat-square) ![AppVersion: v2.6.1](https://img.shields.io/badge/AppVersion-v2.6.1-informational?style=flat-square)
+![Version: 0.29.2](https://img.shields.io/badge/Version-0.29.2-informational?style=flat-square) ![AppVersion: v2.6.2](https://img.shields.io/badge/AppVersion-v2.6.2-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -346,7 +346,7 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.extraVolumeMounts | list | `[]` | List of additional volumeMounts for the snapshot cronjob container. |
 | snapshotAgent.extraVolumes | list | `[]` | List of extraVolumes made available to the snapshot cronjob container. |
 | snapshotAgent.image.repository | string | `"ghcr.io/openbao/openbao-snapshot-agent"` |  |
-| snapshotAgent.image.tag | string | `"0.4.0"` |  |
+| snapshotAgent.image.tag | string | `"0.4.1"` |  |
 | snapshotAgent.resources | object | `{}` |  |
 | snapshotAgent.restartPolicy | string | `"OnFailure"` |  |
 | snapshotAgent.s3CredentialsSecret | string | `""` | Existing Kubernetes secret with S3 Credentials. Must contain keys called AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY. If not provided, you must provide `snapshotAgent.extraSecretEnvironmentVars` |
