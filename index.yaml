@@ -3,6 +3,47 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: security
+          description: |
+           chore: bump OpenBao to v2.6.2
+        - kind: changed
+          description: |
+           feat: Support matchConditions for agent-injector webhook
+        - kind: changed
+          description: |
+           chore: update OpenBao Snapshot Agent to 0.4.1
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.6.2
+    created: "2026-08-18T19:55:56.24922962Z"
+    description: Official OpenBao Chart
+    digest: dc6c523aa895eb65b25aa31ad370d2facefb709d27d8020cec4177ac1524bea4
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.29.2/openbao-0.29.2.tgz
+    version: 0.29.2
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: |
            fix(snapshot-agent): fix namespace and token path configuration
@@ -2418,4 +2459,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-08-12T19:13:20.010985471Z"
+generated: "2026-08-18T19:55:56.249458868Z"
