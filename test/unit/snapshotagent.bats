@@ -53,7 +53,29 @@ load _helpers
     . | tee /dev/stderr |
     yq -r '.spec.schedule' | tee /dev/stderr)
   [ "${actual}" = "0 0 0 0 0" ]
+}
 
+@test "snapshotagent/cronjob: concurrencyPolicy default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.concurrencyPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Forbid" ]
+}
+
+@test "snapshotagent/cronjob: concurrencyPolicy Replace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.concurrencyPolicy=Replace' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.concurrencyPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Replace" ]
 }
 
 @test "snapshot/cronjob: extraVolumes" {
