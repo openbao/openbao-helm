@@ -243,20 +243,6 @@
                 "openshift": {
                     "type": "boolean"
                 },
-                "psp": {
-                    "type": "object",
-                    "properties": {
-                        "annotations": {
-                            "type": [
-                                "object",
-                                "string"
-                            ]
-                        },
-                        "enable": {
-                            "type": "boolean"
-                        }
-                    }
-                },
                 "tlsDisable": {
                     "type": "boolean"
                 }
