@@ -11,6 +11,7 @@ metadata:
   name: {{ template "openbao.fullname" . }}-snapshot
   namespace: {{ include "openbao.namespace" . }}
 spec:
+  concurrencyPolicy: {{ .Values.snapshotAgent.concurrencyPolicy }}
   schedule: {{ .Values.snapshotAgent.schedule | quote }}
   jobTemplate:
     metadata:

@@ -1,5 +1,7 @@
 ## Unreleased
 
+- fix: ConcurrencyPolicy for snapshot-agent's CronJob
+
 ## 0.29.2
 
 - chore: bump OpenBao to v2.6.2

@@ -1551,6 +1551,8 @@ snapshotAgent:
   enabled: false
   # extra Annotations for the job
   annotations: {}
+  # concurrencyPolicy for the cronjob. Can be "Allow", "Forbid", or "Replace"
+  concurrencyPolicy: "Forbid"
   # schedule of the cronjob
   schedule: "*/15 * * * *"
   restartPolicy: OnFailure
