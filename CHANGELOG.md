@@ -2,6 +2,7 @@
 
 - fix: ConcurrencyPolicy for snapshot-agent's CronJob
 - fix(chart): remove obsolete PodSecurityPolicy support
+- chore(openshift): use UBI image for csi agent
 
 ## 0.29.2
 

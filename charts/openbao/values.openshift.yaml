@@ -25,3 +25,10 @@ server:
 
   readinessProbe:
     path: "/v1/sys/health?standbyok=true&uninitcode=204"
+
+csi:
+  agent:
+    image:
+      repository: "openbao/openbao-ubi"
+      # Use the OpenBao UBI image for better OpenShift compatibility
+      # See: https://openbao.org/docs/install/#container-registries
