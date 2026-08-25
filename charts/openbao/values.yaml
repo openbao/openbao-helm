@@ -1582,6 +1582,8 @@ snapshotAgent:
     s3Uri: "s3://openbao-snapshots"
     s3ExpireDays: "14"
     s3cmdExtraFlag: "-v"
+    # The TLS server name to use as the SNI host.
+    baoTlsServerName: ""
     # The path of the Kubernetes authentication backend in OpenBao (e.g. `kubernetes`)
     baoAuthPath: "kubernetes"
     # OpenBao role to use to create the snapshot

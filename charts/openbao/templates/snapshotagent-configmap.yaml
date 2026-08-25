@@ -40,4 +40,7 @@ data:
   {{- else }}
   BAO_ADDR: {{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}
   {{- end }}
+  {{- if .Values.snapshotAgent.config.baoTlsServerName }}
+  BAO_TLS_SERVER_NAME: {{ .Values.snapshotAgent.config.baoTlsServerName }}
+  {{- end }}
 {{ end }}

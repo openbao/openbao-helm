@@ -1,5 +1,6 @@
 ## Unreleased
 
+- feat(snapshotagent): allow configuring `BAO_TLS_SERVER_NAME`
 - fix: ConcurrencyPolicy for snapshot-agent's CronJob
 - fix(chart): remove obsolete PodSecurityPolicy support
 - chore(openshift): use UBI image for csi agent

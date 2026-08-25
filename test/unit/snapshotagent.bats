@@ -224,6 +224,19 @@ load _helpers
   [ "${actual}" = "-q" ]
 }
 
+@test "snapshot/configmap: configuration: baoTlsServerName" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-configmap.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.config.baoTlsServerName=foo' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.data.BAO_TLS_SERVER_NAME' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+
 @test "snapshot/configmap: configuration: baoNamespace" {
   cd `chart_dir`
   local actual=$(helm template \
