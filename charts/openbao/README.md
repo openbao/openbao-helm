@@ -327,11 +327,13 @@ Kubernetes: `>= 1.30.0-0`
 | serverTelemetry.serviceMonitor.selectors | object | `{}` |  |
 | serverTelemetry.serviceMonitor.tlsConfig | object | `{}` |  |
 | snapshotAgent.annotations | object | `{}` |  |
+| snapshotAgent.concurrencyPolicy | string | `"Forbid"` |  |
 | snapshotAgent.config.baoAuthNamespace | string | `""` |  |
 | snapshotAgent.config.baoAuthPath | string | `"kubernetes"` |  |
 | snapshotAgent.config.baoNamespace | string | `""` |  |
 | snapshotAgent.config.baoRole | string | `"snapshot"` |  |
 | snapshotAgent.config.baoSecretPath | string | `""` |  |
+| snapshotAgent.config.baoTlsServerName | string | `""` |  |
 | snapshotAgent.config.s3Bucket | string | `"openbao-snapshots"` |  |
 | snapshotAgent.config.s3ExpireDays | string | `"14"` |  |
 | snapshotAgent.config.s3Host | string | `"s3.eu-east-1.amazonaws.com"` |  |
