@@ -1,6 +1,6 @@
 # openbao
 
-![Version: 0.29.2](https://img.shields.io/badge/Version-0.29.2-informational?style=flat-square) ![AppVersion: v2.6.2](https://img.shields.io/badge/AppVersion-v2.6.2-informational?style=flat-square)
+![Version: 0.29.3](https://img.shields.io/badge/Version-0.29.3-informational?style=flat-square) ![AppVersion: v2.6.2](https://img.shields.io/badge/AppVersion-v2.6.2-informational?style=flat-square)
 
 Official OpenBao Chart
 
@@ -327,6 +327,7 @@ Kubernetes: `>= 1.30.0-0`
 | serverTelemetry.serviceMonitor.selectors | object | `{}` |  |
 | serverTelemetry.serviceMonitor.tlsConfig | object | `{}` |  |
 | snapshotAgent.annotations | object | `{}` |  |
+| snapshotAgent.concurrencyPolicy | string | `"Forbid"` |  |
 | snapshotAgent.config.baoAuthNamespace | string | `""` |  |
 | snapshotAgent.config.baoAuthPath | string | `"kubernetes"` |  |
 | snapshotAgent.config.baoNamespace | string | `""` |  |
