@@ -35,7 +35,7 @@ annotations:
        fix(chart): remove obsolete PodSecurityPolicy support
     - kind: changed
       description: |
-        chore(openshift): use UBI image for csi agent
+       chore(openshift): use UBI image for csi agent
 
 maintainers:
   - name: OpenBao
