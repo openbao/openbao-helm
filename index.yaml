@@ -3,6 +3,47 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: |
+           fix: ConcurrencyPolicy for snapshot-agent's CronJob
+        - kind: fixed
+          description: |
+           fix(chart): remove obsolete PodSecurityPolicy support
+        - kind: changed
+          description: |
+           chore(openshift): use UBI image for csi agent
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.6.2
+    created: "2026-08-27T15:28:11.893637103Z"
+    description: Official OpenBao Chart
+    digest: 3b632c15fbfe0705914c465cb61308d0c6d413948bcdb2d6f57e3c93a571e483
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.29.3/openbao-0.29.3.tgz
+    version: 0.29.3
+  - annotations:
+      artifacthub.io/changes: |
         - kind: security
           description: |
            chore: bump OpenBao to v2.6.2
@@ -2459,4 +2500,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-08-18T19:55:56.249458868Z"
+generated: "2026-08-27T15:28:11.893925991Z"
