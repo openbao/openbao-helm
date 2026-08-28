@@ -209,7 +209,7 @@ spec:
                   # chance to propagate, so requests will not be made
                   # to this pod while it's terminating
                   "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof bao)",
-                ]
+                  ]
             {{- if .Values.server.postStart }}
             postStart:
               exec:
