@@ -1304,3 +1304,33 @@ tolerations for the snapshotAgent cronjob pod
           {{- end }}
   {{- end }}
 {{- end -}}
+
+{{/*
+nodeSelector for the snapshotAgent cronjob pod
+*/}}
+{{- define "snapshotAgent.nodeselector" -}}
+  {{- if .Values.snapshotAgent.nodeSelector }}
+          nodeSelector:
+          {{- $tp := typeOf .Values.snapshotAgent.nodeSelector }}
+          {{- if eq $tp "string" }}
+            {{ tpl .Values.snapshotAgent.nodeSelector . | nindent 12 | trim }}
+          {{- else }}
+            {{- toYaml .Values.snapshotAgent.nodeSelector | nindent 12 }}
+          {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+affinity for the snapshotAgent cronjob pod
+*/}}
+{{- define "snapshotAgent.affinity" -}}
+  {{- if .Values.snapshotAgent.affinity }}
+          affinity:
+          {{- $tp := typeOf .Values.snapshotAgent.affinity }}
+          {{- if eq $tp "string" }}
+            {{ tpl .Values.snapshotAgent.affinity . | nindent 12 | trim }}
+          {{- else }}
+            {{- toYaml .Values.snapshotAgent.affinity | nindent 12 }}
+          {{- end }}
+  {{- end }}
+{{- end -}}

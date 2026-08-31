@@ -1630,3 +1630,14 @@ snapshotAgent:
   # This should be either a multi-line string or YAML matching the Toleration array
   # in a PodSpec.
   tolerations: []
+
+  # nodeSelector labels for snapshot-agent cronjob pod assignment, formatted as a multi-line string or YAML map.
+  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+  # Example:
+  # nodeSelector:
+  #   beta.kubernetes.io/arch: amd64
+  nodeSelector: {}
+
+  # Affinity Settings for snapshot-agent cronjob pod
+  # This should be either a multi-line string or YAML matching the PodSpec's affinity field.
+  affinity: {}

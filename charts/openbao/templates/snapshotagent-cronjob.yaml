@@ -31,6 +31,8 @@ spec:
           serviceAccountName: {{  template "openbao.snapshotAgent.serviceAccount.name" . }}
           {{ template "snapshotAgent.securityContext.pod" .}}
           {{ template "snapshotAgent.tolerations" . }}
+          {{ template "snapshotAgent.nodeselector" . }}
+          {{ template "snapshotAgent.affinity" . }}
           containers:
           - name: bao-snapshot
             envFrom:

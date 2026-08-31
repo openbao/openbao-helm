@@ -326,6 +326,7 @@ Kubernetes: `>= 1.30.0-0`
 | serverTelemetry.serviceMonitor.scrapeTimeout | string | `"10s"` |  |
 | serverTelemetry.serviceMonitor.selectors | object | `{}` |  |
 | serverTelemetry.serviceMonitor.tlsConfig | object | `{}` |  |
+| snapshotAgent.affinity | object | `{}` |  |
 | snapshotAgent.annotations | object | `{}` |  |
 | snapshotAgent.concurrencyPolicy | string | `"Forbid"` |  |
 | snapshotAgent.config.baoAuthNamespace | string | `""` |  |
@@ -346,6 +347,7 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.extraVolumes | list | `[]` | List of extraVolumes made available to the snapshot cronjob container. |
 | snapshotAgent.image.repository | string | `"ghcr.io/openbao/openbao-snapshot-agent"` |  |
 | snapshotAgent.image.tag | string | `"0.4.1"` |  |
+| snapshotAgent.nodeSelector | object | `{}` |  |
 | snapshotAgent.resources | object | `{}` |  |
 | snapshotAgent.restartPolicy | string | `"OnFailure"` |  |
 | snapshotAgent.s3CredentialsSecret | string | `""` | Existing Kubernetes secret with S3 Credentials. Must contain keys called AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY. If not provided, you must provide `snapshotAgent.extraSecretEnvironmentVars` |

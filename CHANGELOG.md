@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat: Allow setting nodeSelector and affinity for snapshot-agent cronjob pod
+
 ## 0.29.3
 
 - fix: ConcurrencyPolicy for snapshot-agent's CronJob
