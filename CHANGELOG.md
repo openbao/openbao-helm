@@ -1,6 +1,7 @@
 ## Unreleased
 
 - feat: Allow setting nodeSelector and affinity for snapshot-agent cronjob pod
+- chore(snpashotAgent): update to v0.4.4
 
 ## 0.29.3
 
