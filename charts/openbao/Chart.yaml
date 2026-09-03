@@ -33,6 +33,9 @@ annotations:
     - kind: changed
       description: |
         chore(snpashotAgent): update to v0.4.4
+    - kind: fixed
+      description: |
+        fix(chart): fix invalid yaml syntax in statefulset definition
 
 maintainers:
   - name: OpenBao
