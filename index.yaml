@@ -3,6 +3,47 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: |
+            feat: Allow setting nodeSelector and affinity for snapshot-agent cronjob pod
+        - kind: changed
+          description: |
+            chore(snpashotAgent): update to v0.4.4
+        - kind: fixed
+          description: |
+            fix(chart): fix invalid yaml syntax in statefulset definition
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.6.2
+    created: "2026-09-03T14:12:52.697608641Z"
+    description: Official OpenBao Chart
+    digest: d62654eb787b70677d76b864528977277a306ac355c67f2cd8cfc301363119fb
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.29.4/openbao-0.29.4.tgz
+    version: 0.29.4
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: |
            fix: ConcurrencyPolicy for snapshot-agent's CronJob
@@ -2500,4 +2541,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-08-27T15:28:11.893925991Z"
+generated: "2026-09-03T14:12:52.697978304Z"
