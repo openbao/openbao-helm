@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.29.4
+
 - feat: Allow setting nodeSelector and affinity for snapshot-agent cronjob pod
 - chore(snpashotAgent): update to v0.4.4
 - fix(chart): fix invalid yaml syntax in statefulset definition
