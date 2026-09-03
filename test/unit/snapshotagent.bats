@@ -510,3 +510,73 @@ load _helpers
       yq '.spec.jobTemplate.spec.template.spec.tolerations == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+#--------------------------------------------------------------------
+# nodeSelector
+
+@test "snapshot/cronjob: nodeSelector not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.spec.jobTemplate.spec.template.spec | .nodeSelector? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "snapshot/cronjob: nodeSelector can be set as string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.nodeSelector=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.jobTemplate.spec.template.spec.nodeSelector == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "snapshot/cronjob: nodeSelector can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set "snapshotAgent.nodeSelector.foo=bar,snapshotAgent.nodeSelector.baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.jobTemplate.spec.template.spec.nodeSelector == {"foo": "bar", "baz": "qux"}' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# affinity
+
+@test "snapshot/cronjob: affinity not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.spec.jobTemplate.spec.template.spec | .affinity? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "snapshot/cronjob: affinity can be set as string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set 'snapshotAgent.affinity=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.jobTemplate.spec.template.spec.affinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "snapshot/cronjob: affinity can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/snapshotagent-cronjob.yaml \
+      --set 'snapshotAgent.enabled=true' \
+      --set "snapshotAgent.affinity.podAntiAffinity=foobar" \
+      . | tee /dev/stderr |
+      yq '.spec.jobTemplate.spec.template.spec.affinity.podAntiAffinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
