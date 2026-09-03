@@ -204,11 +204,11 @@ spec:
             preStop:
               exec:
                 command: [
-                  "/bin/sh", "-c",
-                  # Adding a sleep here to give the pod eviction a
-                  # chance to propagate, so requests will not be made
-                  # to this pod while it's terminating
-                  "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof bao)",
+                    "/bin/sh", "-c",
+                    # Adding a sleep here to give the pod eviction a
+                    # chance to propagate, so requests will not be made
+                    # to this pod while it's terminating
+                    "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof bao)",
                   ]
             {{- if .Values.server.postStart }}
             postStart:
