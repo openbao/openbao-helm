@@ -6,6 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -14,7 +15,7 @@ jobs:
 
       - name: Setup ocm-cli
         run: |
-          VERSION="0.26.0"
+          VERSION="0.50.0"
           ARCHIVE_FILE="ocm-${VERSION}-linux-amd64.tar.gz"
           URL="https://github.com/open-component-model/ocm/releases/download/v${VERSION}/$ARCHIVE_FILE"
 
@@ -69,8 +70,25 @@ jobs:
                             INJECTOR_REPOSITORY=${INJECTOR_REPOSITORY} \
                             INJECTOR_VERSION=${INJECTOR_VERSION}
 
+      - name: Get Sigstore OIDC token
+        run: |
+          SIGSTORE_ID_TOKEN=$(curl -sSL -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sigstore" | jq -r '.value')
+          echo "::add-mask::${SIGSTORE_ID_TOKEN}"
+          echo "SIGSTORE_ID_TOKEN=${SIGSTORE_ID_TOKEN}" >> "$GITHUB_ENV"
+
+      - name: Sign OCM component version
+        run: |
+          CHART_VERSION=$(yq '.version' ./charts/openbao/Chart.yaml)
+
+          ocm sign componentversions \
+            --algorithm sigstore-v2 \
+            --keyless \
+            --signature default \
+            ctf::./ocm/transport.ctf//openbao.org/openbao:${CHART_VERSION}
+
       - name: Push OCM artifact to OCI
         run: |
-          OCI_REGISTRY="ghcr.io/openbao"
+          OCI_REGISTRY="ghcr.io/${GITHUB_REPOSITORY_OWNER}"
           echo "Pushing to ${OCI_REGISTRY} as user '${{ github.actor }}'"
           ocm transfer ctf ./ocm/transport.ctf OCIRegistry::${OCI_REGISTRY}

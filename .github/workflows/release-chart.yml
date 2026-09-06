@@ -23,7 +23,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           current_version=$(yq .version ./charts/openbao/Chart.yaml)
-          url="https://api.github.com/repos/openbao/openbao-helm/releases/latest"
+          url="https://api.github.com/repos/${GITHUB_REPOSITORY_OWNER}/openbao-helm/releases/latest"
           latest_version=$(curl -sSfL -H "Authorization: Bearer ${GITHUB_TOKEN}" "$url" | jq -r '.tag_name' | sed 's/openbao-//')
 
           if [ "$current_version" != "$latest_version" ]; then
@@ -39,6 +39,7 @@ jobs:
     permissions:
       contents: write
       packages: write
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -51,12 +52,29 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      - name: Import PGP Private Key
+        if: ${{ env.GPG_KEY && env.GPG_PASSPHRASE }}
+        env:
+          GPG_KEY: ${{ secrets.PGP_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.PGP_KEY_PASSPHRASE }}
+        run: |
+          echo "${{ secrets.PGP_PRIVATE_KEY }}" | gpg --dearmor --output /tmp/keyring.gpg
+          echo "${{ secrets.PGP_KEY_PASSPHRASE }}" > /tmp/passphrase-file.txt
+
       - name: Run chart-releaser
         id: helm-release
         uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f # v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           CR_GENERATE_RELEASE_NOTES: true
+          CR_KEY: helm-charts+no-reply@openbao.org
+          CR_KEYRING: /tmp/keyring.gpg
+          CR_PASSPHRASE_FILE: /tmp/passphrase-file.txt
+          CR_SIGN: ${{ secrets.PGP_PRIVATE_KEY != '' }}
+
+      - name: Securely delete the PGP key and passphrase
+        if: always()
+        run: shred -f --remove=wipesync /tmp/keyring.gpg /tmp/passphrase-file.txt 2>/dev/null || true
 
       - name: Login to GHCR
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
@@ -65,7 +83,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push Helm chart to GHCR as OCI artifact
+      - name: Install cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
+      - name: Push Helm chart to GHCR as OCI artifact and sign with Cosign
         run: |
           chart_registry="ghcr.io/${GITHUB_REPOSITORY_OWNER}/charts"
           for pkg in .cr-release-packages/*.tgz; do
@@ -73,12 +94,17 @@ jobs:
               break
             fi
 
-            helm push "${pkg}" "oci://${chart_registry}"
+            push_output="$(helm push "${pkg}" "oci://${chart_registry}" 2>&1 | tee /dev/stderr)"
+            digest="$(echo "${push_output}" | grep -oE 'sha256:[0-9a-f]{64}')"
+            chart_name="$(basename "${pkg}" .tgz | sed -E 's/-[0-9]+\.[0-9]+\.[0-9]+.*$//')"
+
+            cosign sign --yes "${chart_registry}/${chart_name}@${digest}"
           done
 
   ocm:
     permissions:
       packages: write
+      id-token: write
     needs:
       - release
     name: Release OCM Artifact
