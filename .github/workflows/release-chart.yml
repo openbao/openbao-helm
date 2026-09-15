@@ -52,14 +52,14 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Import PGP Private Key
+      - name: Import GPG Private Key
         if: ${{ env.GPG_KEY && env.GPG_PASSPHRASE }}
         env:
-          GPG_KEY: ${{ secrets.PGP_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.PGP_KEY_PASSPHRASE }}
+          GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
         run: |
-          echo "${{ secrets.PGP_PRIVATE_KEY }}" | gpg --dearmor --output /tmp/keyring.gpg
-          echo "${{ secrets.PGP_KEY_PASSPHRASE }}" > /tmp/passphrase-file.txt
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --dearmor --output /tmp/keyring.gpg
+          echo "${{ secrets.GPG_KEY_PASSPHRASE }}" > /tmp/passphrase-file.txt
 
       - name: Run chart-releaser
         id: helm-release
@@ -70,9 +70,9 @@ jobs:
           CR_KEY: helm-charts+no-reply@openbao.org
           CR_KEYRING: /tmp/keyring.gpg
           CR_PASSPHRASE_FILE: /tmp/passphrase-file.txt
-          CR_SIGN: ${{ secrets.PGP_PRIVATE_KEY != '' }}
+          CR_SIGN: ${{ secrets.GPG_PRIVATE_KEY != '' }}
 
-      - name: Securely delete the PGP key and passphrase
+      - name: Securely delete the GPG key and passphrase
         if: always()
         run: shred -f --remove=wipesync /tmp/keyring.gpg /tmp/passphrase-file.txt 2>/dev/null || true
 
