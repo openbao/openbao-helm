@@ -104,7 +104,6 @@ jobs:
   ocm:
     permissions:
       packages: write
-      id-token: write
     needs:
       - release
     name: Release OCM Artifact
