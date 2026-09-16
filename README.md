@@ -44,31 +44,31 @@ Please see the many options supported in the [`values.yaml`](https://github.com/
 
 ## Verifying Chart Provenance and Integrity
 
-All OpenBao chart artifacts are signed so that provenance and integrity can be verified. See the instructions to verify artifact signatures for your chosen installation method below.
+OpenBao Helm charts are signed so that provenance and integrity can be verified. See the instructions below to verify artifact signatures for your chosen installation method.
 
-### Helm Repository
-To verify the OpenBao chart when using the standard Helm repository.
+### Verification Using GPG
+
+Both the standard Helm chart and the Helm OCI image can be verified using GPG. When using GPG to verify Helm chart signatures, ensure the required public key has been imported.
 ```bash
 curl -sSL https://github.com/openbao/openbao-helm/blob/main/pubring.asc | gpg --import
+```
 
+To verify the OpenBao chart when using the standard Helm repository.
+```bash
 helm install --verify openbao openbao/openbao
 ```
 
-### Helm OCI Registry
-When using the OCI registry, [Cosign](https://docs.sigstore.dev/cosign/) can be used to verify the OCI artifact.
+To verify the OpenBao chart when using the OCI registry.
+```bash
+helm install openbao --verify oci://ghcr.io/openbao/charts/openbao:${version}
+```
+
+### Verification Using Cosign
+
+[Cosign](https://docs.sigstore.dev/cosign/) can be used as an alterative to GPG to verify the chart provided from the OCI registry.
 ```bash
 cosign verify \
     --certificate-identity='https://github.com/openbao/openbao-helm/.github/workflows/release-chart.yml@refs/heads/main' \
     --certificate-oidc-issuer='https://token.actions.githubusercontent.com' \
-    ghcr.io/openbao/charts/openbao:0.29.4
-```
-
-### Open Component Model
-The [Open Component Model](https://ocm.software/) (OCM) artifact can be verified using Cosign.
-```bash
-ocm verify componentversions \
-    --keyless \
-    --signature default \
-    ghcr.io/openbao//openbao.org/openbao:0.29.4
-
+    ghcr.io/openbao/charts/openbao:${version}
 ```
