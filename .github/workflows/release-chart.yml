@@ -53,23 +53,15 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: GPG Import
-        id: gpg-import
-        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSWORD }}
-
-      - name: Prepare keyring for chart-releaser
+        if: ${{ env.GPG_KEY && env.GPG_PASSWORD }}
+        env:
+          GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
         run: |
-          gpg_dir=/tmp/cr-gpg
-          mkdir "$gpg_dir"
+          keyring="${{ runner.temp }}/secring.gpg"
+          passphrase_file="${{ runner.temp }}/passphrase"
 
-          keyring="$gpg_dir/secring.gpg"
-          gpg --batch --yes --pinentry-mode loopback \
-              --passphrase "${{ secrets.GPG_PASSWORD }}" \
-              --export-secret-keys > "$keyring"
-
-          passphrase_file="$gpg_dir/passphrase"
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --dearmor --output "$keyring"
           echo "${{ secrets.GPG_PASSWORD }}" > "$passphrase_file"
 
           echo "CR_KEYRING=${keyring}" >> "$GITHUB_ENV"
@@ -81,7 +73,7 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           CR_GENERATE_RELEASE_NOTES: true
-          CR_KEY: ${{ steps.gpg-import.outputs.email }}
+          CR_KEY: openbao@lists.lfedge.org
           CR_KEYRING: ${{ env.CR_KEYRING }}
           CR_PASSPHRASE_FILE: ${{ env.CR_PASSPHRASE_FILE }}
           CR_SIGN: ${{ secrets.GPG_PRIVATE_KEY != '' }}
@@ -110,7 +102,7 @@ jobs:
 
             push_output="$(helm push "${pkg}" "oci://${chart_registry}" 2>&1 | tee /dev/stderr)"
             digest="$(echo "${push_output}" | grep -oE 'sha256:[0-9a-f]{64}')"
-            chart_name="$(basename "${pkg}" .tgz | sed -E 's/-[0-9]+\.[0-9]+\.[0-9]+.*$//')"
+            chart_name="$(basename "${pkg}" .tgz | cut -d'-' -f1)"
 
             cosign sign --yes "${chart_registry}/${chart_name}@${digest}"
           done
