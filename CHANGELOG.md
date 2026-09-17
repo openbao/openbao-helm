@@ -1,5 +1,10 @@
 ## Unreleased
 
+## 0.29.5
+
+- fix(snapshotagent-cronjob): use the correct labelname as per k8s documentation (#231)
+- fix(snapshot): update to 0.4.5 (#230)
+
 ## 0.29.4
 
 - feat: Allow setting nodeSelector and affinity for snapshot-agent cronjob pod
