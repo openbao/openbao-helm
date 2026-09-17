@@ -50,7 +50,7 @@ OpenBao Helm charts are signed so that provenance and integrity can be verified.
 
 Both the standard Helm chart and the Helm OCI image can be verified using GPG. When using GPG to verify Helm chart signatures, ensure the required public key has been imported.
 ```bash
-curl -sSL https://github.com/openbao/openbao-helm/blob/main/pubring.asc | gpg --import
+curl -sSL https://openbao.org/assets/openbao-gpg-pub-20240618.asc | gpg --import
 ```
 
 To verify the OpenBao chart when using the standard Helm repository.

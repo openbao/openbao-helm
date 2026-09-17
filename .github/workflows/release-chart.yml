@@ -52,14 +52,28 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Import GPG Private Key
-        if: ${{ env.GPG_KEY && env.GPG_PASSPHRASE }}
-        env:
-          GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
+      - name: GPG Import
+        id: gpg-import
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSWORD }}
+
+      - name: Prepare keyring for chart-releaser
         run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --dearmor --output /tmp/keyring.gpg
-          echo "${{ secrets.GPG_KEY_PASSPHRASE }}" > /tmp/passphrase-file.txt
+          gpg_dir=/tmp/cr-gpg
+          mkdir "$gpg_dir"
+
+          keyring="$gpg_dir/secring.gpg"
+          gpg --batch --yes --pinentry-mode loopback \
+              --passphrase "${{ secrets.GPG_PASSWORD }}" \
+              --export-secret-keys > "$keyring"
+
+          passphrase_file="$gpg_dir/passphrase"
+          echo "${{ secrets.GPG_PASSWORD }}" > "$passphrase_file"
+
+          echo "CR_KEYRING=${keyring}" >> "$GITHUB_ENV"
+          echo "CR_PASSPHRASE_FILE=${passphrase_file}" >> "$GITHUB_ENV"
 
       - name: Run chart-releaser
         id: helm-release
@@ -67,14 +81,14 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           CR_GENERATE_RELEASE_NOTES: true
-          CR_KEY: helm-charts+no-reply@openbao.org
-          CR_KEYRING: /tmp/keyring.gpg
-          CR_PASSPHRASE_FILE: /tmp/passphrase-file.txt
+          CR_KEY: ${{ steps.gpg-import.outputs.email }}
+          CR_KEYRING: ${{ env.CR_KEYRING }}
+          CR_PASSPHRASE_FILE: ${{ env.CR_PASSPHRASE_FILE }}
           CR_SIGN: ${{ secrets.GPG_PRIVATE_KEY != '' }}
 
       - name: Securely delete the GPG key and passphrase
         if: always()
-        run: shred -f --remove=wipesync /tmp/keyring.gpg /tmp/passphrase-file.txt 2>/dev/null || true
+        run: shred -f --remove=wipesync ${{ env.CR_KEYRING }} ${{ env.CR_PASSPHRASE_FILE }} 2>/dev/null || true
 
       - name: Login to GHCR
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
