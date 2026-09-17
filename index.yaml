@@ -3,6 +3,44 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: |
+            fix(snapshotagent-cronjob): use the correct labelname as per k8s documentation
+        - kind: changed
+          description: |
+            fix(snapshot): update to 0.4.5
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.6.2
+    created: "2026-09-17T13:41:04.961099214Z"
+    description: Official OpenBao Chart
+    digest: e67f5ee9603bfe85cf9923d01fbbaaed5dc57d1800f95e154af7f2154f05daae
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.29.5/openbao-0.29.5.tgz
+    version: 0.29.5
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: |
             feat: Allow setting nodeSelector and affinity for snapshot-agent cronjob pod
@@ -2541,4 +2579,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-09-03T14:12:52.697978304Z"
+generated: "2026-09-17T13:41:04.96132881Z"
