@@ -18,14 +18,14 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "openbao.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
-        component: snapshot-agent
+        app.kubernetes.io/component: snapshot-agent
     spec:
       template:
         metadata:
           labels:
             app.kubernetes.io/name: {{ include "openbao.name" . }}
             app.kubernetes.io/instance: {{ .Release.Name }}
-            component: snapshot-agent
+            app.kubernetes.io/component: snapshot-agent
         spec:
           restartPolicy: {{ .Values.snapshotAgent.restartPolicy }}
           serviceAccountName: {{  template "openbao.snapshotAgent.serviceAccount.name" . }}
