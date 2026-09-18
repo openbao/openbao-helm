@@ -1,5 +1,8 @@
 ## Unreleased
 
+- feat: Sign Helm charts using GPG
+- feat: Sign Helm OCI images using Cosign keyless
+
 ## 0.29.5
 
 - fix(snapshotagent-cronjob): use the correct labelname as per k8s documentation (#231)
