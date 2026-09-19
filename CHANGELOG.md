@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat(snapshot-agent): support resource-specific metadata
+
 ## 0.29.5
 
 - fix(snapshotagent-cronjob): use the correct labelname as per k8s documentation (#231)

@@ -1538,11 +1538,14 @@ extraObjects: []
 snapshotAgent:
   # whether or not to enable the snapshot agent cronjob
   enabled: false
-  # extra Annotations for the job
+  # Extra labels to attach to the snapshot agent CronJob
+  # This should be a YAML map of the labels to apply to the CronJob
+  extraLabels: {}
+  # Extra Annotations to attach to the snapshot agent CronJob
   annotations: {}
-  # concurrencyPolicy for the cronjob. Can be "Allow", "Forbid", or "Replace"
+  # concurrencyPolicy for the CronJob. Can be "Allow", "Forbid", or "Replace"
   concurrencyPolicy: "Forbid"
-  # schedule of the cronjob
+  # schedule of the CronJob
   schedule: "*/15 * * * *"
   restartPolicy: OnFailure
   # service account settings for the snapshot agent
@@ -1551,6 +1554,16 @@ snapshotAgent:
     name: ""
     annotations: {}
     extraLabels: {}
+  job:
+    # Extra labels to attach to snapshot agent Jobs
+    extraLabels: {}
+    # Extra annotations to attach to snapshot agent Jobs
+    annotations: {}
+  pod:
+    # Extra labels to attach to snapshot agent Pods
+    extraLabels: {}
+    # Extra annotations to attach to snapshot agent Pods
+    annotations: {}
   # The image settings for the snapshot agent
   image:
     repository: ghcr.io/openbao/openbao-snapshot-agent
