@@ -7,6 +7,9 @@ metadata:
     app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- with .Values.snapshotAgent.extraLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- template "openbao.snapshotAgent.annotations" . }}
   name: {{ template "openbao.fullname" . }}-snapshot
   namespace: {{ include "openbao.namespace" . }}
@@ -19,6 +22,10 @@ spec:
         app.kubernetes.io/name: {{ include "openbao.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: snapshot-agent
+        {{- with .Values.snapshotAgent.job.extraLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- template "openbao.snapshotAgent.job.annotations" . }}
     spec:
       template:
         metadata:
@@ -26,6 +33,10 @@ spec:
             app.kubernetes.io/name: {{ include "openbao.name" . }}
             app.kubernetes.io/instance: {{ .Release.Name }}
             app.kubernetes.io/component: snapshot-agent
+            {{- with .Values.snapshotAgent.pod.extraLabels }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- template "openbao.snapshotAgent.pod.annotations" . }}
         spec:
           restartPolicy: {{ .Values.snapshotAgent.restartPolicy }}
           serviceAccountName: {{  template "openbao.snapshotAgent.serviceAccount.name" . }}
