@@ -1,7 +1,5 @@
 ## Unreleased
 
-- ci: update GitHub Actions for Node.js 24 with `pinact run --update --min-age 14`
-
 ## 0.29.5
 
 - fix(snapshotagent-cronjob): use the correct labelname as per k8s documentation (#231)
