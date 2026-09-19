@@ -342,12 +342,17 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.config.tokenPath | string | `""` |  |
 | snapshotAgent.enabled | bool | `false` |  |
 | snapshotAgent.extraEnvironmentVars | object | `{}` | Map of extra environment variables to set in the snapshot-agent cronjob |
+| snapshotAgent.extraLabels | object | `{}` |  |
 | snapshotAgent.extraSecretEnvironmentVars | list | `[]` | List of extra environment variables to set in the snapshot-agent cronjob These variables take value from existing Secret objects. |
 | snapshotAgent.extraVolumeMounts | list | `[]` | List of additional volumeMounts for the snapshot cronjob container. |
 | snapshotAgent.extraVolumes | list | `[]` | List of extraVolumes made available to the snapshot cronjob container. |
 | snapshotAgent.image.repository | string | `"ghcr.io/openbao/openbao-snapshot-agent"` |  |
 | snapshotAgent.image.tag | string | `"0.4.5"` |  |
+| snapshotAgent.job.annotations | object | `{}` |  |
+| snapshotAgent.job.extraLabels | object | `{}` |  |
 | snapshotAgent.nodeSelector | object | `{}` |  |
+| snapshotAgent.pod.annotations | object | `{}` |  |
+| snapshotAgent.pod.extraLabels | object | `{}` |  |
 | snapshotAgent.resources | object | `{}` |  |
 | snapshotAgent.restartPolicy | string | `"OnFailure"` |  |
 | snapshotAgent.s3CredentialsSecret | string | `""` | Existing Kubernetes secret with S3 Credentials. Must contain keys called AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY. If not provided, you must provide `snapshotAgent.extraSecretEnvironmentVars` |

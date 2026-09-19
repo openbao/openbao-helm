@@ -1232,7 +1232,7 @@ Sets extra service account annotations for the snapshot-agent
 {{- end -}}
 
 {{/*
-Sets extra snapshotAgent job annotations
+Sets extra snapshotAgent CronJob annotations
 */}}
 {{- define "openbao.snapshotAgent.annotations" -}}
   {{- if .Values.snapshotAgent.annotations }}
@@ -1243,6 +1243,36 @@ Sets extra snapshotAgent job annotations
     {{- else }}
       {{- toYaml .Values.snapshotAgent.annotations | nindent 4 }}
     {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra snapshotAgent Job annotations
+*/}}
+{{- define "openbao.snapshotAgent.job.annotations" -}}
+  {{- if .Values.snapshotAgent.job.annotations }}
+      annotations:
+        {{- $tp := typeOf .Values.snapshotAgent.job.annotations }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.snapshotAgent.job.annotations . | nindent 8 }}
+        {{- else }}
+          {{- toYaml .Values.snapshotAgent.job.annotations | nindent 8 }}
+        {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra snapshotAgent Pod annotations
+*/}}
+{{- define "openbao.snapshotAgent.pod.annotations" -}}
+  {{- if .Values.snapshotAgent.pod.annotations }}
+          annotations:
+            {{- $tp := typeOf .Values.snapshotAgent.pod.annotations }}
+            {{- if eq $tp "string" }}
+              {{- tpl .Values.snapshotAgent.pod.annotations . | nindent 12 }}
+            {{- else }}
+              {{- toYaml .Values.snapshotAgent.pod.annotations | nindent 12 }}
+            {{- end }}
   {{- end }}
 {{- end -}}
 
