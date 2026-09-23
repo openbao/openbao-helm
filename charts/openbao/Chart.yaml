@@ -29,6 +29,9 @@ annotations:
   artifacthub.io/changes: |
     - kind: changed
       description: |
+        feat: change standalone storage backend to PebbleDB
+    - kind: changed
+      description: |
         chore: bump OpenBao to 2.7.0
 
 maintainers:

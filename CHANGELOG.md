@@ -2,6 +2,7 @@
 
 ## 0.30.0
 
+- feat: change standalone storage backend to PebbleDB
 - chore: bump OpenBao to v2.7.0
 - feat: Sign Helm charts using GPG
 - feat: Sign Helm OCI images using Cosign keyless
