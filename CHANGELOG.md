@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.29.6
+
+- chore: bump OpenBao to v2.6.3
+
 ## 0.29.5
 
 - fix(snapshotagent-cronjob): use the correct labelname as per k8s documentation (#231)
