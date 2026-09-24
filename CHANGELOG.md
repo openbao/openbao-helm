@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat(snapshot-agent): support resource-specific metadata
+
 ## 0.29.6
 
 - chore: bump OpenBao to v2.6.3

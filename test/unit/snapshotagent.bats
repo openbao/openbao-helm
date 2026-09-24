@@ -31,18 +31,6 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
-@test "snapshotagent/cronjob: annotations:" {
-  cd `chart_dir`
-  local actual=$(helm template \
-    --show-only templates/snapshotagent-cronjob.yaml \
-    --set 'snapshotAgent.enabled=true' \
-    --set 'snapshotAgent.annotations.example\.com/foo=bar' \
-    --namespace foo \
-    . | tee /dev/stderr |
-    yq -r '.metadata.annotations["example.com/foo"]' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
-}
-
 @test "snapshotagent/cronjob: schedule:" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -330,6 +318,84 @@ load _helpers
     . | tee /dev/stderr |
     yq -r '.data.BAO_ADDR' | tee /dev/stderr)
   [ "${actual}" = "https://bao.example.com" ]
+}
+
+#--------------------------------------------------------------------
+# annotations
+
+@test "snapshotagent/cronjob: specify annotations:" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.annotations.example\.com/foo=bar' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.metadata.annotations["example.com/foo"]' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "snapshotagent/job: specify annotations:" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.job.annotations.example\.com/foo=bar' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.jobTemplate.metadata.annotations["example.com/foo"]' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "snapshotagent/pod: specify annotations:" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.pod.annotations.example\.com/foo=bar' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.jobTemplate.spec.template.metadata.annotations["example.com/foo"]' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+#--------------------------------------------------------------------
+# extraLabels
+
+@test "snapshotagent/cronjob: specify extraLabels:" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.extraLabels.foo=bar' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "snapshotagent/job: specify extraLabels:" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.job.extraLabels.foo=bar' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.jobTemplate.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "snapshotagent/pod: specify extraLabels:" {
+  cd `chart_dir`
+  local actual=$(helm template \
+    --show-only templates/snapshotagent-cronjob.yaml \
+    --set 'snapshotAgent.enabled=true' \
+    --set 'snapshotAgent.pod.extraLabels.foo=bar' \
+    --namespace foo \
+    . | tee /dev/stderr |
+    yq -r '.spec.jobTemplate.spec.template.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
 }
 
 #--------------------------------------------------------------------
