@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat: Sign Helm charts using GPG
+- feat: Sign Helm OCI images using Cosign keyless
 - feat(snapshot-agent): support resource-specific metadata
 
 ## 0.29.6
