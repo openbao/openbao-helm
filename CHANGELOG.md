@@ -1,5 +1,7 @@
 ## Unreleased
 
+- fix(helm): use inline icon image so it works in disconnected environments
+
 ## 0.29.6
 
 - chore: bump OpenBao to v2.6.3
