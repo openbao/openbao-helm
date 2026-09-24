@@ -41,3 +41,34 @@ helm install oci://ghcr.io/openbao/charts/openbao
 ```
 
 Please see the many options supported in the [`values.yaml`](https://github.com/openbao/openbao-helm/blob/main/charts/openbao/values.yaml) file. These are also fully documented directly in the [openbao README](https://github.com/openbao/openbao-helm/blob/main/charts/openbao/README.md) along with more detailed installation instructions.
+
+## Verifying Chart Provenance and Integrity
+
+OpenBao Helm charts are signed so that provenance and integrity can be verified. See the instructions below to verify artifact signatures for your chosen installation method.
+
+### Verification Using GPG
+
+Both the standard Helm chart and the Helm OCI image can be verified using GPG. When using GPG to verify Helm chart signatures, ensure the required public key has been imported.
+```bash
+curl -sSL https://openbao.org/assets/openbao-gpg-pub-20240618.asc | gpg --import
+```
+
+To verify the OpenBao chart when using the standard Helm repository.
+```bash
+helm install --verify openbao openbao/openbao
+```
+
+To verify the OpenBao chart when using the OCI registry.
+```bash
+helm install openbao --verify oci://ghcr.io/openbao/charts/openbao:${version}
+```
+
+### Verification Using Cosign
+
+[Cosign](https://docs.sigstore.dev/cosign/) can be used as an alterative to GPG to verify the chart provided from the OCI registry.
+```bash
+cosign verify \
+    --certificate-identity='https://github.com/openbao/openbao-helm/.github/workflows/release-chart.yml@refs/heads/main' \
+    --certificate-oidc-issuer='https://token.actions.githubusercontent.com' \
+    ghcr.io/openbao/charts/openbao:${version}
+```
