@@ -953,7 +953,7 @@ server:
 
   # Run OpenBao in "standalone" mode. This is the default mode that will deploy if
   # no arguments are given to helm. This requires a PVC for data storage to use
-  # the "file" backend.  This mode is not highly available and should not be scaled
+  # the "pebbledb" backend. This mode is not highly available and should not be scaled
   # past a single replica.
   standalone:
     enabled: "-"
@@ -979,8 +979,8 @@ server:
         #  unauthenticated_metrics_access = "true"
         #}
       }
-      storage "file" {
-        path = "/openbao/data"
+      storage "pebbledb" {
+        path = "/openbao/data/pebbledb"
       }
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The

@@ -3,8 +3,8 @@
 
 apiVersion: v2
 name: openbao
-version: 0.29.6
-appVersion: v2.6.3
+version: 0.30.0
+appVersion: v2.7.0
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
 home: https://github.com/openbao/openbao-helm
@@ -25,11 +25,14 @@ sources:
 annotations:
   charts.openshift.io/name: OpenBao
   charts.openshift.io/provider: OpenBao
-  artifacthub.io/containsSecurityUpdates: "true"
+  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: changed
       description: |
-        chore: bump OpenBao to 2.6.3
+        feat: change standalone storage backend to PebbleDB
+    - kind: changed
+      description: |
+        chore: bump OpenBao to 2.7.0
 
 maintainers:
   - name: OpenBao
