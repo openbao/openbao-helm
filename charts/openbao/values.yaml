@@ -980,7 +980,7 @@ server:
         #}
       }
       storage "pebbledb" {
-        path = "/openbao/data"
+        path = "/openbao/data/pebbledb"
       }
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
