@@ -1,5 +1,7 @@
 ## Unreleased
 
+- ocm: remove openbao-hsm-ubi-image reference
+
 ## 0.30.0
 
 - BREAKING: Standalone storage backend changed to PebbleDB, manual migration required

@@ -33,15 +33,6 @@ components:
           type: ociArtifact
           imageReference: "{{ .OPENBAO_REGISTRY }}/openbao/openbao-ubi:{{ .OPENBAO_VERSION }}"
 
-      # HSM Image referenced in the Helm chart
-      - name: openbao-hsm-ubi-image
-        type: ociImage
-        version: "{{ .OPENBAO_VERSION }}"
-        relation: local
-        access:
-          type: ociArtifact
-          imageReference: "{{ .OPENBAO_REGISTRY }}/openbao/openbao-hsm-ubi:{{ .OPENBAO_VERSION }}"
-
       # CSI Image referenced in the Helm chart
       - name: openbao-csi-provider
         type: ociImage
