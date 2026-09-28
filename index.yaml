@@ -4,6 +4,51 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: changed
+          description: "BREAKING: Standalone storage backend changed to PebbleDB, manual migration required"
+          links:
+            - name: Migration guide
+              url: https://openbao.org/docs/guides/migrations/k8s-pebbledb
+        - kind: changed
+          description: "Bump OpenBao to 2.7.0"
+        - kind: added
+          description: "Sign Helm charts using GPG"
+        - kind: added
+          description: "Sign Helm OCI images using Cosign keyless"
+        - kind: added
+          description: "snapshot-agent: support resource-specific metadata"
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.7.0
+    created: "2026-09-28T15:33:39.487887337Z"
+    description: Official OpenBao Chart
+    digest: ee6c2642f63efa06edc1f8b70b7652fc01f82c832c6e3a272f93427b0dfe26bf
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.30.0/openbao-0.30.0.tgz
+    version: 0.30.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
           description: |
             chore: bump OpenBao to 2.6.3
       artifacthub.io/containsSecurityUpdates: "true"
@@ -2614,4 +2659,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-09-23T18:21:28.73751176Z"
+generated: "2026-09-28T15:33:39.488038183Z"
