@@ -2,8 +2,8 @@
 
 ## 0.30.0
 
-- feat: change standalone storage backend to PebbleDB
-- chore: bump OpenBao to v2.7.0
+- BREAKING: Standalone storage backend changed to PebbleDB, manual migration required
+- chore: Bump OpenBao to v2.7.0
 - feat: Sign Helm charts using GPG
 - feat: Sign Helm OCI images using Cosign keyless
 - feat(snapshot-agent): support resource-specific metadata

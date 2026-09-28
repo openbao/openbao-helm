@@ -34,6 +34,12 @@ annotations:
           url: https://openbao.org/docs/guides/migrations/k8s-pebbledb
     - kind: changed
       description: "Bump OpenBao to 2.7.0"
+    - kind: added
+      description: "Sign Helm charts using GPG"
+    - kind: added
+      description: "Sign Helm OCI images using Cosign keyless"
+    - kind: added
+      description: "snapshot-agent: support resource-specific metadata"
 
 maintainers:
   - name: OpenBao
