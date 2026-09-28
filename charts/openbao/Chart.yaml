@@ -28,11 +28,12 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: changed
-      description: |
-        feat: change standalone storage backend to PebbleDB
+      description: "BREAKING: Standalone storage backend changed to PebbleDB, manual migration required"
+      links:
+        - name: Migration guide
+          url: https://openbao.org/docs/guides/migrations/k8s-pebbledb
     - kind: changed
-      description: |
-        chore: bump OpenBao to 2.7.0
+      description: "Bump OpenBao to 2.7.0"
 
 maintainers:
   - name: OpenBao
