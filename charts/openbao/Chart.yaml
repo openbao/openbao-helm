@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.30.0
+version: 0.30.1
 appVersion: v2.7.0
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -27,19 +27,8 @@ annotations:
   charts.openshift.io/provider: OpenBao
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: changed
-      description: "BREAKING: Standalone storage backend changed to PebbleDB, manual migration required"
-      links:
-        - name: Migration guide
-          url: https://openbao.org/docs/guides/migrations/k8s-pebbledb
-    - kind: changed
-      description: "Bump OpenBao to 2.7.0"
-    - kind: added
-      description: "Sign Helm charts using GPG"
-    - kind: added
-      description: "Sign Helm OCI images using Cosign keyless"
-    - kind: added
-      description: "snapshot-agent: support resource-specific metadata"
+    - kind: fixed
+      description: "fix(ocm): remove openbao-hsm-ubi-image reference"
 
 maintainers:
   - name: OpenBao
