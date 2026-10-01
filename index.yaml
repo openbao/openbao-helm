@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          chore: Update OpenBao to v2.7.1
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.7.1
+    created: "2026-10-01T18:21:12.899645645Z"
+    description: Official OpenBao Chart
+    digest: 53a55a9e53e28656b8d4b1264a549116267391eb2652735a855cd94fec461c9f
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.30.2/openbao-0.30.2.tgz
+    version: 0.30.2
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: "fix(ocm): remove openbao-hsm-ubi-image reference"
       artifacthub.io/containsSecurityUpdates: "false"
@@ -2693,4 +2727,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-10-01T12:06:02.264331395Z"
+generated: "2026-10-01T18:21:12.899843604Z"
