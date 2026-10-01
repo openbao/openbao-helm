@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.30.2
+
+- chore: bump OpenBao to v2.7.1
+
 ## 0.30.1
 
 - ocm: remove openbao-hsm-ubi-image reference
