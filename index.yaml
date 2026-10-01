@@ -3,6 +3,40 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: "fix(ocm): remove openbao-hsm-ubi-image reference"
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.7.0
+    created: "2026-10-01T12:06:02.264005455Z"
+    description: Official OpenBao Chart
+    digest: 0a29f475302e70ddde3c5f3588412bbdee099a568f801a2701e5405cd85e1541
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.30.1/openbao-0.30.1.tgz
+    version: 0.30.1
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: "BREAKING: Standalone storage backend changed to PebbleDB, manual migration required"
           links:
@@ -2659,4 +2693,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-09-28T15:33:39.488038183Z"
+generated: "2026-10-01T12:06:02.264331395Z"
