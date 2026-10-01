@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.30.1
+
 - ocm: remove openbao-hsm-ubi-image reference
 
 ## 0.30.0
