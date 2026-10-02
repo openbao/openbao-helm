@@ -21,14 +21,14 @@ spec:
       labels:
         app: pgdump
       annotations:
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-secret-db-creds: "database/creds/db-backup"
-        vault.hashicorp.com/agent-inject-template-db-creds: |
+        openbao.org/agent-inject: "true"
+        openbao.org/agent-inject-secret-db-creds: "database/creds/db-backup"
+        openbao.org/agent-inject-template-db-creds: |
           {{- with secret "database/creds/db-backup" -}}
           postgresql://{{ .Data.username }}:{{ .Data.password }}@postgres.acceptance.svc.cluster.local:5432/mydb
           {{- end }}
-        vault.hashicorp.com/role: "db-backup"
-        vault.hashicorp.com/agent-pre-populate-only: "true"
+        openbao.org/role: "db-backup"
+        openbao.org/agent-pre-populate-only: "true"
     spec:
       serviceAccountName: pgdump
       containers:
