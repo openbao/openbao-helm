@@ -10,7 +10,7 @@ injector:
   image:
     registry: "registry.connect.redhat.com"
     repository: "hashicorp/vault-k8s"
-    tag: "1.7.2-ubi"
+    tag: "1.7.6-ubi"
 
   agentImage:
     repository: "openbao/openbao-ubi"

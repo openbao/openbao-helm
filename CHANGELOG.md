@@ -1,6 +1,7 @@
 ## Unreleased
 
 - fix(chart): ensure name uniqueness for clusterrolebinding resources (#243)
+- fix(deps): Update injector to v1.7.6
 
 ## 0.30.2
 
