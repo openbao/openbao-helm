@@ -8,7 +8,7 @@ SPDX-License-Identifier: MPL-2.0
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ template "openbao.fullname" . }}-server-binding
+  name: {{ include "openbao.namespace" . }}-{{ template "openbao.fullname" . }}-server-binding
   labels:
     helm.sh/chart: {{ include "openbao.chart" . }}
     app.kubernetes.io/name: {{ include "openbao.name" . }}

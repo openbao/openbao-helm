@@ -1,5 +1,7 @@
 ## Unreleased
 
+- fix(chart): ensure name uniqueness for clusterrolebinding resources (#243)
+
 ## 0.30.2
 
 - chore: bump OpenBao to v2.7.1
