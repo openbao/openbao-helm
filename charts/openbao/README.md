@@ -109,7 +109,7 @@ Kubernetes: `>= 1.30.0-0`
 | injector.image.pullPolicy | string | `"IfNotPresent"` | image pull policy to use for k8s image. if tag is "latest", set to "Always" |
 | injector.image.registry | string | `"docker.io"` | image registry to use for k8s image |
 | injector.image.repository | string | `"hashicorp/vault-k8s"` | image repo to use for k8s image |
-| injector.image.tag | string | `"1.7.2"` | image tag to use for k8s image |
+| injector.image.tag | string | `"1.7.6"` | image tag to use for k8s image |
 | injector.leaderElector | object | `{"enabled":true}` | If multiple replicas are specified, by default a leader will be determined so that only one injector attempts to create TLS certificates. |
 | injector.livenessProbe.failureThreshold | int | `2` | When a probe fails, Kubernetes will try failureThreshold times before giving up |
 | injector.livenessProbe.initialDelaySeconds | int | `5` | Number of seconds after the container has started before probe initiates |
