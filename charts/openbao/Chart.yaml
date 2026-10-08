@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.30.2
+version: 0.30.3
 appVersion: v2.7.1
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -25,10 +25,12 @@ sources:
 annotations:
   charts.openshift.io/name: OpenBao
   charts.openshift.io/provider: OpenBao
-  artifacthub.io/containsSecurityUpdates: "true"
+  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: changed
-      chore: Update OpenBao to v2.7.1
+    - kind: fixed
+      fix(chart): ensure name uniqueness for clusterrolebinding resources
+    - kind: fixed
+      fix(deps): update vault-k8s injector to 1.7.6
 
 maintainers:
   - name: OpenBao
