@@ -3,6 +3,42 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          fix(chart): ensure name uniqueness for clusterrolebinding resources
+        - kind: fixed
+          fix(deps): update vault-k8s injector to 1.7.6
+      artifacthub.io/containsSecurityUpdates: "false"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.7.1
+    created: "2026-10-08T20:13:26.917403752Z"
+    description: Official OpenBao Chart
+    digest: d50ed31b8305f430df308c342dd3c1efa877222380e99cb480f74f070d6beaa8
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.30.3/openbao-0.30.3.tgz
+    version: 0.30.3
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           chore: Update OpenBao to v2.7.1
       artifacthub.io/containsSecurityUpdates: "true"
@@ -2727,4 +2763,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-10-01T18:21:12.899843604Z"
+generated: "2026-10-08T20:13:26.917769116Z"
