@@ -385,7 +385,7 @@ server:
     # -- image registry to use for server image
     registry: "quay.io"
     # -- image repo to use for server image
-    repository: "openbao/openbao"
+    repository: "openbao/openbao-distroless"
     # -- image tag to use for server image - defaults to chart appVersion
     tag: ""
     # -- image pull policy to use for server image. if tag is "latest", set to "Always"
