@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat(image): use distroless image for server
+
 ## 0.30.3
 
 - fix(chart): ensure name uniqueness for clusterrolebinding resources (#243)
