@@ -1,0 +1,56 @@
+suite: OpenBao chart rendering
+templates:
+  - templates/*.yaml
+tests:
+  - it: renders the default standalone deployment
+    asserts:
+      - matchSnapshot: {}
+
+  - it: renders a development deployment
+    set:
+      server.dev.enabled: true
+      server.standalone.enabled: false
+    asserts:
+      - matchSnapshot: {}
+
+  - it: renders a highly available deployment
+    set:
+      server.ha.enabled: true
+      server.standalone.enabled: false
+    asserts:
+      - matchSnapshot: {}
+
+  - it: renders the injector without an in-cluster server
+    set:
+      global.externalVaultAddr: https://openbao.example.com
+    asserts:
+      - matchSnapshot: {}
+
+  - it: renders CSI resources
+    set:
+      csi.enabled: true
+    asserts:
+      - matchSnapshot: {}
+
+  - it: renders service monitor and Prometheus rules
+    set:
+      server.telemetry.serviceMonitor.enabled: true
+      server.telemetry.prometheusRules.enabled: true
+      server.telemetry.prometheusRules.rules[0].alert: OpenBaoDown
+      server.telemetry.prometheusRules.rules[0].expr: up == 0
+      server.telemetry.prometheusRules.rules[0].for: 5m
+      server.telemetry.prometheusRules.rules[0].labels.severity: critical
+    asserts:
+      - matchSnapshot: {}
+
+  - it: renders Gateway API resources
+    set:
+      server.route.enabled: true
+      server.route.host: openbao.example.com
+      server.route.tls.termination: edge
+      server.httpRoute.enabled: true
+      server.httpRoute.hostnames[0]: openbao.example.com
+      server.tlsRoute.enabled: true
+      server.tlsRoute.hostnames[0]: openbao.example.com
+    asserts:
+      - matchSnapshot: {}
