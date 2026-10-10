@@ -1,12 +1,15 @@
 name: Tests
 on: [push, workflow_dispatch, pull_request]
 jobs:
-  bats-unit-tests:
+  helm-unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: ./.github/actions/setup-test-tools
-      - run: bats --tap --timing ./test/unit
+      - name: Install helm-unittest
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version "${HELM_UNITTEST_VERSION}"
+        env:
+          HELM_UNITTEST_VERSION: "1.2.1"
+      - run: helm unittest --strict ./charts/openbao
   chart-verifier:
     runs-on: ubuntu-latest
     env:
