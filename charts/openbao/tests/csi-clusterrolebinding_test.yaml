@@ -1,0 +1,51 @@
+suite: OpenBao CSI ClusterRoleBinding Test
+templates:
+  - templates/csi-clusterrolebinding.yaml
+release:
+  name: release-name
+  namespace: foo
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: is rendered when CSI is enabled
+    set:
+      csi.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: references the expected ClusterRole
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: roleRef.name
+          value: release-name-openbao-csi-provider-clusterrole
+
+  - it: references the expected service account
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: subjects[0].name
+          value: release-name-openbao-csi-provider
+
+  - it: uses the release namespace for the service account
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: subjects[0].namespace
+          value: foo
+
+  - it: allows the global namespace to override the service account namespace
+    set:
+      csi.enabled: true
+      global.namespace: bar
+    asserts:
+      - equal:
+          path: subjects[0].namespace
+          value: bar

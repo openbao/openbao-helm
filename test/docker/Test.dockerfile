@@ -13,6 +13,7 @@ FROM docker.mirror.hashicorp.services/alpine:latest
 WORKDIR /root
 
 ENV BATS_VERSION "1.3.0"
+ENV HELM_UNITTEST_VERSION "1.2.1"
 ENV TERRAFORM_VERSION "0.12.10"
 
 # base packages
@@ -52,7 +53,11 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s
 # helm
 RUN curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
-# bats
+# helm-unittest
+RUN helm plugin install https://github.com/helm-unittest/helm-unittest.git \
+    --version ${HELM_UNITTEST_VERSION}
+
+# bats (acceptance tests)
 RUN curl -sSL https://github.com/bats-core/bats-core/archive/v${BATS_VERSION}.tar.gz -o /tmp/bats.tgz \
     && tar -zxf /tmp/bats.tgz -C /tmp \
     && /bin/bash /tmp/bats-core-$BATS_VERSION/install.sh /usr/local
