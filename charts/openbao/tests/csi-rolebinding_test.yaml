@@ -1,0 +1,36 @@
+suite: OpenBao CSI RoleBinding Test
+templates:
+  - templates/csi-rolebinding.yaml
+release:
+  name: release-name
+  namespace: foo
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: uses the expected name
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: release-name-openbao-csi-provider-rolebinding
+
+  - it: uses the release namespace
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: foo
+
+  - it: allows the global namespace to override the release namespace
+    set:
+      csi.enabled: true
+      global.namespace: bar
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: bar
