@@ -10,12 +10,20 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: is rendered when CSI is enabled
+  - it: renders with the expected basic defaults when CSI is enabled
     set:
       csi.enabled: true
     asserts:
       - hasDocuments:
           count: 1
+      - equal:
+          path: metadata.namespace
+          value: foo
+      - isNull:
+          path: spec.template.spec.priorityClassName
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: release-name-openbao-csi-provider
 
   - it: remains rendered when CSI is enabled and global is disabled
     set:
@@ -24,14 +32,6 @@ tests:
     asserts:
       - hasDocuments:
           count: 1
-
-  - it: uses the release namespace
-    set:
-      csi.enabled: true
-    asserts:
-      - equal:
-          path: metadata.namespace
-          value: foo
 
   - it: allows the global namespace to override the release namespace
     set:
@@ -42,13 +42,6 @@ tests:
           path: metadata.namespace
           value: bar
 
-  - it: does not set a priority class by default
-    set:
-      csi.enabled: true
-    asserts:
-      - isNull:
-          path: spec.template.spec.priorityClassName
-
   - it: allows setting a priority class
     set:
       csi.enabled: true
@@ -57,14 +50,6 @@ tests:
       - equal:
           path: spec.template.spec.priorityClassName
           value: armaggeddon
-
-  - it: references the expected service account
-    set:
-      csi.enabled: true
-    asserts:
-      - equal:
-          path: spec.template.spec.serviceAccountName
-          value: release-name-openbao-csi-provider
 
   - it: allows configuring provider and agent images
     set:
@@ -99,12 +84,14 @@ tests:
       - lengthEqual:
           path: spec.template.spec.imagePullSecrets
           count: 2
-      - equal:
-          path: spec.template.spec.imagePullSecrets[0].name
-          value: foo
-      - equal:
-          path: spec.template.spec.imagePullSecrets[1].name
-          value: bar
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: foo
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: bar
 
   - it: supports image pull secrets as strings
     set:
@@ -116,19 +103,33 @@ tests:
       - lengthEqual:
           path: spec.template.spec.imagePullSecrets
           count: 2
-      - equal:
-          path: spec.template.spec.imagePullSecrets[0].name
-          value: foo
-      - equal:
-          path: spec.template.spec.imagePullSecrets[1].name
-          value: bar
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: foo
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: bar
 
-  - it: does not set image pull secrets by default
+  - it: uses the expected provider defaults
     set:
       csi.enabled: true
     asserts:
       - isNull:
           path: spec.template.spec.imagePullSecrets
+      - equal:
+          path: spec.template.spec.containers[0].args[1]
+          value: --debug=false
+      - equal:
+          path: spec.template.spec.containers[0].args[2]
+          value: --hmac-secret-name=openbao-csi-provider-hmac-key
+      - lengthEqual:
+          path: spec.template.spec.containers[0].args
+          count: 3
+      - equal:
+          path: spec.updateStrategy.type
+          value: RollingUpdate
 
   - it: configures the debug argument
     set:
@@ -139,22 +140,6 @@ tests:
           path: spec.template.spec.containers[0].args[1]
           value: --debug=true
 
-  - it: disables the debug argument by default
-    set:
-      csi.enabled: true
-    asserts:
-      - equal:
-          path: spec.template.spec.containers[0].args[1]
-          value: --debug=false
-
-  - it: uses the default HMAC secret argument
-    set:
-      csi.enabled: true
-    asserts:
-      - equal:
-          path: spec.template.spec.containers[0].args[2]
-          value: --hmac-secret-name=openbao-csi-provider-hmac-key
-
   - it: allows configuring the HMAC secret argument
     set:
       csi.enabled: true
@@ -163,14 +148,6 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].args[2]
           value: --hmac-secret-name=foo
-
-  - it: has three provider arguments by default
-    set:
-      csi.enabled: true
-    asserts:
-      - lengthEqual:
-          path: spec.template.spec.containers[0].args
-          count: 3
 
   - it: passes extra provider arguments
     set:
@@ -192,14 +169,6 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].args[5]
           value: first
-
-  - it: uses RollingUpdate by default
-    set:
-      csi.enabled: true
-    asserts:
-      - equal:
-          path: spec.updateStrategy.type
-          value: RollingUpdate
 
   - it: allows setting the update strategy to OnDelete
     set:
@@ -381,12 +350,11 @@ tests:
         - name: plugins
           emptyDir: {}
     asserts:
-      - equal:
-          path: spec.template.spec.volumes[3].name
-          value: plugins
-      - equal:
-          path: spec.template.spec.volumes[3].emptyDir
-          value: {}
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: plugins
+            emptyDir: {}
 
   - it: uses the default provider directory
     set:
@@ -416,15 +384,12 @@ tests:
           mountPath: /usr/local/libexec/vault
           readOnly: true
     asserts:
-      - equal:
-          path: spec.template.spec.containers[0].volumeMounts[2].name
-          value: plugins
-      - equal:
-          path: spec.template.spec.containers[0].volumeMounts[2].mountPath
-          value: /usr/local/libexec/vault
-      - equal:
-          path: spec.template.spec.containers[0].volumeMounts[2].readOnly
-          value: true
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: plugins
+            mountPath: /usr/local/libexec/vault
+            readOnly: true
 
   - it: uses the default liveness probe settings
     set:
@@ -520,27 +485,33 @@ tests:
     set:
       csi.enabled: true
     asserts:
-      - equal:
-          path: spec.template.spec.containers[0].env[0].value
-          value: unix:///var/run/vault/agent.sock
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: unix:///var/run/vault/agent.sock
 
   - it: keeps VAULT_ADDR on the agent socket with global.externalVaultAddr
     set:
       csi.enabled: true
       global.externalVaultAddr: http://openbao-outside
     asserts:
-      - equal:
-          path: spec.template.spec.containers[0].env[0].value
-          value: unix:///var/run/vault/agent.sock
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: unix:///var/run/vault/agent.sock
 
   - it: keeps VAULT_ADDR on the agent socket with global.externalBaoAddr
     set:
       csi.enabled: true
       global.externalBaoAddr: http://openbao-outside
     asserts:
-      - equal:
-          path: spec.template.spec.containers[0].env[0].value
-          value: unix:///var/run/vault/agent.sock
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: unix:///var/run/vault/agent.sock
 
   - it: ignores injector.externalVaultAddr when the agent is disabled
     set:
@@ -548,9 +519,11 @@ tests:
       csi.agent.enabled: false
       injector.externalVaultAddr: http://openbao-outside
     asserts:
-      - equal:
-          path: spec.template.spec.containers[0].env[0].value
-          value: http://release-name-openbao.foo.svc:8200
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: http://release-name-openbao.foo.svc:8200
 
   - it: uses global.externalVaultAddr when the agent is disabled
     set:
@@ -558,9 +531,11 @@ tests:
       csi.agent.enabled: false
       global.externalVaultAddr: http://openbao-outside
     asserts:
-      - equal:
-          path: spec.template.spec.containers[0].env[0].value
-          value: http://openbao-outside
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: http://openbao-outside
 
   - it: uses global.externalBaoAddr when the agent is disabled
     set:
@@ -568,9 +543,11 @@ tests:
       csi.agent.enabled: false
       global.externalBaoAddr: http://openbao-outside
     asserts:
-      - equal:
-          path: spec.template.spec.containers[0].env[0].value
-          value: http://openbao-outside
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: http://openbao-outside
 
   - it: gives global.externalBaoAddr precedence when the agent is disabled
     set:
@@ -579,9 +556,11 @@ tests:
       global.externalBaoAddr: http://openbao-outside
       global.externalVaultAddr: http://vault-outside
     asserts:
-      - equal:
-          path: spec.template.spec.containers[0].env[0].value
-          value: http://openbao-outside
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: http://openbao-outside
 
   - it: does not set a pod security context by default
     set:
@@ -690,18 +669,22 @@ tests:
       csi.enabled: true
       csi.agent.logLevel: error
     asserts:
-      - equal:
-          path: spec.template.spec.containers[1].env[0].value
-          value: error
+      - contains:
+          path: spec.template.spec.containers[1].env
+          content:
+            name: BAO_LOG_LEVEL
+            value: error
 
   - it: configures the agent log format
     set:
       csi.enabled: true
       csi.agent.logFormat: json
     asserts:
-      - equal:
-          path: spec.template.spec.containers[1].env[1].value
-          value: json
+      - contains:
+          path: spec.template.spec.containers[1].env
+          content:
+            name: BAO_LOG_FORMAT
+            value: json
 
   - it: does not set agent resources by default
     set:

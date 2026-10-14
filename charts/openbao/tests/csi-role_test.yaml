@@ -10,7 +10,7 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: uses the expected name and default HMAC secret name
+  - it: uses the expected defaults
     set:
       csi.enabled: true
     asserts:
@@ -20,11 +20,6 @@ tests:
       - equal:
           path: rules[0].resourceNames[0]
           value: openbao-csi-provider-hmac-key
-
-  - it: uses the release namespace
-    set:
-      csi.enabled: true
-    asserts:
       - equal:
           path: metadata.namespace
           value: foo

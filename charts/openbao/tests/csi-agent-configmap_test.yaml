@@ -10,21 +10,24 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: uses the expected name
+  - it: uses the expected name and release namespace
     set:
       csi.enabled: true
     asserts:
       - equal:
           path: metadata.name
           value: release-name-openbao-csi-provider-agent-config
-
-  - it: uses the release namespace
-    set:
-      csi.enabled: true
-    asserts:
       - equal:
           path: metadata.namespace
           value: foo
+
+  - it: is not rendered when the agent is disabled
+    set:
+      csi.enabled: true
+      csi.agent.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
 
   - it: allows the global namespace to override the release namespace
     set:

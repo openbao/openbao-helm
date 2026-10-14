@@ -9,17 +9,12 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: is rendered when CSI is enabled
+  - it: renders with the expected name when CSI is enabled
     set:
       csi.enabled: true
     asserts:
       - hasDocuments:
           count: 1
-
-  - it: uses the expected name
-    set:
-      csi.enabled: true
-    asserts:
       - equal:
           path: metadata.name
           value: release-name-openbao-csi-provider-clusterrole
