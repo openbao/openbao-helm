@@ -1,0 +1,49 @@
+suite: OpenBao CSI Agent ConfigMap Test
+templates:
+  - templates/csi-agent-configmap.yaml
+tests:
+  - it: is not renedered by default
+    asserts:
+      - matchSnapshot: {}
+
+  - it: renders a configmap when enabled
+    set:
+      csi.enabled: true
+    asserts:
+      - matchSnapshot: {}
+
+  - it: allows overriding the namespace
+    set:
+      csi.enabled: true
+      global.namespace: bar
+    asserts:
+      - matchSnapshot: {}
+
+  - it: is not affected by the injector's OpenBao address
+    set:
+      csi.enabled: true
+      injector.externalBaoAddress: "http://fopenbao-outside"
+    asserts:
+      - matchSnapshot: {}
+
+  - it: renders correctly when OpenBao address is set in global.
+    set:
+      csi.enabled: true
+      global.externalBaoAddress: "http://openbao-outside"
+    asserts:
+      - matchSnapshot: {}
+
+  - it: renders correctly when OpenBao address is set in global (over externalVaultAddress)
+    set:
+      csi.enabled: true
+      global.externalVaultAddress: "http://vault-outside"
+    asserts:
+      - matchSnapshot: {}
+
+  - it: renders correctly when OpenBao address is set in global (check precedence)
+    set:
+      csi.enabled: true
+      global.externalVaultAddress: "http://vault-outside"
+      global.externalBaoAddress: "http://openbao-outside"
+    asserts:
+      - matchSnapshot: {}
