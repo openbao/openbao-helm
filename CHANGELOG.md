@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.30.4
+
+- fix(grafana/dashboard): add Namespace variable (#252)
+
 ## 0.30.3
 
 - fix(chart): ensure name uniqueness for clusterrolebinding resources (#243)
