@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.30.3
+version: 0.30.4
 appVersion: v2.7.1
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -28,9 +28,7 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: fixed
-      fix(chart): ensure name uniqueness for clusterrolebinding resources
-    - kind: fixed
-      fix(deps): update vault-k8s injector to 1.7.6
+      description: fix(grafana/dashboard): add Namespace variable
 
 maintainers:
   - name: OpenBao
