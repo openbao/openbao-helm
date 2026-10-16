@@ -5,6 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # continue using bats testing until we migrated everything to helm unittest
+      - uses: ./.github/actions/setup-test-tools
+      - run: bats --tap --timing ./test/unit
       - name: Install helm-unittest
         run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version "${HELM_UNITTEST_VERSION}"
         env:
