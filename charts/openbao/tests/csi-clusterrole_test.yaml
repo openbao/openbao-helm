@@ -1,0 +1,20 @@
+suite: OpenBao CSI ClusterRole Test
+templates:
+  - templates/csi-clusterrole.yaml
+release:
+  name: release-name
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: renders with the expected name when CSI is enabled
+    set:
+      csi.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: release-name-openbao-csi-provider-clusterrole

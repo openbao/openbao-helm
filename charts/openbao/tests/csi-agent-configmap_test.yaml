@@ -1,0 +1,79 @@
+suite: OpenBao CSI Agent ConfigMap Test
+templates:
+  - templates/csi-agent-configmap.yaml
+release:
+  name: release-name
+  namespace: foo
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: uses the expected name and release namespace
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: release-name-openbao-csi-provider-agent-config
+      - equal:
+          path: metadata.namespace
+          value: foo
+
+  - it: is not rendered when the agent is disabled
+    set:
+      csi.enabled: true
+      csi.agent.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: allows the global namespace to override the release namespace
+    set:
+      csi.enabled: true
+      global.namespace: bar
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: bar
+
+  - it: is not affected by the injector's OpenBao address
+    set:
+      csi.enabled: true
+      injector.externalVaultAddr: http://openbao-outside
+    asserts:
+      - matchRegex:
+          path: data["config.hcl"]
+          pattern: '"address" = "http://release-name-openbao.foo.svc:8200"'
+
+  - it: uses global.externalVaultAddr
+    set:
+      csi.enabled: true
+      global.externalVaultAddr: http://openbao-outside
+    asserts:
+      - matchRegex:
+          path: data["config.hcl"]
+          pattern: '"address" = "http://openbao-outside"'
+
+  - it: uses global.externalBaoAddr
+    set:
+      csi.enabled: true
+      global.externalBaoAddr: http://openbao-outside
+    asserts:
+      - matchRegex:
+          path: data["config.hcl"]
+          pattern: '"address" = "http://openbao-outside"'
+
+  - it: gives global.externalBaoAddr precedence over global.externalVaultAddr
+    set:
+      csi.enabled: true
+      global.externalBaoAddr: http://openbao-outside
+      global.externalVaultAddr: http://vault-outside
+    asserts:
+      - matchRegex:
+          path: data["config.hcl"]
+          pattern: '"address" = "http://openbao-outside"'
+      - notMatchRegex:
+          path: data["config.hcl"]
+          pattern: '"address" = "http://vault-outside"'
