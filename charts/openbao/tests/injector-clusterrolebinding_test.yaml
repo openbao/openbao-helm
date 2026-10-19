@@ -1,0 +1,43 @@
+suite: OpenBao Injector Clusterrolebinding Test
+templates:
+  - templates/injector-clusterrolebinding.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "injector/ClusterRoleBinding: enabled by default"
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/ClusterRoleBinding: disable with global.enabled"
+    set:
+      global:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/ClusterRoleBinding: service account namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - equal:
+          path: subjects[0].namespace
+          value: "foo"
+
+  - it: "injector/ClusterRoleBinding: service account namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+      global:
+        namespace: "bar"
+    asserts:
+      - equal:
+          path: subjects[0].namespace
+          value: "bar"
