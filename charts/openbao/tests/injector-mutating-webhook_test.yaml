@@ -1,0 +1,340 @@
+suite: OpenBao Injector Mutating Webhook Test
+templates:
+  - templates/injector-mutating-webhook.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "injector/MutatingWebhookConfiguration: enabled by default"
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/MutatingWebhookConfiguration: disable with global.enabled false"
+    set:
+      global:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/MutatingWebhookConfiguration: disable with injector.enabled false"
+    set:
+      injector:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/MutatingWebhookConfiguration: namespace is set (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - equal:
+          path: webhooks[0].clientConfig.service.namespace
+          value: "foo"
+
+  - it: "injector/MutatingWebhookConfiguration: namespace is set (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+      global:
+        namespace: "bar"
+    asserts:
+      - equal:
+          path: webhooks[0].clientConfig.service.namespace
+          value: "bar"
+
+  - it: "injector/MutatingWebhookConfiguration: caBundle is empty string"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - equal:
+          path: webhooks[0].clientConfig.caBundle
+          value: ""
+
+  - it: "injector/MutatingWebhookConfiguration: failurePolicy 'Ignore' by default (deprecated)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+        webhook: null
+    asserts:
+      - equal:
+          path: webhooks[0].failurePolicy
+          value: "Ignore"
+
+  - it: "injector/MutatingWebhookConfiguration: can set failurePolicy (deprecated)"
+    set:
+      injector:
+        enabled: true
+        webhook: null
+        failurePolicy: "Fail"
+    asserts:
+      - equal:
+          path: webhooks[0].failurePolicy
+          value: "Fail"
+
+  - it: "injector/MutatingWebhookConfiguration: webhook.failurePolicy 'Ignore' by default"
+    set:
+      injector:
+        enabled: true
+        failurePolicy: "Invalid"
+    asserts:
+      - equal:
+          path: webhooks[0].failurePolicy
+          value: "Ignore"
+
+  - it: "injector/MutatingWebhookConfiguration: can set webhook.failurePolicy"
+    set:
+      injector:
+        enabled: true
+        webhook:
+          failurePolicy: "Fail"
+        failurePolicy: "Invalid"
+    asserts:
+      - equal:
+          path: webhooks[0].failurePolicy
+          value: "Fail"
+
+  - it: "injector/MutatingWebhookConfiguration: webhook.matchPolicy 'Exact' by default"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - equal:
+          path: webhooks[0].matchPolicy
+          value: "Exact"
+
+  - it: "injector/MutatingWebhookConfiguration: can set webhook.matchPolicy"
+    set:
+      injector:
+        enabled: true
+        webhook:
+          matchPolicy: "Equivalent"
+    asserts:
+      - equal:
+          path: webhooks[0].matchPolicy
+          value: "Equivalent"
+
+  - it: "injector/MutatingWebhookConfiguration: timeoutSeconds by default 30"
+    set:
+      injector:
+        enabled: true
+        webhook: null
+    asserts:
+      - equal:
+          path: webhooks[0].timeoutSeconds
+          value: 30
+
+  - it: "injector/MutatingWebhookConfiguration: can set webhook.timeoutSeconds"
+    set:
+      injector:
+        enabled: true
+        webhook:
+          timeoutSeconds: 50
+    asserts:
+      - equal:
+          path: webhooks[0].timeoutSeconds
+          value: 50
+
+  - it: "injector/MutatingWebhookConfiguration: default webhookAnnotations (deprecated)"
+    set:
+      injector:
+        enabled: true
+        webhook: null
+    asserts:
+      - isNull:
+          path: metadata.annotations
+
+  - it: "injector/MutatingWebhookConfiguration: specify webhookAnnotations yaml (deprecated)"
+    set:
+      injector:
+        enabled: true
+        webhook: null
+        webhookAnnotations:
+          foo: "bar"
+    asserts:
+      - equal:
+          path: metadata.annotations.foo
+          value: "bar"
+
+  - it: "injector/MutatingWebhookConfiguration: specify webhookAnnotations yaml string (deprecated)"
+    set:
+      injector:
+        enabled: true
+        webhook: null
+        webhookAnnotations: "foo: bar"
+    asserts:
+      - equal:
+          path: metadata.annotations.foo
+          value: "bar"
+
+  - it: "injector/MutatingWebhookConfiguration: default webhook.annotations"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - isNull:
+          path: metadata.annotations
+
+  - it: "injector/MutatingWebhookConfiguration: specify webhook.annotations yaml"
+    set:
+      injector:
+        enabled: true
+        webhook:
+          annotations:
+            foo: "bar"
+        webhookAnnotations:
+          invalid: "invalid"
+    asserts:
+      - equal:
+          path: metadata.annotations.foo
+          value: "bar"
+
+  - it: "injector/MutatingWebhookConfiguration: specify webhook.annotations yaml string"
+    set:
+      injector:
+        enabled: true
+        webhook:
+          annotations: "foo: bar"
+        webhookAnnotations: "invalid: invalid"
+    asserts:
+      - equal:
+          path: metadata.annotations.foo
+          value: "bar"
+
+  - it: "injector/MutatingWebhookConfiguration: namespaceSelector empty by default (deprecated)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+        webhook: null
+    asserts:
+      - isNull:
+          path: webhooks[0].namespaceSelector
+
+  - it: "injector/MutatingWebhookConfiguration: can set namespaceSelector (deprecated)"
+    set:
+      injector:
+        enabled: true
+        namespaceSelector:
+          matchLabels:
+            injector: true
+    asserts:
+      - equal:
+          path: webhooks[0].namespaceSelector.matchLabels.injector
+          value: true
+
+  - it: "injector/MutatingWebhookConfiguration: webhook.namespaceSelector empty by default"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - isNull:
+          path: webhooks[0].namespaceSelector
+
+  - it: "injector/MutatingWebhookConfiguration: can set set webhook.namespaceSelector"
+    set:
+      injector:
+        enabled: true
+        webhook:
+          namespaceSelector:
+            matchLabels:
+              injector: true
+        namespaceSelector:
+          matchLabels:
+            injector: false
+    asserts:
+      - equal:
+          path: webhooks[0].namespaceSelector.matchLabels.injector
+          value: true
+
+  - it: "injector/MutatingWebhookConfiguration: objectSelector empty by default (deprecated)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+        webhook: null
+    asserts:
+      - isNull:
+          path: webhooks[0].objectSelector
+
+  - it: "injector/MutatingWebhookConfiguration: can set objectSelector (deprecated)"
+    set:
+      injector:
+        enabled: true
+        webhook: null
+        objectSelector:
+          matchLabels:
+            injector: true
+    asserts:
+      - equal:
+          path: webhooks[0].objectSelector.matchLabels.injector
+          value: true
+
+  - it: "injector/MutatingWebhookConfiguration: webhook.objectSelector not empty by default"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - equal:
+          path: webhooks[0].objectSelector.matchExpressions[0].key
+          value: "app.kubernetes.io/name"
+
+  - it: "injector/MutatingWebhookConfiguration: can set webhook.objectSelector"
+    set:
+      injector:
+        enabled: true
+        webhook:
+          objectSelector:
+            matchLabels:
+              injector: true
+        objectSelector:
+          matchLabels:
+            injector: false
+    asserts:
+      - equal:
+          path: webhooks[0].objectSelector.matchLabels.injector
+          value: true
+
+  - it: "injector/MutatingWebhookConfiguration: webhook.matchConditions empty by default"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - isNull:
+          path: webhooks[0].matchConditions
+
+  - it: "injector/MutatingWebhookConfiguration: can set webhook.matchConditions"
+    set:
+      injector:
+        enabled: true
+        webhook:
+          matchConditions:
+            - name: "has-annotation"
+              expression: "has(object.metadata.annotations)"
+    asserts:
+      - equal:
+          path: webhooks[0].matchConditions[?(@.name == "has-annotation")].name
+          value: "has-annotation"
+      - equal:
+          path: webhooks[0].matchConditions[?(@.name == "has-annotation")].expression
+          value: "has(object.metadata.annotations)"

@@ -1,0 +1,57 @@
+suite: OpenBao Injector Disruptionbudget Test
+templates:
+  - templates/injector-disruptionbudget.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "injector/DisruptionBudget: disabled by default"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/DisruptionBudget: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        podDisruptionBudget:
+          minAvailable: 2
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "injector/DisruptionBudget: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        podDisruptionBudget:
+          minAvailable: 2
+      global:
+        namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "injector/DisruptionBudget: configure with injector.podDisruptionBudget minAvailable"
+    set:
+      injector:
+        podDisruptionBudget:
+          minAvailable: 2
+    asserts:
+      - equal:
+          path: spec.minAvailable
+          value: 2
+
+  - it: "injector/DisruptionBudget: configure with injector.podDisruptionBudget maxUnavailable"
+    set:
+      injector:
+        podDisruptionBudget:
+          maxUnavailable: 3
+    asserts:
+      - equal:
+          path: spec.maxUnavailable
+          value: 3
