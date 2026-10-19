@@ -1,0 +1,43 @@
+suite: OpenBao CSI Role Test
+templates:
+  - templates/csi-role.yaml
+release:
+  name: release-name
+  namespace: foo
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: uses the expected defaults
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: release-name-openbao-csi-provider-role
+      - equal:
+          path: rules[0].resourceNames[0]
+          value: openbao-csi-provider-hmac-key
+      - equal:
+          path: metadata.namespace
+          value: foo
+
+  - it: allows the global namespace to override the release namespace
+    set:
+      csi.enabled: true
+      global.namespace: bar
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: bar
+
+  - it: allows configuring the HMAC secret name
+    set:
+      csi.enabled: true
+      csi.hmacSecretName: foo
+    asserts:
+      - equal:
+          path: rules[0].resourceNames[0]
+          value: foo

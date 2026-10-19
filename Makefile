@@ -4,8 +4,8 @@ CLOUDSDK_CORE_PROJECT?=openbao-helm-dev-246514
 # set to run a single test - e.g acceptance/server-ha-enterprise-dr.bats
 ACCEPTANCE_TESTS?=acceptance
 
-# filter bats unit tests to run.
-UNIT_TESTS_FILTER?='.*'
+# glob of helm-unittest suites to run, relative to the chart directory.
+UNIT_TESTS?=tests/*_test.yaml
 
 # set to 'true' to run acceptance tests locally in a kind cluster
 LOCAL_ACCEPTANCE_TESTS?=false
@@ -24,11 +24,10 @@ test-image:
 	@docker build --rm -t $(TEST_IMAGE) -f $(CURDIR)/test/docker/Test.dockerfile $(CURDIR)
 
 test-unit:
-	@docker run --rm -it -v ${PWD}:/helm-test $(TEST_IMAGE) bats -f $(UNIT_TESTS_FILTER) /helm-test/test/unit
+	@docker run --rm -it -v ${PWD}:/helm-test $(TEST_IMAGE) \
+		helm unittest --strict -f '$(UNIT_TESTS)' /helm-test/charts/openbao
 
-test-bats: test-unit test-acceptance
-
-test: test-image test-bats
+test: test-image test-unit test-acceptance
 
 # run acceptance tests on GKE
 # set google project/credential vars above
@@ -97,4 +96,4 @@ setup-kind:
 delete-kind:
 	kind delete cluster --name ${KIND_CLUSTER_NAME} || :
 
-.PHONY: values-schema test-image test-unit test-bats test test-acceptance test-destroy test-provision acceptance provision-cluster destroy-cluster
+.PHONY: values-schema test-image test-unit test test-acceptance test-destroy test-provision acceptance provision-cluster destroy-cluster

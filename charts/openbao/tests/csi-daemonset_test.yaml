@@ -1,0 +1,718 @@
+suite: OpenBao CSI DaemonSet Test
+templates:
+  - templates/csi-daemonset.yaml
+release:
+  name: release-name
+  namespace: foo
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: renders with the expected basic defaults when CSI is enabled
+    set:
+      csi.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.namespace
+          value: foo
+      - isNull:
+          path: spec.template.spec.priorityClassName
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: release-name-openbao-csi-provider
+
+  - it: remains rendered when CSI is enabled and global is disabled
+    set:
+      csi.enabled: true
+      global.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: allows the global namespace to override the release namespace
+    set:
+      csi.enabled: true
+      global.namespace: bar
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: bar
+
+  - it: allows setting a priority class
+    set:
+      csi.enabled: true
+      csi.priorityClassName: armaggeddon
+    asserts:
+      - equal:
+          path: spec.template.spec.priorityClassName
+          value: armaggeddon
+
+  - it: allows configuring provider and agent images
+    set:
+      csi.enabled: true
+      csi.image.repository: Image1
+      csi.image.tag: 0.0.1
+      csi.image.pullPolicy: PullPolicy1
+      csi.agent.image.repository: Image2
+      csi.agent.image.tag: 0.0.2
+      csi.agent.image.pullPolicy: PullPolicy2
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: quay.io/Image1:0.0.1
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: PullPolicy1
+      - equal:
+          path: spec.template.spec.containers[1].image
+          value: quay.io/Image2:0.0.2
+      - equal:
+          path: spec.template.spec.containers[1].imagePullPolicy
+          value: PullPolicy2
+
+  - it: supports image pull secrets as objects
+    set:
+      csi.enabled: true
+      global.imagePullSecrets:
+        - name: foo
+        - name: bar
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.imagePullSecrets
+          count: 2
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: foo
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: bar
+
+  - it: supports image pull secrets as strings
+    set:
+      csi.enabled: true
+      global.imagePullSecrets:
+        - foo
+        - bar
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.imagePullSecrets
+          count: 2
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: foo
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: bar
+
+  - it: uses the expected provider defaults
+    set:
+      csi.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.imagePullSecrets
+      - equal:
+          path: spec.template.spec.containers[0].args[1]
+          value: --debug=false
+      - equal:
+          path: spec.template.spec.containers[0].args[2]
+          value: --hmac-secret-name=openbao-csi-provider-hmac-key
+      - lengthEqual:
+          path: spec.template.spec.containers[0].args
+          count: 3
+      - equal:
+          path: spec.updateStrategy.type
+          value: RollingUpdate
+
+  - it: configures the debug argument
+    set:
+      csi.enabled: true
+      csi.debug: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[1]
+          value: --debug=true
+
+  - it: allows configuring the HMAC secret argument
+    set:
+      csi.enabled: true
+      csi.hmacSecretName: foo
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[2]
+          value: --hmac-secret-name=foo
+
+  - it: passes extra provider arguments
+    set:
+      csi.enabled: true
+      csi.extraArgs:
+        - --foo=bar
+        - --bar baz
+        - first
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.containers[0].args
+          count: 6
+      - equal:
+          path: spec.template.spec.containers[0].args[3]
+          value: --foo=bar
+      - equal:
+          path: spec.template.spec.containers[0].args[4]
+          value: --bar baz
+      - equal:
+          path: spec.template.spec.containers[0].args[5]
+          value: first
+
+  - it: allows setting the update strategy to OnDelete
+    set:
+      csi.enabled: true
+      csi.daemonSet.updateStrategy.type: OnDelete
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: OnDelete
+
+  - it: allows setting maxUnavailable
+    set:
+      csi.enabled: true
+      csi.daemonSet.updateStrategy.maxUnavailable: 25%
+    asserts:
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+          value: 25%
+
+  - it: does not set DaemonSet annotations by default
+    set:
+      csi.enabled: true
+    asserts:
+      - isNull:
+          path: metadata.annotations
+
+  - it: supports DaemonSet annotations as YAML
+    set:
+      csi.enabled: true
+      csi.daemonSet.annotations:
+        foo: bar
+    asserts:
+      - equal:
+          path: metadata.annotations.foo
+          value: bar
+
+  - it: supports DaemonSet annotations as a YAML string
+    set:
+      csi.enabled: true
+      csi.daemonSet.annotations: "foo: bar"
+    asserts:
+      - equal:
+          path: metadata.annotations.foo
+          value: bar
+
+  - it: does not set pod annotations by default
+    set:
+      csi.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.metadata.annotations
+
+  - it: supports pod annotations as YAML
+    set:
+      csi.enabled: true
+      csi.pod.annotations:
+        foo: bar
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.foo
+          value: bar
+
+  - it: supports pod annotations as a YAML string
+    set:
+      csi.enabled: true
+      csi.pod.annotations: "foo: bar"
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.foo
+          value: bar
+
+  - it: does not set tolerations by default
+    set:
+      csi.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.tolerations
+
+  - it: supports tolerations as a string
+    set:
+      csi.enabled: true
+      csi.pod.tolerations: foobar
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations
+          value: foobar
+
+  - it: supports tolerations as YAML
+    set:
+      csi.enabled: true
+      csi.pod.tolerations:
+        - foo: bar
+        - baz: qux
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - foo: bar
+            - baz: qux
+
+  - it: does not set a node selector by default
+    set:
+      csi.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.nodeSelector
+
+  - it: supports a node selector as a string
+    set:
+      csi.enabled: true
+      csi.pod.nodeSelector: foobar
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value: foobar
+
+  - it: supports a node selector as YAML
+    set:
+      csi.enabled: true
+      csi.pod.nodeSelector:
+        foo: bar
+        baz: qux
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector.foo
+          value: bar
+      - equal:
+          path: spec.template.spec.nodeSelector.baz
+          value: qux
+
+  - it: does not set affinity by default
+    set:
+      csi.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.affinity
+
+  - it: supports affinity as a string
+    set:
+      csi.enabled: true
+      csi.pod.affinity: foobar
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity
+          value: foobar
+
+  - it: supports affinity as YAML
+    set:
+      csi.enabled: true
+      csi.pod.affinity:
+        podAntiAffinity: foobar
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity.podAntiAffinity
+          value: foobar
+
+  - it: supports extra DaemonSet labels
+    set:
+      csi.enabled: true
+      csi.daemonSet.extraLabels.foo: bar
+    asserts:
+      - equal:
+          path: metadata.labels.foo
+          value: bar
+
+  - it: supports extra pod labels
+    set:
+      csi.enabled: true
+      csi.pod.extraLabels.foo: bar
+    asserts:
+      - equal:
+          path: spec.template.metadata.labels.foo
+          value: bar
+
+  - it: adds custom volumes
+    set:
+      csi.enabled: true
+      csi.volumes:
+        - name: plugins
+          emptyDir: {}
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: plugins
+            emptyDir: {}
+
+  - it: uses the default provider directory
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].name
+          value: providervol
+      - equal:
+          path: spec.template.spec.volumes[0].hostPath.path
+          value: /etc/kubernetes/secrets-store-csi-providers
+
+  - it: allows overriding the provider directory
+    set:
+      csi.enabled: true
+      csi.daemonSet.providersDir: /alt/csi-prov-dir
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].hostPath.path
+          value: /alt/csi-prov-dir
+
+  - it: adds custom volume mounts
+    set:
+      csi.enabled: true
+      csi.volumeMounts:
+        - name: plugins
+          mountPath: /usr/local/libexec/vault
+          readOnly: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: plugins
+            mountPath: /usr/local/libexec/vault
+            readOnly: true
+
+  - it: uses the default liveness probe settings
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.failureThreshold
+          value: 2
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 5
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.periodSeconds
+          value: 5
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.successThreshold
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.timeoutSeconds
+          value: 3
+
+  - it: allows configuring liveness probe settings
+    set:
+      csi.enabled: true
+      csi.livenessProbe.failureThreshold: 10
+      csi.livenessProbe.initialDelaySeconds: 11
+      csi.livenessProbe.periodSeconds: 12
+      csi.livenessProbe.successThreshold: 13
+      csi.livenessProbe.timeoutSeconds: 14
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.failureThreshold
+          value: 10
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 11
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.periodSeconds
+          value: 12
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.successThreshold
+          value: 13
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.timeoutSeconds
+          value: 14
+
+  - it: uses the default readiness probe settings
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.failureThreshold
+          value: 2
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+          value: 5
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+          value: 5
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.successThreshold
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.timeoutSeconds
+          value: 3
+
+  - it: allows configuring readiness probe settings
+    set:
+      csi.enabled: true
+      csi.readinessProbe.failureThreshold: 10
+      csi.readinessProbe.initialDelaySeconds: 11
+      csi.readinessProbe.periodSeconds: 12
+      csi.readinessProbe.successThreshold: 13
+      csi.readinessProbe.timeoutSeconds: 14
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.failureThreshold
+          value: 10
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+          value: 11
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+          value: 12
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.successThreshold
+          value: 13
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.timeoutSeconds
+          value: 14
+
+  - it: points VAULT_ADDR to the agent socket by default
+    set:
+      csi.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: unix:///var/run/vault/agent.sock
+
+  - it: keeps VAULT_ADDR on the agent socket with global.externalVaultAddr
+    set:
+      csi.enabled: true
+      global.externalVaultAddr: http://openbao-outside
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: unix:///var/run/vault/agent.sock
+
+  - it: keeps VAULT_ADDR on the agent socket with global.externalBaoAddr
+    set:
+      csi.enabled: true
+      global.externalBaoAddr: http://openbao-outside
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: unix:///var/run/vault/agent.sock
+
+  - it: ignores injector.externalVaultAddr when the agent is disabled
+    set:
+      csi.enabled: true
+      csi.agent.enabled: false
+      injector.externalVaultAddr: http://openbao-outside
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: http://release-name-openbao.foo.svc:8200
+
+  - it: uses global.externalVaultAddr when the agent is disabled
+    set:
+      csi.enabled: true
+      csi.agent.enabled: false
+      global.externalVaultAddr: http://openbao-outside
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: http://openbao-outside
+
+  - it: uses global.externalBaoAddr when the agent is disabled
+    set:
+      csi.enabled: true
+      csi.agent.enabled: false
+      global.externalBaoAddr: http://openbao-outside
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: http://openbao-outside
+
+  - it: gives global.externalBaoAddr precedence when the agent is disabled
+    set:
+      csi.enabled: true
+      csi.agent.enabled: false
+      global.externalBaoAddr: http://openbao-outside
+      global.externalVaultAddr: http://vault-outside
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VAULT_ADDR
+            value: http://openbao-outside
+
+  - it: does not set a pod security context by default
+    set:
+      csi.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.securityContext
+
+  - it: uses the default provider container security context with the agent
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+      - isNull:
+          path: spec.template.spec.containers[0].securityContext.runAsNonRoot
+
+  - it: uses the default provider container security context without the agent
+    set:
+      csi.enabled: true
+      csi.agent.enabled: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+
+  - it: supports a pod security context as YAML
+    set:
+      csi.enabled: true
+      csi.daemonSet.securityContext.pod.foo: bar
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.foo
+          value: bar
+
+  - it: supports a container security context as YAML
+    set:
+      csi.enabled: true
+      csi.daemonSet.securityContext.container.foo: bar
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.foo
+          value: bar
+
+  - it: supports a container security context as a YAML string
+    set:
+      csi.enabled: true
+      csi.daemonSet.securityContext.container: "foo: bar"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.foo
+          value: bar
+
+  - it: enables the agent sidecar by default
+    set:
+      csi.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 2
+
+  - it: makes the agent socket group writable
+    set:
+      csi.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[1].command[0]
+          value: /bin/sh
+      - equal:
+          path: spec.template.spec.containers[1].command[1]
+          value: -ec
+      - matchRegex:
+          path: spec.template.spec.containers[1].args[0]
+          pattern: umask 0007
+      - isNull:
+          path: spec.template.spec.containers[1].lifecycle
+
+  - it: passes extra arguments to the agent sidecar
+    set:
+      csi.enabled: true
+      csi.agent.extraArgs:
+        - -config=extra-config.hcl
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[1].args[4]
+          value: -config=extra-config.hcl
+
+  - it: configures the agent log level
+    set:
+      csi.enabled: true
+      csi.agent.logLevel: error
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[1].env
+          content:
+            name: BAO_LOG_LEVEL
+            value: error
+
+  - it: configures the agent log format
+    set:
+      csi.enabled: true
+      csi.agent.logFormat: json
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[1].env
+          content:
+            name: BAO_LOG_FORMAT
+            value: json
+
+  - it: does not set agent resources by default
+    set:
+      csi.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[1].resources
+
+  - it: configures agent resources
+    set:
+      csi.enabled: true
+      csi.agent.resources:
+        requests:
+          memory: 256Mi
+          cpu: 250m
+        limits:
+          memory: 512Mi
+          cpu: 500m
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[1].resources.requests.memory
+          value: 256Mi
+      - equal:
+          path: spec.template.spec.containers[1].resources.requests.cpu
+          value: 250m
+      - equal:
+          path: spec.template.spec.containers[1].resources.limits.memory
+          value: 512Mi
+      - equal:
+          path: spec.template.spec.containers[1].resources.limits.cpu
+          value: 500m
