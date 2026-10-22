@@ -60,6 +60,9 @@ spec:
     {{- end }}
     component: server
     openbao-active: "false"
+  {{- if .Values.server.service.standby.trafficDistribution -}}
+  trafficDistribution: {{ .Values.server.service.standby.trafficDistribution }}
+  {{- end -}}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -59,5 +59,8 @@ spec:
     app.kubernetes.io/instance: {{ .Release.Name }}
     {{- end }}
     component: server
+  {{- if .Values.server.service.trafficDistribution -}}
+  trafficDistribution: {{ .Values.server.service.trafficDistribution }}
+  {{- end -}}
 {{- end }}
 {{- end }}
