@@ -1,5 +1,10 @@
 ## Unreleased
 
+
+## 0.30.5
+
+- chore: bump OpenBao to v2.7.2
+
 ## 0.30.4
 
 - fix(grafana/dashboard): add Namespace variable (#252)
