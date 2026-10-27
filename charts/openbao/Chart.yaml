@@ -28,7 +28,7 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |
     - kind: changed
-      chore: update OpenBao to 2.7.2
+      description: "Bump OpenBao to 2.7.2"
 
 maintainers:
   - name: OpenBao
