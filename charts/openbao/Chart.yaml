@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.30.5
+version: 0.30.6
 appVersion: v2.7.2
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -28,7 +28,11 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |
     - kind: changed
-      description: "Bump OpenBao to 2.7.2"
+      description: |
+        Bump OpenBao to 2.7.2
+    - kind: fixed
+      description: |
+        ArtifactHub changes annotation
 
 maintainers:
   - name: OpenBao
