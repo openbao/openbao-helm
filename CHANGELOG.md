@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.30.6
+
+- fix: ArtifactHub changes annotation
 
 ## 0.30.5
 
