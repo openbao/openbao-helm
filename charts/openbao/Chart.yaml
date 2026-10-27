@@ -28,9 +28,11 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |
     - kind: changed
-      description: "Bump OpenBao to 2.7.2"
+      description: |
+        Bump OpenBao to 2.7.2
     - kind: fixed
-      description: "ArtifactHub changes annotation"
+      description: |
+        ArtifactHub changes annotation
 
 maintainers:
   - name: OpenBao
