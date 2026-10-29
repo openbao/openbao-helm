@@ -47,5 +47,6 @@ spec:
   type: {{ .Values.ui.serviceType }}
   {{- include "service.externalTrafficPolicy" .Values.ui }}
   {{- include "service.loadBalancer" .Values.ui }}
+  {{- include "service.trafficDistribution" .Values.ui }}
 {{- end -}}
 {{- end }}
