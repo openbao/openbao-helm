@@ -1,5 +1,7 @@
 ## Unreleased
 
+- chore: Remove the legacy GKE acceptance test infrastructure
+
 ## 0.30.6
 
 - fix: ArtifactHub changes annotation
