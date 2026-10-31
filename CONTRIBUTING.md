@@ -171,13 +171,6 @@ If the acceptance tests fail, deployed resources in the Kubernetes cluster
 may not be properly cleaned up. We recommend recycling the Kubernetes cluster to
 start from a clean slate.
 
-**Note:** There is a Terraform configuration in the
-[`test/terraform/`](https://github.com/openbao/openbao-helm/tree/main/test/terraform) directory
-that can be used to quickly bring up a GKE cluster and configure
-`kubectl` and `helm` locally. This can be used to quickly spin up a test
-cluster for acceptance tests. Unit tests _do not_ require a running Kubernetes
-cluster.
-
 ### Writing Unit Tests
 
 Changes to the Helm chart should be accompanied by appropriate unit tests.

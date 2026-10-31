@@ -2,20 +2,11 @@
 
 ## Running OpenBao Helm Acceptance tests
 
-The Makefile at the top level of this repo contains a few target that should help with running acceptance tests in your own GKE instance or in a kind cluster.
-
-### Running in a GKE cluster
-
-* Set the `GOOGLE_CREDENTIALS` and `CLOUDSDK_CORE_PROJECT` variables at the top of the file. `GOOGLE_CREDENTIALS` should contain the local path to your Google Cloud Platform account credentials in JSON format. `CLOUDSDK_CORE_PROJECT` should be set to the ID of your GCP project.
-* Run `make test-image` to create the docker image (with dependencies installed) that will be re-used in the below steps.
-* Run `make test-provision` to provision the GKE cluster using terraform.
-* Run `make test-acceptance` to run the acceptance tests in this already provisioned cluster.
-* You can choose to only run certain tests by setting the ACCEPTANCE_TESTS variable and re-running the above target.
-* Run `make test-destroy` when you have finished testing and want to tear-down and remove the cluster.
+The Makefile at the top level of this repo contains a few targets that should help with running acceptance tests in a kind cluster.
 
 ### Running in a kind cluster
 
-* Run `make test-acceptance LOCAL_ACCEPTANCE_TESTS=true`
+* Run `make test-acceptance` to create or reuse a kind cluster and run the acceptance tests.
 * You can choose to only run certain tests by setting the `ACCEPTANCE_TESTS` variable and re-running the above target.
 * Run `make delete-kind` when you have finished testing and want to tear-down and remove the cluster.
 * You can set an alternate kind cluster name by specifying the `KIND_CLUSTER_NAME` variable for any of the above targets.
