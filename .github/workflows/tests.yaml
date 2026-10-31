@@ -3,15 +3,29 @@ on: [push, workflow_dispatch, pull_request]
 jobs:
   helm-unit-tests:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # continue using bats testing until we migrated everything to helm unittest
       - uses: ./.github/actions/setup-test-tools
       - run: bats --tap --timing ./test/unit
       - name: Install helm-unittest
-        run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version "${HELM_UNITTEST_VERSION}"
+        run: |
+          # Import the public key
+          # See: https://github.com/helm-unittest/helm-unittest#install
+          helm version --short
+          curl -fsSL "https://raw.githubusercontent.com/helm-unittest/helm-unittest/${HELM_UNITTEST_VERSION_COMMITHASH}/public-key.asc" | gpg --import
+          gpg --export > ~/.gnupg/pubring.gpg
+
+          helm plugin install \
+            https://github.com/helm-unittest/helm-unittest/releases/download/v${HELM_UNITTEST_VERSION}/unittest-${HELM_UNITTEST_VERSION}.tgz \
+            --keyring ~/.gnupg/pubring.gpg
+
         env:
           HELM_UNITTEST_VERSION: "1.2.1"
+          HELM_UNITTEST_VERSION_COMMITHASH: "67056cc631eab9e001e6762a1f601e6c92a71ba7"
       - run: helm unittest --strict ./charts/openbao
   chart-verifier:
     runs-on: ubuntu-latest
