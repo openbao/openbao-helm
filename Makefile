@@ -1,89 +1,36 @@
 TEST_IMAGE?=openbao-helm-test
-GOOGLE_CREDENTIALS?=openbao-helm-test.json
-CLOUDSDK_CORE_PROJECT?=openbao-helm-dev-246514
-# set to run a single test - e.g acceptance/server-ha-enterprise-dr.bats
+# set to run a single test - e.g acceptance/server-ha-raft.bats
 ACCEPTANCE_TESTS?=acceptance
-
 # glob of helm-unittest suites to run, relative to the chart directory.
 UNIT_TESTS?=tests/*_test.yaml
-
-# set to 'true' to run acceptance tests locally in a kind cluster
-LOCAL_ACCEPTANCE_TESTS?=false
-
 # kind cluster name
 KIND_CLUSTER_NAME?=openbao-helm
-
 # kind k8s version
 KIND_K8S_VERSION?=v1.30.10
 
 # Generate json schema for chart values. See test/README.md for more details.
+.PHONY: values-schema
 values-schema:
 	helm schema-gen values.yaml > values.schema.json
 
+.PHONY: test-image
 test-image:
 	@docker build --rm -t $(TEST_IMAGE) -f $(CURDIR)/test/docker/Test.dockerfile $(CURDIR)
 
+.PHONY: test-unit
 test-unit:
 	@docker run --rm -it -v ${PWD}:/helm-test $(TEST_IMAGE) \
 		helm unittest --strict -f '$(UNIT_TESTS)' /helm-test/charts/openbao
 
+.PHONY: test
 test: test-image test-unit test-acceptance
 
-# run acceptance tests on GKE
-# set google project/credential vars above
-test-acceptance:
-ifeq ($(LOCAL_ACCEPTANCE_TESTS),true)
-	make setup-kind acceptance
-else
-	@docker run -it -v ${PWD}:/helm-test \
-	-e GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS} \
-	-e CLOUDSDK_CORE_PROJECT=${CLOUDSDK_CORE_PROJECT} \
-	-e KUBECONFIG=/helm-test/.kube/config \
-	-w /helm-test \
-	$(TEST_IMAGE) \
-	make acceptance
-endif
-
-# destroy GKE cluster using terraform
-test-destroy:
-	@docker run -it -v ${PWD}:/helm-test \
-	-e GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS} \
-	-e CLOUDSDK_CORE_PROJECT=${CLOUDSDK_CORE_PROJECT} \
-	-w /helm-test \
-	$(TEST_IMAGE) \
-	make destroy-cluster
-
-# provision GKE cluster using terraform
-test-provision:
-	@docker run -it -v ${PWD}:/helm-test \
-	-e GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS} \
-	-e CLOUDSDK_CORE_PROJECT=${CLOUDSDK_CORE_PROJECT} \
-	-e KUBECONFIG=/helm-test/.kube/config \
-	-w /helm-test \
-	$(TEST_IMAGE) \
-	make provision-cluster
-
-# this target is for running the acceptance tests
-# it is run in the docker container above when the test-acceptance target is invoked
-acceptance:
-ifneq ($(LOCAL_ACCEPTANCE_TESTS),true)
-	gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
-endif
+.PHONY: test-acceptance
+test-acceptance: setup-kind
 	bats --tap --timing test/${ACCEPTANCE_TESTS}
 
-# this target is for provisioning the GKE cluster
-# it is run in the docker container above when the test-provision target is invoked
-provision-cluster:
-	gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
-	terraform init test/terraform
-	terraform apply -var project=${CLOUDSDK_CORE_PROJECT} -var init_cli=true -auto-approve test/terraform
-
-# this target is for removing the GKE cluster
-# it is run in the docker container above when the test-destroy target is invoked
-destroy-cluster:
-	terraform destroy -auto-approve
-
 # create a kind cluster for running the acceptance tests locally
+.PHONY: setup-kind
 setup-kind:
 	kind get clusters | grep -q "^${KIND_CLUSTER_NAME}$$" || \
 	kind create cluster \
@@ -93,7 +40,6 @@ setup-kind:
 	kubectl config use-context kind-${KIND_CLUSTER_NAME}
 
 # delete the kind cluster
+.PHONY: delete-kind
 delete-kind:
 	kind delete cluster --name ${KIND_CLUSTER_NAME} || :
-
-.PHONY: values-schema test-image test-unit test test-acceptance test-destroy test-provision acceptance provision-cluster destroy-cluster
