@@ -41,8 +41,8 @@ spec:
     app.kubernetes.io/name: {{ include "openbao.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
-  {{- if .Values.server.service.headless.trafficDistribution -}}
+  {{- if .Values.server.service.headless.trafficDistribution }}
   trafficDistribution: {{ .Values.server.service.headless.trafficDistribution }}
-  {{- end -}}
+  {{- end }}
 {{- end }}
 {{- end }}
