@@ -419,3 +419,14 @@ load _helpers
       yq -r '.spec.ipFamilyPolicy' | tee /dev/stderr)
   [ "${actual}" = "PreferDualStack" ]
 }
+
+@test "ui/Service: Assert trafficDistribution set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml  \
+      --set 'ui.enabled=true' \
+      --set 'ui.trafficDistribution=PreferSameNode' \
+      . | tee /dev/stderr |
+      yq -r '.spec.trafficDistribution' | tee /dev/stderr)
+  [ "${actual}" = "PreferSameNode" ]
+}
