@@ -351,7 +351,7 @@ injector:
     # Extra labels for the service definition.
     # This should be a YAML map of the labels to apply to the injector service
     extraLabels: {}
-    # Traffic distribution for the injector service. 
+    # Traffic distribution for the injector service.
     trafficDistribution: ""
 
   # Injector serviceAccount specific config
@@ -802,7 +802,7 @@ server:
       # Extra labels for the service definition.
       # This should be a YAML map of the labels to apply to the active service
       extraLabels: {}
-      # Traffic distribution for the active service. 
+      # Traffic distribution for the active service.
       trafficDistribution: ""
     # Enable or disable the openbao-standby service, which selects OpenBao pods that
     # have labeled themselves as a cluster follower with `openbao-active: "false"`.
@@ -815,14 +815,14 @@ server:
       # Extra labels for the service definition.
       # This should be a YAML map of the labels to apply to the standby service
       extraLabels: {}
-      # Traffic distribution for the standby service. 
+      # Traffic distribution for the standby service.
       trafficDistribution: ""
     headless:
       # Extra annotations for the headless service definition. This can either be YAML or a
       # YAML-formatted multi-line templated string map of the annotations to apply
       # to the headless service.
       annotations: {}
-      # Traffic distribution for the headless service. 
+      # Traffic distribution for the headless service.
       trafficDistribution: ""
     # If enabled, the service selectors will include `app.kubernetes.io/instance: {{ .Release.Name }}`
     # When disabled, services may select OpenBao pods not deployed from the chart.
@@ -899,7 +899,7 @@ server:
     # Extra labels for the service definition.
     # This should be a YAML map of the labels to apply to the service
     extraLabels: {}
-    # Traffic distribution for the server service. 
+    # Traffic distribution for the server service.
     trafficDistribution: ""
 
   # This configures the OpenBao Statefulset to create a PVC for data
@@ -1222,8 +1222,8 @@ ui:
   # Extra labels for the service definition.
   # This should be a YAML map of the labels to apply to the ui service
   extraLabels: {}
-  
-  # Traffic distribution for the UI service. 
+
+  # Traffic distribution for the UI service.
   trafficDistribution: ""
 
 # openbao-csi-provider
