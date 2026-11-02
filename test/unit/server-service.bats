@@ -528,3 +528,13 @@ load _helpers
       yq '.spec.ipFamilies' -c | tee /dev/stderr)
   [ "${actual}" = '["IPv4","IPv6"]' ]
 }
+
+@test "server/Service: Assert trafficDistribution set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.service.trafficDistribution=PreferSameNode' \
+      . | tee /dev/stderr |
+      yq -r '.spec.trafficDistribution' | tee /dev/stderr)
+  [ "${actual}" = "PreferSameNode" ]
+}

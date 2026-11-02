@@ -332,3 +332,14 @@ load _helpers
       yq -r '.spec.selector["app.kubernetes.io/instance"]' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
+
+@test "server/ha-active-Service: Assert trafficDistribution set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.active.trafficDistribution=PreferSameNode' \
+      . | tee /dev/stderr |
+      yq -r '.spec.trafficDistribution' | tee /dev/stderr)
+  [ "${actual}" = "PreferSameNode" ]
+}
