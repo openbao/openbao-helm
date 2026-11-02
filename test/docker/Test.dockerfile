@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 # This Dockerfile installs all the dependencies necessary to run the unit and
-# acceptance tests. This image also contains gcloud so you can run tests
-# against a GKE cluster easily.
+# acceptance tests.
 #
 # This image has no automatic entrypoint. It is expected that you'll run
 # a script to configure kubectl, potentially install Helm, and run the tests
@@ -14,7 +13,6 @@ WORKDIR /root
 
 ENV BATS_VERSION "1.3.0"
 ENV HELM_UNITTEST_VERSION "1.2.1"
-ENV TERRAFORM_VERSION "0.12.10"
 
 # base packages
 RUN apk update && apk add --no-cache --virtual .build-deps \
@@ -34,16 +32,6 @@ RUN python3 -m venv venv && \
     pip install yq && \
     ln -s $PWD/venv/bin/yq /usr/local/bin/yq && \
     deactivate
-
-# gcloud
-RUN curl -OL https://dl.google.com/dl/cloudsdk/channels/rapid/install_google_cloud_sdk.bash && \
-    bash install_google_cloud_sdk.bash --disable-prompts --install-dir='/root/' && \
-    ln -s /root/google-cloud-sdk/bin/gcloud /usr/local/bin/gcloud
-
-# terraform
-RUN curl -sSL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o /tmp/tf.zip \
-    && unzip /tmp/tf.zip  \
-    && ln -s /root/terraform /usr/local/bin/terraform
 
 # kubectl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
