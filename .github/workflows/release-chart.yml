@@ -41,8 +41,6 @@ jobs:
       packages: write
       id-token: write
     runs-on: ubuntu-latest
-    env:
-      GPG_SIGNING_SUBKEY: ${{ vars.GPG_SIGNING_SUBKEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -75,7 +73,7 @@ jobs:
           done
 
           pubring="${RUNNER_TEMP}/pubring.gpg"
-          gpg --batch --export "$GPG_SIGNING_SUBKEY" > "$pubring"
+          gpg --batch --export "${{ steps.gpg-import.outputs.fingerprint }}" > "$pubring"
 
           cd .cr-release-packages
           for pkg in *.tgz; do
@@ -88,7 +86,7 @@ jobs:
 
             # The trailing "!" forces gpg to use exactly this subkey.
             gpg --batch --yes --digest-algo SHA512 \
-              --local-user "${GPG_SIGNING_SUBKEY}!" \
+              --local-user "${{ steps.gpg-import.outputs.fingerprint }}!" \
               --clearsign --output "${pkg}.prov" "$body"
             rm -f "$body"
 
