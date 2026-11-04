@@ -1,0 +1,342 @@
+suite: OpenBao Server Dev Statefulset Test
+templates:
+  - templates/server-statefulset.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/dev-StatefulSet: enable with server.dev.enabled true"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/dev-StatefulSet: disable with global.enabled"
+    set:
+      global.enabled: false
+      server.dev.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/dev-StatefulSet: disable with global.externalVaultAddr"
+    set:
+      global.externalVaultAddr: "http://openbao-outside"
+      server.dev.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/dev-StatefulSet: image defaults to server.image.repository:tag"
+    set:
+      server.image.repository: "foo"
+      server.image.tag: "1.2.3"
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "quay.io/foo:1.2.3"
+
+  - it: "server/ha-StatefulSet: image tag defaults to appVersion"
+    set:
+      server.image.repository: "foo"
+      server.image.tag: ""
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "quay.io/foo:2.7.2"
+
+  - it: "server/dev-StatefulSet: default replicas"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+
+  - it: "server/dev-StatefulSet: cant set replicas"
+    set:
+      server.dev.enabled: true
+      server.dev.replicas: 100
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+
+  - it: "server/dev-StatefulSet: updateStrategy"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: "OnDelete"
+
+  - it: "server/dev-StatefulSet: default resources"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].resources
+
+  - it: "server/dev-StatefulSet: custom resources (case 1)"
+    set:
+      server.dev.enabled: true
+      server.resources.requests.memory: "256Mi"
+      server.resources.requests.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: "256Mi"
+
+  - it: "server/dev-StatefulSet: custom resources (case 2)"
+    set:
+      server.dev.enabled: true
+      server.resources.limits.memory: "256Mi"
+      server.resources.limits.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: "256Mi"
+
+  - it: "server/dev-StatefulSet: custom resources (case 3)"
+    set:
+      server.dev.enabled: true
+      server.resources.requests.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: "250m"
+
+  - it: "server/dev-StatefulSet: custom resources (case 4)"
+    set:
+      server.dev.enabled: true
+      server.resources.limits.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: "250m"
+
+  - it: "server/dev-StatefulSet: adds extra volume (case 1)"
+    set:
+      server.dev.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].configMap.name
+          value: "foo"
+      - isNull:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].configMap.secretName
+
+  - it: "server/dev-StatefulSet: adds extra volume (case 2)"
+    set:
+      server.dev.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].readOnly
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].mountPath
+          value: "/openbao/userconfig/foo"
+
+  - it: "server/dev-StatefulSet: adds extra secret volume (case 1)"
+    set:
+      server.dev.enabled: true
+      server:
+        extraVolumes:
+          - type: "secret"
+            name: "foo"
+    asserts:
+      - isNull:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].secret.name
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].secret.secretName
+          value: "foo"
+
+  - it: "server/dev-StatefulSet: adds extra secret volume (case 2)"
+    set:
+      server.dev.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].readOnly
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].mountPath
+          value: "/openbao/userconfig/foo"
+
+  - it: "server/dev-StatefulSet: no storageClass on claim by default"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - isNull:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+
+  - it: "server/dev-StatefulSet: set default devRootToken"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "VAULT_DEV_ROOT_TOKEN_ID")].value
+          value: "root"
+
+  - it: "server/dev-StatefulSet: set custom devRootToken"
+    set:
+      server.dev.enabled: true
+      server.dev.devRootToken: "customtoken"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "VAULT_DEV_ROOT_TOKEN_ID")].value
+          value: "customtoken"
+
+  - it: "server/dev-StatefulSet: set dev listen address in dev mode"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "VAULT_DEV_LISTEN_ADDRESS")].value
+          value: "[::]:8200"
+
+  - it: "server/dev-StatefulSet: dev listen address isn't set in non-dev mode"
+    set:
+      server.dev.enabled: false
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name == "VAULT_DEV_LISTEN_ADDRESS")].name
+
+  - it: "server/dev-StatefulSet: set extraEnvironmentVars"
+    set:
+      server.dev.enabled: true
+      server.extraEnvironmentVars.FOO: "bar"
+      server.extraEnvironmentVars.FOOBAR: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "FOO")].value
+          value: "bar"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "FOOBAR")].value
+          value: "foobar"
+
+  - it: "server/dev-StatefulSet: set extraSecretEnvironmentVars"
+    set:
+      server:
+        extraSecretEnvironmentVars:
+          - envName: "ENV_FOO_0"
+            secretName: "secret_name_0"
+            secretKey: "secret_key_0"
+          - envName: "ENV_FOO_1"
+            secretName: "secret_name_1"
+            secretKey: "secret_key_1"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENV_FOO_0")].valueFrom.secretKeyRef.name
+          value: "secret_name_0"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENV_FOO_0")].valueFrom.secretKeyRef.key
+          value: "secret_key_0"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENV_FOO_1")].valueFrom.secretKeyRef.name
+          value: "secret_name_1"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENV_FOO_1")].valueFrom.secretKeyRef.key
+          value: "secret_key_1"
+
+  - it: "server/dev-StatefulSet: can't set storageClass (case 1)"
+    set:
+      server.dev.enabled: true
+      server.dataStorage.enabled: true
+      server.dataStorage.storageClass: "foo"
+    asserts:
+      - isEmpty:
+          path: spec.volumeClaimTemplates
+
+  - it: "server/dev-StatefulSet: can't set storageClass (case 2)"
+    set:
+      server.dev.enabled: true
+      server.auditStorage.enabled: true
+      server.auditStorage.storageClass: "foo"
+    asserts:
+      - isEmpty:
+          path: spec.volumeClaimTemplates
+
+  - it: "server/dev-StatefulSet: can't set storageClass (case 3)"
+    set:
+      server.dev.enabled: true
+      server.auditStorage.enabled: true
+      server.auditStorage.storageClass: "foo"
+      server.auditStorage.enabled: true
+      server.auditStorage.storageClass: "foo"
+    asserts:
+      - isEmpty:
+          path: spec.volumeClaimTemplates
+
+  - it: "server/dev-StatefulSet: uid default"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 100
+
+  - it: "server/dev-StatefulSet: uid configurable"
+    set:
+      server.uid: 2000
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 2000
+
+  - it: "server/dev-StatefulSet: gid default"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 1000
+
+  - it: "server/dev-StatefulSet: gid configurable"
+    set:
+      server.gid: 2000
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 2000
+
+  - it: "server/dev-StatefulSet: fsgroup default"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 1000
+
+  - it: "server/dev-StatefulSet: fsgroup configurable"
+    set:
+      server.gid: 2000
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 2000
+
+  - it: "server/dev-StatefulSet: add extraArgs"
+    set:
+      server.dev.enabled: true
+      server.extraArgs: "foobar"
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: "foobar"

@@ -1,0 +1,218 @@
+suite: OpenBao Server Httproute Test
+templates:
+  - templates/server-httproute.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/gateway/httproute: disabled by default"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/gateway/httproute: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      server.gateway.httpRoute.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/gateway/httproute: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      server.gateway.httpRoute.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/gateway/httproute: has api version"
+    set:
+      server.gateway.httpRoute.enabled: true
+    asserts:
+      - isNotNull:
+          path: apiVersion
+
+  - it: "server/gateway/httproute: disable by global.externalVaultAddr"
+    set:
+      server.gateway.httpRoute.enabled: true
+      global.externalVaultAddr: "http://openbao-outside"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/gateway/httproute: checking host entry gets added"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server:
+        gateway:
+          httpRoute:
+            hosts:
+              - "test.com"
+    asserts:
+      - equal:
+          path: spec.hostnames[0]
+          value: "test.com"
+
+  - it: "server/gateway/httproute: openbao backend should be added"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server:
+        gateway:
+          httpRoute:
+            hosts:
+              - "test.com"
+    asserts:
+      - isNotNull:
+          path: spec.rules[0].backendRefs[0].name
+
+  - it: "server/gateway/httproute: labels gets added to object"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.gateway.httpRoute.labels.traffic: "external"
+      server.gateway.httpRoute.labels.team: "dev"
+    asserts:
+      - equal:
+          path: metadata.labels.traffic
+          value: "external"
+
+  - it: "server/gateway/httproute: annotations added to object - string"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.gateway.httpRoute.annotations: "kubernetes.io/ingress.class: nginx"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubernetes.io/ingress.class"]
+          value: "nginx"
+
+  - it: "server/gateway/httproute: annotations added to object - yaml"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server:
+        gateway:
+          httpRoute:
+            annotations:
+              "kubernetes.io/ingress.class": "nginx"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubernetes.io/ingress.class"]
+          value: "nginx"
+
+  - it: "server/gateway/httproute: uses active service when ha by default - yaml"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.dev.enabled: false
+      server.ha.enabled: true
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: "release-name-openbao-active"
+
+  - it: "server/gateway/httproute: uses regular service when configured with ha - yaml"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.gateway.httpRoute.activeService: false
+      server.dev.enabled: false
+      server.ha.enabled: true
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: "release-name-openbao"
+
+  - it: "server/gateway/httproute: uses regular service when not ha - yaml"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.dev.enabled: false
+      server.ha.enabled: false
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: "release-name-openbao"
+
+  - it: "server/gateway/httproute: uses regular service when not ha and activeService is true - yaml"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.gateway.httpRoute.activeService: true
+      server.dev.enabled: false
+      server.ha.enabled: false
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: "release-name-openbao"
+
+  - it: "server/gateway/httproute: override matches"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.gateway.httpRoute.matches.path.type: "Exact"
+      server.gateway.httpRoute.matches.path.value: "/test"
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: "Exact"
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: "/test"
+
+  - it: "server/gateway/httproute: no filters"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.service.enabled: true
+    asserts:
+      - isNull:
+          path: spec.rules[0].filters
+
+  - it: "server/gateway/httproute: filters"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.service.enabled: true
+      server:
+        gateway:
+          httpRoute:
+            filters:
+              - type: "RequestHeaderModifier"
+                requestHeaderModifier:
+                  set:
+                    - name: "X-Forwarded-Proto"
+                      value: "https"
+    asserts:
+      - equal:
+          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].value
+          value: "RequestHeaderModifier"
+      - equal:
+          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].value
+          value: "X-Forwarded-Proto"
+      - equal:
+          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].value
+          value: "https"
+
+  - it: "server/gateway/httproute: has matches"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: "PathPrefix"
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: "/"
+
+  - it: "server/gateway/httproute: has timeouts"
+    set:
+      server.gateway.httpRoute.enabled: true
+      server.gateway.httpRoute.timeouts.request: "10s"
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].timeouts.request
+          value: "10s"

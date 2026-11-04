@@ -1,0 +1,473 @@
+suite: OpenBao Server Service Test
+templates:
+  - templates/server-service.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/Service: service enabled by default (case 1)"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/Service: service enabled by default (case 2)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/Service: service enabled by default (case 3)"
+    set:
+      server.standalone.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/Service: disable with global.enabled false (case 1)"
+    set:
+      server.dev.enabled: true
+      global.enabled: false
+      server.service.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: disable with global.enabled false (case 2)"
+    set:
+      server.ha.enabled: true
+      global.enabled: false
+      server.service.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: disable with global.enabled false (case 3)"
+    set:
+      server.standalone.enabled: true
+      global.enabled: false
+      server.service.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: disable with server.service.enabled false (case 1)"
+    set:
+      server.dev.enabled: true
+      server.service.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: disable with server.service.enabled false (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: disable with server.service.enabled false (case 3)"
+    set:
+      server.standalone.enabled: true
+      server.service.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: disable with global.enabled false server.service.enabled false (case 1)"
+    set:
+      server.dev.enabled: true
+      global.enabled: false
+      server.service.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: disable with global.enabled false server.service.enabled false (case 2)"
+    set:
+      server.ha.enabled: true
+      global.enabled: false
+      server.service.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: disable with global.enabled false server.service.enabled false (case 3)"
+    set:
+      server.standalone.enabled: true
+      global.enabled: false
+      server.service.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/Service: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      server.service.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/Service: disable with global.externalVaultAddr (case 1)"
+    set:
+      server.dev.enabled: true
+      global.externalVaultAddr: "http://openbao-outside"
+      server.service.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: disable with global.externalVaultAddr (case 2)"
+    set:
+      server.ha.enabled: true
+      global.externalVaultAddr: "http://openbao-outside"
+      server.service.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: disable with global.externalVaultAddr (case 3)"
+    set:
+      server.standalone.enabled: true
+      global.externalVaultAddr: "http://openbao-outside"
+      server.service.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/Service: generic annotations"
+    set:
+      server.service.annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/Service: generic extraLabels"
+    set:
+      server.service.extraLabels.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: metadata.labels.openBaoIsAwesome
+          value: true
+
+  - it: "server/Service: publish not ready (case 1)"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: true
+
+  - it: "server/Service: publish not ready (case 2)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: true
+
+  - it: "server/Service: publish not ready (case 3)"
+    set:
+      server.standalone.enabled: true
+    asserts:
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: true
+
+  - it: "server/Service: publish not ready (case 4)"
+    set:
+      server.service.publishNotReadyAddresses: false
+    asserts:
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: false
+
+  - it: "server/Service: type empty by default (case 1)"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - isNull:
+          path: spec.type
+
+  - it: "server/Service: type empty by default (case 2)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNull:
+          path: spec.type
+
+  - it: "server/Service: type empty by default (case 3)"
+    asserts:
+      - isNull:
+          path: spec.type
+
+  - it: "server/Service: type can set (case 1)"
+    set:
+      server.dev.enabled: true
+      server.service.type: "NodePort"
+    asserts:
+      - equal:
+          path: spec.type
+          value: "NodePort"
+
+  - it: "server/Service: type can set (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+    asserts:
+      - equal:
+          path: spec.type
+          value: "NodePort"
+
+  - it: "server/Service: type can set (case 3)"
+    set:
+      server.service.type: "NodePort"
+    asserts:
+      - equal:
+          path: spec.type
+          value: "NodePort"
+
+  - it: "server/Service: clusterIP empty by default (case 1)"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - isNull:
+          path: spec.clusterIP
+
+  - it: "server/Service: clusterIP empty by default (case 2)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNull:
+          path: spec.clusterIP
+
+  - it: "server/Service: clusterIP empty by default (case 3)"
+    asserts:
+      - isNull:
+          path: spec.clusterIP
+
+  - it: "server/Service: clusterIP can set (case 1)"
+    set:
+      server.dev.enabled: true
+      server.service.clusterIP: "None"
+    asserts:
+      - equal:
+          path: spec.clusterIP
+          value: "None"
+
+  - it: "server/Service: clusterIP can set (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.clusterIP: "None"
+    asserts:
+      - equal:
+          path: spec.clusterIP
+          value: "None"
+
+  - it: "server/Service: clusterIP can set (case 3)"
+    set:
+      server.service.clusterIP: "None"
+    asserts:
+      - equal:
+          path: spec.clusterIP
+          value: "None"
+
+  - it: "server/Service: port and targetPort will be 8200 by default (case 1)"
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 8200
+
+  - it: "server/Service: port and targetPort will be 8200 by default (case 2)"
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: 8200
+
+  - it: "server/Service: port and targetPort can be set (case 1)"
+    set:
+      server.service.port: 8000
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 8000
+
+  - it: "server/Service: port and targetPort can be set (case 2)"
+    set:
+      server.service.targetPort: 80
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: 80
+
+  - it: "server/Service: nodeport can set (case 1)"
+    set:
+      server.dev.enabled: true
+      server.service.type: "NodePort"
+      server.service.nodePort: 30008
+    asserts:
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 30008
+
+  - it: "server/Service: nodeport can set (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+      server.service.nodePort: 30009
+    asserts:
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 30009
+
+  - it: "server/Service: nodeport can set (case 3)"
+    set:
+      server.service.type: "NodePort"
+      server.service.nodePort: 30010
+    asserts:
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 30010
+
+  - it: "server/Service: nodeport can't set when type isn't NodePort (case 1)"
+    set:
+      server.dev.enabled: true
+      server.service.nodePort: 30008
+    asserts:
+      - isNull:
+          path: spec.ports[0].nodePort
+
+  - it: "server/Service: nodeport can't set when type isn't NodePort (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.nodePort: 30009
+    asserts:
+      - isNull:
+          path: spec.ports[0].nodePort
+
+  - it: "server/Service: nodeport can't set when type isn't NodePort (case 3)"
+    set:
+      server.standalone.enabled: true
+      server.service.nodePort: 30010
+    asserts:
+      - isNull:
+          path: spec.ports[0].nodePort
+
+  - it: "server/Service: openbao port name is http, when tlsDisable is true"
+    set:
+      global.tlsDisable: true
+    asserts:
+      - equal:
+          path: spec.ports[?(@.port == 8200)].name
+          value: "http"
+
+  - it: "server/Service: openbao port name is https, when tlsDisable is false"
+    set:
+      global.tlsDisable: false
+    asserts:
+      - equal:
+          path: spec.ports[?(@.port == 8200)].name
+          value: "https"
+
+  - it: "server/Service: extraPorts assert is empty by default"
+    asserts:
+      - lengthEqual:
+          path: spec.ports
+          count: 2
+
+  - it: "server/Service: adds extra ports"
+    set:
+      server:
+        service:
+          extraPorts:
+            - port: 9101
+              targetPort: 9101
+              name: "metrics"
+    asserts:
+      - equal:
+          path: spec.ports[?(@.name == "metrics")].port
+          value: 9101
+      - equal:
+          path: spec.ports[?(@.name == "metrics")].targetPort
+          value: 9101
+      - equal:
+          path: spec.ports[?(@.name == "metrics")].name
+          value: "metrics"
+
+  - it: "server/Service: NodePort assert externalTrafficPolicy"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+      server.service.externalTrafficPolicy: "Foo"
+    asserts:
+      - equal:
+          path: spec.externalTrafficPolicy
+          value: "Foo"
+
+  - it: "server/ha-active-Service: NodePort assert no externalTrafficPolicy"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+      server.service.externalTrafficPolicy: ""
+    asserts:
+      - isNull:
+          path: spec.externalTrafficPolicy
+
+  - it: "server/Service: ClusterIP assert no externalTrafficPolicy"
+    set:
+      server.ha.enabled: true
+      server.service.type: "ClusterIP"
+      server.service.externalTrafficPolicy: "Foo"
+    asserts:
+      - isNull:
+          path: spec.externalTrafficPolicy
+
+  - it: "server/Service: instance selector can be disabled (case 1)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.selector["app.kubernetes.io/instance"]
+          value: "release-name"
+
+  - it: "server/Service: instance selector can be disabled (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.instanceSelector.enabled: false
+    asserts:
+      - isNull:
+          path: spec.selector["app.kubernetes.io/instance"]
+
+  - it: "server/Service: Assert ipFamilyPolicy set"
+    set:
+      server.service.ipFamilyPolicy: "PreferDualStack"
+    asserts:
+      - equal:
+          path: spec.ipFamilyPolicy
+          value: "PreferDualStack"
+
+  - it: "server/Service: Assert ipFamilies set"
+    set:
+      server.service.ipFamilies: ["IPv4","IPv6"]
+    asserts:
+      - equal:
+          path: spec.ipFamilies
+          value: ["IPv4","IPv6"]

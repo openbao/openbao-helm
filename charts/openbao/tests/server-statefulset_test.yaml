@@ -1,0 +1,1468 @@
+suite: OpenBao Server Statefulset Test
+templates:
+  - templates/server-statefulset.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/StatefulSet: disabled server.enabled"
+    set:
+      server.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/StatefulSet: disabled server.enabled random string"
+    set:
+      server.enabled: "blabla"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/StatefulSet: enabled server.enabled explicit true"
+    set:
+      server.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/standalone-StatefulSet: default server.standalone.enabled"
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/standalone-StatefulSet: enable with server.standalone.enabled true"
+    set:
+      server.standalone.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/standalone-StatefulSet: disable with global.enabled"
+    set:
+      global.enabled: false
+      server.standalone.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/standalone-StatefulSet: disable with global.externalVaultAddr"
+    set:
+      global.externalVaultAddr: "http://openbao-outside"
+      server.standalone.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/standalone-StatefulSet: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      server.standalone.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/standalone-StatefulSet: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      server.standalone.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/standalone-StatefulSet: image defaults to server.image.repository:tag (case 1)"
+    set:
+      server.image.repository: "foo"
+      server.image.tag: "1.2.3"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "quay.io/foo:1.2.3"
+
+  - it: "server/standalone-StatefulSet: image defaults to server.image.repository:tag (case 2)"
+    set:
+      server.image.repository: "foo"
+      server.image.tag: "1.2.3"
+      server.standalone.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "quay.io/foo:1.2.3"
+
+  - it: "server/standalone-StatefulSet: image tag defaults to appVersion (case 1)"
+    set:
+      server.image.repository: "foo"
+      server.image.tag: ""
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "quay.io/foo:2.7.2"
+
+  - it: "server/standalone-StatefulSet: image tag defaults to appVersion (case 2)"
+    set:
+      server.image.repository: "foo"
+      server.image.tag: ""
+      server.standalone.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "quay.io/foo:2.7.2"
+
+  - it: "server/standalone-StatefulSet: default imagePullPolicy"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: "IfNotPresent"
+
+  - it: "server/standalone-StatefulSet: Custom imagePullPolicy"
+    set:
+      server.image.pullPolicy: "Always"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: "Always"
+
+  - it: "server/standalone-StatefulSet: Custom imagePullSecrets"
+    set:
+      global:
+        imagePullSecrets:
+          - name: "foo"
+          - name: "bar"
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.imagePullSecrets
+          count: 2
+      - equal:
+          path: spec.template.spec.imagePullSecrets[0].name
+          value: "foo"
+      - equal:
+          path: spec.template.spec.imagePullSecrets[1].name
+          value: "bar"
+
+  - it: "server/standalone-StatefulSet: Custom imagePullSecrets - string array"
+    set:
+      global:
+        imagePullSecrets:
+          - "foo"
+          - "bar"
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.imagePullSecrets
+          count: 2
+      - equal:
+          path: spec.template.spec.imagePullSecrets[0].name
+          value: "foo"
+      - equal:
+          path: spec.template.spec.imagePullSecrets[1].name
+          value: "bar"
+
+  - it: "server/standalone-StatefulSet: default imagePullSecrets"
+    asserts:
+      - isNull:
+          path: spec.template.spec.imagePullSecrets
+
+  - it: "server/standalone-StatefulSet: OnDelete updateStrategy"
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: "OnDelete"
+
+  - it: "server/standalone-StatefulSet: default replicas"
+    set:
+      server.standalone.enabled: true
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+
+  - it: "server/standalone-StatefulSet: custom replicas (case 1)"
+    set:
+      server.standalone.replicas: 100
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+
+  - it: "server/standalone-StatefulSet: custom replicas (case 2)"
+    set:
+      server.standalone.enabled: true
+      server.standalone.replicas: 100
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+
+  - it: "server/standalone-StatefulSet: default resources"
+    set:
+      server.standalone.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].resources
+
+  - it: "server/standalone-StatefulSet: custom resources (case 1)"
+    set:
+      server.standalone.enabled: true
+      server.resources.requests.memory: "256Mi"
+      server.resources.requests.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: "256Mi"
+
+  - it: "server/standalone-StatefulSet: custom resources (case 2)"
+    set:
+      server.standalone.enabled: true
+      server.resources.limits.memory: "256Mi"
+      server.resources.limits.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: "256Mi"
+
+  - it: "server/standalone-StatefulSet: custom resources (case 3)"
+    set:
+      server.standalone.enabled: true
+      server.resources.requests.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: "250m"
+
+  - it: "server/standalone-StatefulSet: custom resources (case 4)"
+    set:
+      server.standalone.enabled: true
+      server.resources.limits.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: "250m"
+
+  - it: "server/standalone-StatefulSet: server.extraVolumes adds extra volume (case 1)"
+    set:
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].configMap.name
+          value: "foo"
+      - isNull:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].configMap.secretName
+
+  - it: "server/standalone-StatefulSet: server.extraVolumes adds extra volume (case 2)"
+    set:
+      server.standalone.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].configMap.name
+          value: "foo"
+      - isNull:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].configMap.secretName
+
+  - it: "server/standalone-StatefulSet: server.extraVolumes adds extra volume (case 3)"
+    set:
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].readOnly
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].mountPath
+          value: "/openbao/userconfig/foo"
+
+  - it: "server/standalone-StatefulSet: server.extraVolumes adds extra volume (case 4)"
+    set:
+      server.standalone.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].readOnly
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].mountPath
+          value: "/openbao/userconfig/foo"
+
+  - it: "server/standalone-StatefulSet: server.extraVolumes adds extra secret volume (case 1)"
+    set:
+      server:
+        extraVolumes:
+          - type: "secret"
+            name: "foo"
+    asserts:
+      - isNull:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].secret.name
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].secret.secretName
+          value: "foo"
+
+  - it: "server/standalone-StatefulSet: server.extraVolumes adds extra secret volume (case 2)"
+    set:
+      server.standalone.enabled: true
+      server:
+        extraVolumes:
+          - type: "secret"
+            name: "foo"
+    asserts:
+      - isNull:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].secret.name
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].secret.secretName
+          value: "foo"
+
+  - it: "server/standalone-StatefulSet: server.extraVolumes adds extra secret volume (case 3)"
+    set:
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].readOnly
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].mountPath
+          value: "/openbao/userconfig/foo"
+
+  - it: "server/standalone-StatefulSet: server.extraVolumes adds extra secret volume (case 4)"
+    set:
+      server.standalone.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].readOnly
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].mountPath
+          value: "/openbao/userconfig/foo"
+
+  - it: "server/standalone-StatefulSet: can mount audit"
+    set:
+      server.auditStorage.enabled: true
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "audit")]
+
+  - it: "server/standalone-StatefulSet: server.volumes adds volume"
+    set:
+      server:
+        volumes:
+          - name: "plugins"
+            emptyDir: {}
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "plugins")].emptyDir
+          value: {}
+
+  - it: "server/standalone-StatefulSet: server.volumeMounts adds volumeMount"
+    set:
+      server:
+        volumeMounts:
+          - name: "plugins"
+            mountPath: "/usr/local/libexec/vault"
+            readOnly: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "plugins")].mountPath
+          value: "/usr/local/libexec/vault"
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "plugins")].readOnly
+          value: true
+
+  - it: "server/standalone-StatefulSet: default log level to empty"
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_LOG_LEVEL")].name
+
+  - it: "server/standalone-StatefulSet: log level can be changed"
+    set:
+      server.logLevel: "debug"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_LOG_LEVEL")].value
+          value: "debug"
+
+  - it: "server/standalone-StatefulSet: default log format to empty"
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_LOG_FORMAT")].name
+
+  - it: "server/standalone-StatefulSet: can set log format"
+    set:
+      server.logFormat: "json"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_LOG_FORMAT")].value
+          value: "json"
+
+  - it: "server/standalone-StatefulSet: set extraEnvironmentVars (case 1)"
+    set:
+      server.standalone.enabled: true
+      server.extraEnvironmentVars.FOO: "bar"
+      server.extraEnvironmentVars.FOOBAR: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "FOO")].value
+          value: "bar"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "FOOBAR")].value
+          value: "foobar"
+
+  - it: "server/standalone-StatefulSet: set extraEnvironmentVars (case 2)"
+    set:
+      server.extraEnvironmentVars.FOO: "bar"
+      server.extraEnvironmentVars.FOOBAR: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "FOO")].value
+          value: "bar"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "FOOBAR")].value
+          value: "foobar"
+
+  - it: "server/standalone-StatefulSet: storageClass on claim by default (case 1)"
+    asserts:
+      - isNull:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+
+  - it: "server/standalone-StatefulSet: storageClass on claim by default (case 2)"
+    set:
+      server.standalone.enabled: true
+    asserts:
+      - isNull:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+
+  - it: "server/standalone-StatefulSet: can set storageClass (case 1)"
+    set:
+      server.dataStorage.enabled: true
+      server.dataStorage.storageClass: "foo"
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+          value: "foo"
+
+  - it: "server/standalone-StatefulSet: can set storageClass (case 2)"
+    set:
+      server.standalone.enabled: true
+      server.dataStorage.enabled: false
+      server.auditStorage.enabled: true
+      server.auditStorage.storageClass: "foo"
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+          value: "foo"
+
+  - it: "server/standalone-StatefulSet: can set storageClass (case 3)"
+    set:
+      server.standalone.enabled: true
+      server.auditStorage.enabled: true
+      server.auditStorage.storageClass: "foo"
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[1].spec.storageClassName
+          value: "foo"
+
+  - it: "server/standalone-StatefulSet: can set storageClass (case 4)"
+    set:
+      server.auditStorage.enabled: true
+      server.dataStorage.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 2
+
+  - it: "server/standalone-StatefulSet: can set storageClass (case 5)"
+    set:
+      server.standalone.enabled: true
+      server.auditStorage.enabled: true
+      server.dataStorage.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 2
+
+  - it: "server/standalone-StatefulSet: can disable storage (case 1)"
+    set:
+      server.auditStorage.enabled: false
+      server.dataStorage.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 1
+
+  - it: "server/standalone-StatefulSet: can disable storage (case 2)"
+    set:
+      server.auditStorage.enabled: true
+      server.dataStorage.enabled: false
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 1
+
+  - it: "server/standalone-StatefulSet: can disable storage (case 3)"
+    set:
+      server.standalone.enabled: true
+      server.auditStorage.enabled: false
+      server.dataStorage.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 1
+
+  - it: "server/standalone-StatefulSet: can disable storage (case 4)"
+    set:
+      server.standalone.enabled: true
+      server.auditStorage.enabled: true
+      server.dataStorage.enabled: false
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 1
+
+  - it: "server/standalone-StatefulSet: can disable storage (case 5)"
+    set:
+      server.auditStorage.enabled: true
+      server.dataStorage.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 2
+
+  - it: "server/standalone-StatefulSet: can disable storage (case 6)"
+    set:
+      server.standalone.enabled: true
+      server.auditStorage.enabled: true
+      server.dataStorage.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 2
+
+  - it: "server/standalone-StatefulSet: can disable storage (case 7)"
+    set:
+      server.auditStorage.enabled: "fa;se"
+      server.dataStorage.enabled: false
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 0
+
+  - it: "server/standalone-StatefulSet: can disable storage (case 8)"
+    set:
+      server.standalone.enabled: true
+      server.auditStorage.enabled: false
+      server.dataStorage.enabled: false
+    asserts:
+      - notExists:
+          path: spec.volumeClaimTemplates
+
+  - it: "server/standalone-StatefulSet: default audit storage mount path"
+    set:
+      server.auditStorage.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "audit")].mountPath
+          value: "/openbao/audit"
+
+  - it: "server/standalone-StatefulSet: can configure audit storage mount path"
+    set:
+      server.auditStorage.enabled: true
+      server.auditStorage.mountPath: "/var/log/vault"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "audit")].mountPath
+          value: "/var/log/vault"
+
+  - it: "server/standalone-StatefulSet: default data storage mount path"
+    set:
+      server.dataStorage.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "data")].mountPath
+          value: "/openbao/data"
+
+  - it: "server/standalone-StatefulSet: can configure data storage mount path"
+    set:
+      server.dataStorage.enabled: true
+      server.dataStorage.mountPath: "/opt/vault"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "data")].mountPath
+          value: "/opt/vault"
+
+  - it: "server/standalone-StatefulSet: affinity is set by default"
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.affinity["podAntiAffinity"]
+
+  - it: "server/standalone-StatefulSet: affinity can be set as string"
+    set:
+      server.affinity: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity
+          value: "foobar"
+
+  - it: "server/standalone-StatefulSet: affinity can be set as YAML"
+    set:
+      server.affinity.podAntiAffinity: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity.podAntiAffinity
+          value: "foobar"
+
+  - it: "server/standalone-StatefulSet: topologySpreadConstraints is null by default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.topologySpreadConstraints
+
+  - it: "server/standalone-StatefulSet: topologySpreadConstraints can be set as YAML"
+    set:
+      server:
+        topologySpreadConstraints:
+          - foo: "bar"
+          - baz: "qux"
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints
+          value: [{"foo":"bar"},{"baz":"qux"}]
+
+  - it: "server/standalone-StatefulSet: tolerations not set by default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.tolerations
+
+  - it: "server/standalone-StatefulSet: tolerations can be set as string"
+    set:
+      server.tolerations: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations
+          value: "foobar"
+
+  - it: "server/standalone-StatefulSet: tolerations can be set as YAML"
+    set:
+      server:
+        tolerations:
+          - foo: "bar"
+          - baz: "qux"
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations
+          value: [{"foo":"bar"},{"baz":"qux"}]
+
+  - it: "server/standalone-StatefulSet: nodeSelector is not set by default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.nodeSelector
+
+  - it: "server/standalone-StatefulSet: specified nodeSelector as string"
+    set:
+      server.nodeSelector: "testing"
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value: "testing"
+
+  - it: "server/standalone-StatefulSet: nodeSelector can be set as YAML"
+    set:
+      server:
+        nodeSelector:
+          "beta.kubernetes.io/arch": "amd64"
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value: {"beta.kubernetes.io/arch":"amd64"}
+
+  - it: "server/standalone-StatefulSet: adds extra init containers"
+    set:
+      server:
+        extraInitContainers:
+          - image: "test-image"
+            name: "test-container"
+            ports:
+              - name: "test-port"
+                containerPort: 9410
+                protocol: "TCP"
+            env:
+              - name: "TEST_ENV"
+                value: "test_env_value"
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[?(@.name == "test-container")].name
+          value: "test-container"
+      - equal:
+          path: spec.template.spec.initContainers[?(@.name == "test-container")].image
+          value: "test-image"
+      - equal:
+          path: spec.template.spec.initContainers[?(@.name == "test-container")].ports[0].name
+          value: "test-port"
+      - equal:
+          path: spec.template.spec.initContainers[?(@.name == "test-container")].ports[0].containerPort
+          value: 9410
+      - equal:
+          path: spec.template.spec.initContainers[?(@.name == "test-container")].ports[0].protocol
+          value: "TCP"
+      - equal:
+          path: spec.template.spec.initContainers[?(@.name == "test-container")].env[0].name
+          value: "TEST_ENV"
+      - equal:
+          path: spec.template.spec.initContainers[?(@.name == "test-container")].env[0].value
+          value: "test_env_value"
+
+  - it: "server/standalone-StatefulSet: add two extra init containers"
+    set:
+      server:
+        extraInitContainers:
+          - image: "test-image"
+            name: "test-container"
+          - image: "test-image"
+            name: "test-container-2"
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.initContainers
+          count: 2
+
+  - it: "server/standalone-StatefulSet: adds extra containers"
+    set:
+      server:
+        extraContainers:
+          - image: "test-image"
+            name: "test-container"
+            ports:
+              - name: "test-port"
+                containerPort: 9410
+                protocol: "TCP"
+            env:
+              - name: "TEST_ENV"
+                value: "test_env_value"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[?(@.name == "test-container")].name
+          value: "test-container"
+      - equal:
+          path: spec.template.spec.containers[?(@.name == "test-container")].image
+          value: "test-image"
+      - equal:
+          path: spec.template.spec.containers[?(@.name == "test-container")].ports[0].name
+          value: "test-port"
+      - equal:
+          path: spec.template.spec.containers[?(@.name == "test-container")].ports[0].containerPort
+          value: 9410
+      - equal:
+          path: spec.template.spec.containers[?(@.name == "test-container")].ports[0].protocol
+          value: "TCP"
+      - equal:
+          path: spec.template.spec.containers[?(@.name == "test-container")].env[0].name
+          value: "TEST_ENV"
+      - equal:
+          path: spec.template.spec.containers[?(@.name == "test-container")].env[0].value
+          value: "test_env_value"
+
+  - it: "server/standalone-StatefulSet: add two extra containers"
+    set:
+      server:
+        extraContainers:
+          - image: "test-image"
+            name: "test-container"
+          - image: "test-image"
+            name: "test-container-2"
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 3
+
+  - it: "server/standalone-StatefulSet: no extra containers added"
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 1
+
+  - it: "server/standalone-StatefulSet: shareProcessNamespace disabled by default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.shareProcessNamespace
+
+  - it: "server/standalone-StatefulSet: shareProcessNamespace enabled"
+    set:
+      server.shareProcessNamespace: true
+    asserts:
+      - equal:
+          path: spec.template.spec.shareProcessNamespace
+          value: true
+
+  - it: "server/standalone-StatefulSet: specify extraLabels"
+    set:
+      server.extraLabels.foo: "bar"
+    asserts:
+      - equal:
+          path: spec.template.metadata.labels.foo
+          value: "bar"
+
+  - it: "server/standalone-StatefulSet: default statefulSet.annotations"
+    asserts:
+      - isNull:
+          path: metadata.annotations
+
+  - it: "server/standalone-StatefulSet: specify statefulSet.annotations yaml"
+    set:
+      server.statefulSet.annotations.foo: "bar"
+    asserts:
+      - equal:
+          path: metadata.annotations.foo
+          value: "bar"
+
+  - it: "server/standalone-StatefulSet: specify statefulSet.annotations yaml string"
+    set:
+      server.statefulSet.annotations: "foo: bar"
+    asserts:
+      - equal:
+          path: metadata.annotations.foo
+          value: "bar"
+
+  - it: "server/standalone-StatefulSet: uid default"
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 100
+
+  - it: "server/standalone-StatefulSet: uid configurable"
+    set:
+      server.uid: 2000
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 2000
+
+  - it: "server/standalone-StatefulSet: gid default"
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 1000
+
+  - it: "server/standalone-StatefulSet: gid configurable"
+    set:
+      server.gid: 2000
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 2000
+
+  - it: "server/standalone-StatefulSet: fsgroup default"
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 1000
+
+  - it: "server/standalone-StatefulSet: fsgroup configurable"
+    set:
+      server.gid: 2000
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 2000
+
+  - it: "server/standalone-StatefulSet: readinessProbe default"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.exec.command[2]
+          value: "bao status -tls-skip-verify"
+
+  - it: "server/standalone-StatefulSet: readinessProbe configurable"
+    set:
+      server.readinessProbe.enabled: false
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  - it: "server/standalone-StatefulSet: readiness failureThreshold default"
+    set:
+      server.readinessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.failureThreshold
+          value: 2
+
+  - it: "server/standalone-StatefulSet: readiness failureThreshold configurable"
+    set:
+      server.readinessProbe.enabled: true
+      server.readinessProbe.failureThreshold: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.failureThreshold
+          value: 100
+
+  - it: "server/standalone-StatefulSet: readiness initialDelaySeconds default"
+    set:
+      server.readinessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+          value: 5
+
+  - it: "server/standalone-StatefulSet: readiness initialDelaySeconds configurable"
+    set:
+      server.readinessProbe.enabled: true
+      server.readinessProbe.initialDelaySeconds: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+          value: 100
+
+  - it: "server/standalone-StatefulSet: readiness periodSeconds default"
+    set:
+      server.readinessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+          value: 5
+
+  - it: "server/standalone-StatefulSet: readiness periodSeconds configurable"
+    set:
+      server.readinessProbe.enabled: true
+      server.readinessProbe.periodSeconds: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+          value: 100
+
+  - it: "server/standalone-StatefulSet: readiness successThreshold default"
+    set:
+      server.readinessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.successThreshold
+          value: 1
+
+  - it: "server/standalone-StatefulSet: readiness successThreshold configurable"
+    set:
+      server.readinessProbe.enabled: true
+      server.readinessProbe.successThreshold: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.successThreshold
+          value: 100
+
+  - it: "server/standalone-StatefulSet: readiness timeoutSeconds default"
+    set:
+      server.readinessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.timeoutSeconds
+          value: 3
+
+  - it: "server/standalone-StatefulSet: readiness timeoutSeconds configurable"
+    set:
+      server.readinessProbe.enabled: true
+      server.readinessProbe.timeoutSeconds: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.timeoutSeconds
+          value: 100
+
+  - it: "server/standalone-StatefulSet: livenessProbe default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].livenessProbe
+
+  - it: "server/standalone-StatefulSet: livenessProbe configurable"
+    set:
+      server.livenessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+          value: "/v1/sys/health?standbyok=true"
+
+  - it: "server/standalone-StatefulSet: liveness failureThreshold default"
+    set:
+      server.livenessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.failureThreshold
+          value: 2
+
+  - it: "server/standalone-StatefulSet: liveness failureThreshold configurable"
+    set:
+      server.livenessProbe.enabled: true
+      server.livenessProbe.failureThreshold: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.failureThreshold
+          value: 100
+
+  - it: "server/standalone-StatefulSet: liveness initialDelaySeconds default"
+    set:
+      server.livenessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 60
+
+  - it: "server/standalone-StatefulSet: liveness initialDelaySeconds configurable"
+    set:
+      server.livenessProbe.enabled: true
+      server.livenessProbe.initialDelaySeconds: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 100
+
+  - it: "server/standalone-StatefulSet: liveness periodSeconds default"
+    set:
+      server.livenessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.periodSeconds
+          value: 5
+
+  - it: "server/standalone-StatefulSet: liveness periodSeconds configurable"
+    set:
+      server.livenessProbe.enabled: true
+      server.livenessProbe.periodSeconds: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.periodSeconds
+          value: 100
+
+  - it: "server/standalone-StatefulSet: liveness successThreshold default"
+    set:
+      server.livenessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.successThreshold
+          value: 1
+
+  - it: "server/standalone-StatefulSet: liveness successThreshold configurable"
+    set:
+      server.livenessProbe.enabled: true
+      server.livenessProbe.successThreshold: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.successThreshold
+          value: 100
+
+  - it: "server/standalone-StatefulSet: liveness timeoutSeconds default"
+    set:
+      server.livenessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.timeoutSeconds
+          value: 3
+
+  - it: "server/standalone-StatefulSet: liveness timeoutSeconds configurable"
+    set:
+      server.livenessProbe.enabled: true
+      server.livenessProbe.timeoutSeconds: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.timeoutSeconds
+          value: 100
+
+  - it: "server/standalone-StatefulSet: liveness exec disabled by default"
+    set:
+      server.livenessProbe.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].livenessProbe.exec
+      - isNotNull:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet
+
+  - it: "server/standalone-StatefulSet: liveness exec can be set"
+    set:
+      server.livenessProbe.enabled: true
+      server.livenessProbe.execCommand: ["/bin/sh","-c","sleep"]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.exec.command[0]
+          value: "/bin/sh"
+      - isNull:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet
+
+  - it: "server/standalone-StatefulSet: add extraArgs"
+    set:
+      server.extraArgs: "foobar"
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: "foobar"
+
+  - it: "server/standalone-StatefulSet: terminationGracePeriodSeconds default"
+    asserts:
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 10
+
+  - it: "server/standalone-StatefulSet: terminationGracePeriodSeconds 30"
+    set:
+      server.terminationGracePeriodSeconds: 30
+    asserts:
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 30
+
+  - it: "server/standalone-StatefulSet: preStop sleep duration default"
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]
+          pattern: "^sleep\\ 5\\ \\&\\&"
+
+  - it: "server/standalone-StatefulSet: preStop sleep duration 10"
+    set:
+      server.preStopSleepSeconds: 10
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]
+          pattern: "^sleep\\ 10\\ \\&\\&"
+
+  - it: "server/standalone-StatefulSet: openbao port name is http, when tlsDisable is true"
+    set:
+      global.tlsDisable: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[?(@.containerPort == 8200)].name
+          value: "http"
+
+  - it: "server/standalone-StatefulSet: openbao replication port name is http-rep, when tlsDisable is true"
+    set:
+      global.tlsDisable: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[?(@.containerPort == 8202)].name
+          value: "http-rep"
+
+  - it: "server/standalone-StatefulSet: openbao port name is https, when tlsDisable is false"
+    set:
+      global.tlsDisable: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[?(@.containerPort == 8200)].name
+          value: "https"
+
+  - it: "server/standalone-StatefulSet: openbao replication port name is https-rep, when tlsDisable is false"
+    set:
+      global.tlsDisable: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[?(@.containerPort == 8202)].name
+          value: "https-rep"
+
+  - it: "server/standalone-StatefulSet: generic annotations string"
+    set:
+      server.annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/standalone-StatefulSet: auditStorage volumeClaim annotations string"
+    set:
+      server.auditStorage.enabled: true
+      server.auditStorage.annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[1].metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/standalone-StatefulSet: dataStorage volumeClaim annotations string"
+    set:
+      server.dataStorage.enabled: true
+      server.dataStorage.annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/standalone-StatefulSet: auditStorage volumeClaim annotations yaml"
+    set:
+      server.auditStorage.enabled: true
+      server.auditStorage.annotations.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[1].metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/standalone-StatefulSet: dataStorage volumeClaim annotations yaml"
+    set:
+      server.dataStorage.enabled: true
+      server.dataStorage.annotations.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/ha-standby-Service: generic annotations yaml"
+    set:
+      server.annotations.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/standalone-StatefulSet: config checksum annotation defaults to off"
+    asserts:
+      - isNull:
+          path: spec.template.metadata.annotations["openbao.hashicorp.com/config-checksum"]
+
+  - it: "server/standalone-StatefulSet: config checksum annotation off does not set annotations"
+    asserts:
+      - notExists:
+          path: spec.template.metadata.annotations
+
+  - it: "server/standalone-StatefulSet: config checksum annotation can be enabled"
+    set:
+      server.configAnnotation: true
+    asserts:
+      - isNotNull:
+          path: spec.template.metadata.annotations["openbao.hashicorp.com/config-checksum"]
+
+  - it: "server/standalone-StatefulSet: priorityClassName not set by default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.priorityClassName
+
+  - it: "server/standalone-StatefulSet: priorityClassName can be set"
+    set:
+      server.priorityClassName: "armaggeddon"
+    asserts:
+      - equal:
+          path: spec.template.spec.priorityClassName
+          value: "armaggeddon"
+
+  - it: "server/standalone-StatefulSet: postStart disabled by default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].lifecycle.postStart
+
+  - it: "server/standalone-StatefulSet: postStart can be set"
+    set:
+      server.postStart: ["/bin/sh","-c","sleep"]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle.postStart.exec.command[0]
+          value: "/bin/sh"
+
+  - it: "server/standalone-StatefulSet: OpenShift - runAsUser disabled"
+    set:
+      global.openshift: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.securityContext.runAsUser
+
+  - it: "server/standalone-StatefulSet: OpenShift - runAsGroup disabled"
+    set:
+      global.openshift: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.securityContext.runAsGroup
+
+  - it: "server/standalone-StatefulSet: serviceAccount.name is set (case 1)"
+    set:
+      server.serviceAccount.create: false
+      server.serviceAccount.name: "user-defined-ksa"
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "user-defined-ksa"
+
+  - it: "server/standalone-StatefulSet: serviceAccount.name is set (case 2)"
+    set:
+      server.serviceAccount.create: true
+      server.serviceAccount.name: "user-defined-ksa"
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "user-defined-ksa"
+
+  - it: "server/standalone-StatefulSet: serviceAccount.name is not set (case 1)"
+    set:
+      server.serviceAccount.create: false
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "default"
+
+  - it: "server/standalone-StatefulSet: serviceAccount.name is not set (case 2)"
+    set:
+      server.serviceAccount.create: true
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "release-name-openbao"
+
+  - it: "server/standalone-StatefulSet: default statefulSet.securityContext.pod"
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.securityContext
+
+  - it: "server/standalone-StatefulSet: default statefulSet.securityContext.container"
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.containers[0].securityContext
+
+  - it: "server/standalone-StatefulSet: specify statefulSet.securityContext.pod yaml"
+    set:
+      server.statefulSet.securityContext.pod.foo: "bar"
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.foo
+          value: "bar"
+
+  - it: "server/standalone-StatefulSet: specify statefulSet.securityContext.container yaml"
+    set:
+      server.statefulSet.securityContext.container.foo: "bar"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.foo
+          value: "bar"
+
+  - it: "server/standalone-StatefulSet: specify statefulSet.securityContext.pod yaml string"
+    set:
+      server.statefulSet.securityContext.pod: "foo: bar"
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.foo
+          value: "bar"
+
+  - it: "server/standalone-StatefulSet: specify statefulSet.securityContext.container yaml string"
+    set:
+      server.statefulSet.securityContext.container: "foo: bar"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.foo
+          value: "bar"
+
+  - it: "server/StatefulSet: server.hostNetwork not set"
+    asserts:
+      - equal:
+          path: spec.template.spec.hostNetwork
+          value: false
+
+  - it: "server/StatefulSet: server.hostNetwork is set"
+    set:
+      server.hostNetwork: true
+    asserts:
+      - equal:
+          path: spec.template.spec.hostNetwork
+          value: true
+
+  - it: "server/StatefulSet: server.hostAliases not set"
+    asserts:
+      - isNull:
+          path: spec.template.spec.hostAliases
+
+  - it: "server/StatefulSet: server.hostAliases is set"
+    set:
+      server:
+        hostAliases:
+          - "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.hostAliases[0]
+          value: "foo"
+
+  - it: "server/standalone-StatefulSet: adds extra ports"
+    set:
+      server:
+        extraPorts:
+          - containerPort: 1111
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[?(@.name == "foo")].containerPort
+          value: 1111
+      - equal:
+          path: spec.template.spec.containers[0].ports[?(@.name == "foo")].name
+          value: "foo"
+
+  - it: "server/StatefulSet: server.readinessProbe.port is set"
+    set:
+      server.readinessProbe.enabled: true
+      server.readinessProbe.path: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.port
+          value: 8200
+
+  - it: "server/StatefulSet: server.livenessProbe.port is set"
+    set:
+      server.livenessProbe.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.port
+          value: 8200
+
+  - it: "server/standalone-StatefulSet: auditStorage volumeClaim labels string"
+    set:
+      server.auditStorage.enabled: true
+      server.auditStorage.labels: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[1].metadata.labels["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/standalone-StatefulSet: dataStorage volumeClaim labels string"
+    set:
+      server.dataStorage.enabled: true
+      server.dataStorage.labels: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.labels["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/standalone-StatefulSet: auditStorage volumeClaim labels yaml"
+    set:
+      server.auditStorage.enabled: true
+      server.auditStorage.labels.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[1].metadata.labels["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/standalone-StatefulSet: dataStorage volumeClaim labels yaml"
+    set:
+      server.dataStorage.enabled: true
+      server.dataStorage.labels.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.labels["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/standalone-StatefulSet: default podManagementPolicy is OrderedReady"
+    asserts:
+      - equal:
+          path: spec.podManagementPolicy
+          value: "OrderedReady"
+
+  - it: "server/standalone-StatefulSet: podManagementPolicy can be set to Parallel"
+    set:
+      server.podManagementPolicy: "Parallel"
+    asserts:
+      - equal:
+          path: spec.podManagementPolicy
+          value: "Parallel"
+
+  - it: "server/standalone-StatefulSet: podManagementPolicy can be explicitly set to OrderedReady"
+    set:
+      server.podManagementPolicy: "OrderedReady"
+    asserts:
+      - equal:
+          path: spec.podManagementPolicy
+          value: "OrderedReady"

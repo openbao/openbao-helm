@@ -1,0 +1,231 @@
+suite: OpenBao Server Ingress Test
+templates:
+  - templates/server-ingress.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/ingress: disabled by default"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ingress: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      server.ingress.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/ingress: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      server.ingress.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/ingress: disable by global.externalVaultAddr"
+    set:
+      server.ingress.enabled: true
+      global.externalVaultAddr: "http://openbao-outside"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ingress: checking host entry gets added and path is / (case 1)"
+    set:
+      server.ingress.enabled: true
+      server:
+        ingress:
+          hosts:
+            - host: "test.com"
+              paths:
+                - "/"
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: "test.com"
+
+  - it: "server/ingress: checking host entry gets added and path is / (case 2)"
+    set:
+      server.ingress.enabled: true
+      server:
+        ingress:
+          hosts:
+            - host: "test.com"
+              paths:
+                - "/"
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: "/"
+
+  - it: "server/ingress: openbao backend should be added when I specify a path"
+    set:
+      server.ingress.enabled: true
+      server:
+        ingress:
+          hosts:
+            - host: "test.com"
+              paths:
+                - "/"
+    asserts:
+      - isNotNull:
+          path: spec.rules[0].http.paths[0].backend.service.name
+
+  - it: "server/ingress: extra paths prepend host configuration (case 1)"
+    set:
+      server.ingress.enabled: true
+      server:
+        ingress:
+          hosts:
+            - host: "test.com"
+              paths:
+                - "/"
+          extraPaths:
+            - path: "/annotation-service"
+              backend:
+                service:
+                  name: "ssl-redirect"
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: "ssl-redirect"
+
+  - it: "server/ingress: extra paths prepend host configuration (case 2)"
+    set:
+      server.ingress.enabled: true
+      server:
+        ingress:
+          hosts:
+            - host: "test.com"
+              paths:
+                - "/"
+          extraPaths:
+            - path: "/annotation-service"
+              backend:
+                service:
+                  name: "ssl-redirect"
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: "/annotation-service"
+
+  - it: "server/ingress: extra paths prepend host configuration (case 3)"
+    set:
+      server.ingress.enabled: true
+      server:
+        ingress:
+          hosts:
+            - host: "test.com"
+              paths:
+                - "/"
+          extraPaths:
+            - path: "/annotation-service"
+              backend:
+                service:
+                  name: "ssl-redirect"
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[1].path
+          value: "/"
+
+  - it: "server/ingress: labels gets added to object"
+    set:
+      server.ingress.enabled: true
+      server.ingress.labels.traffic: "external"
+      server.ingress.labels.team: "dev"
+    asserts:
+      - equal:
+          path: metadata.labels.traffic
+          value: "external"
+
+  - it: "server/ingress: annotations added to object - string"
+    set:
+      server.ingress.enabled: true
+      server.ingress.annotations: "kubernetes.io/ingress.class: nginx"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubernetes.io/ingress.class"]
+          value: "nginx"
+
+  - it: "server/ingress: annotations added to object - yaml"
+    set:
+      server.ingress.enabled: true
+      server:
+        ingress:
+          annotations:
+            "kubernetes.io/ingress.class": "nginx"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubernetes.io/ingress.class"]
+          value: "nginx"
+
+  - it: "server/ingress: ingressClassName added to object spec - string"
+    set:
+      server.ingress.enabled: true
+      server.ingress.ingressClassName: "nginx"
+    asserts:
+      - equal:
+          path: spec.ingressClassName
+          value: "nginx"
+
+  - it: "server/ingress: ingressClassName is not added by default"
+    set:
+      server.ingress.enabled: true
+    asserts:
+      - isNull:
+          path: spec.ingressClassName
+
+  - it: "server/ingress: uses active service when ha by default - yaml"
+    set:
+      server.ingress.enabled: true
+      server.dev.enabled: false
+      server.ha.enabled: true
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: "release-name-openbao-active"
+
+  - it: "server/ingress: uses regular service when configured with ha - yaml"
+    set:
+      server.ingress.enabled: true
+      server.ingress.activeService: false
+      server.dev.enabled: false
+      server.ha.enabled: true
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: "release-name-openbao"
+
+  - it: "server/ingress: uses regular service when not ha - yaml"
+    set:
+      server.ingress.enabled: true
+      server.dev.enabled: false
+      server.ha.enabled: false
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: "release-name-openbao"
+
+  - it: "server/ingress: uses regular service when not ha and activeService is true - yaml"
+    set:
+      server.ingress.enabled: true
+      server.ingress.activeService: true
+      server.dev.enabled: false
+      server.ha.enabled: false
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: "release-name-openbao"

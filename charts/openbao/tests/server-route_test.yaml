@@ -1,0 +1,167 @@
+suite: OpenBao Server Route Test
+templates:
+  - templates/server-route.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/route: OpenShift - disabled by default"
+    set:
+      global.openshift: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/route: OpenShift -disable by global.externalVaultAddr"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      global.externalVaultAddr: "http://openbao-outside"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/route: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/route: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/route: OpenShift - checking host entry gets added and path is /"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      server.route.host: "test.com"
+    asserts:
+      - equal:
+          path: spec.host
+          value: "test.com"
+
+  - it: "server/route: OpenShift - openbao backend should be added when I specify a path"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      server.route.host: "test.com"
+    asserts:
+      - isNotNull:
+          path: spec.to.name
+
+  - it: "server/route: OpenShift - labels gets added to object"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      server.route.labels.traffic: "external"
+      server.route.labels.team: "dev"
+    asserts:
+      - equal:
+          path: metadata.labels.traffic
+          value: "external"
+
+  - it: "server/route: OpenShift - annotations added to object - string"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      server.route.annotations: "kubernetes.io/route.class: haproxy"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubernetes.io/route.class"]
+          value: "haproxy"
+
+  - it: "server/route: OpenShift - annotations added to object - yaml"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      server:
+        route:
+          annotations:
+            "kubernetes.io/route.class": "haproxy"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubernetes.io/route.class"]
+          value: "haproxy"
+
+  - it: "server/route: OpenShift - route points to main service by default"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+    asserts:
+      - equal:
+          path: spec.to.name
+          value: "release-name-openbao"
+
+  - it: "server/route: OpenShift - route points to main service when not ha and activeService is true"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      server.route.activeService: true
+    asserts:
+      - equal:
+          path: spec.to.name
+          value: "release-name-openbao"
+
+  - it: "server/route: OpenShift - route points to active service by when HA by default"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.to.name
+          value: "release-name-openbao-active"
+
+  - it: "server/route: OpenShift - route points to general service by when HA when configured"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      server.route.activeService: false
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.to.name
+          value: "release-name-openbao"
+
+  - it: "server/route: OpenShift - route termination mode set to default passthrough"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+    asserts:
+      - equal:
+          path: spec.tls.termination
+          value: "passthrough"
+
+  - it: "server/route: OpenShift - route termination mode set to edge"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      server.route.tls.termination: "edge"
+    asserts:
+      - equal:
+          path: spec.tls.termination
+          value: "edge"
+
+  - it: "server/route: OpenShift - route custom tls entry"
+    set:
+      global.openshift: true
+      server.route.enabled: true
+      server.route.tls.insecureEdgeTerminationPolicy: "Redirect"
+    asserts:
+      - equal:
+          path: spec.tls.insecureEdgeTerminationPolicy
+          value: "Redirect"

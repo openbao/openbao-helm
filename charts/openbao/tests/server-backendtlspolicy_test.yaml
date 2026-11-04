@@ -1,0 +1,190 @@
+suite: OpenBao Server Backendtlspolicy Test
+templates:
+  - templates/server-backendtlspolicy.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/gateway/tlspolicy: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/gateway/tlspolicy: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/gateway/tlspolicy: has api version"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+    asserts:
+      - isNotNull:
+          path: apiVersion
+
+  - it: "server/gateway/tlspolicy: disable by tlsDisable"
+    set:
+      global.tlsDisable: true
+      server.gateway.tlsPolicy.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/gateway/tlspolicy: disable by global.externalVaultAddr"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      global.externalVaultAddr: "http://openbao-outside"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/gateway/tlspolicy: labels gets added to object"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server.gateway.tlsPolicy.labels.traffic: "external"
+      server.gateway.tlsPolicy.labels.team: "dev"
+    asserts:
+      - equal:
+          path: metadata.labels.traffic
+          value: "external"
+
+  - it: "server/gateway/tlspolicy: annotations added to object - string"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server.gateway.tlsPolicy.annotations: "kubernetes.io/ingress.class: nginx"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubernetes.io/ingress.class"]
+          value: "nginx"
+
+  - it: "server/gateway/tlspolicy: annotations added to object - yaml"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server:
+        gateway:
+          tlsPolicy:
+            annotations:
+              "kubernetes.io/ingress.class": "nginx"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubernetes.io/ingress.class"]
+          value: "nginx"
+
+  - it: "server/gateway/tlspolicy: uses active service when ha by default - yaml"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server.dev.enabled: false
+      server.ha.enabled: true
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.targetRefs[0].name
+          value: "release-name-openbao-active"
+
+  - it: "server/gateway/tlspolicy: uses regular service when configured with ha - yaml"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server.gateway.tlsPolicy.activeService: false
+      server.dev.enabled: false
+      server.ha.enabled: true
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.targetRefs[0].name
+          value: "release-name-openbao"
+
+  - it: "server/gateway/tlspolicy: uses regular service when not ha - yaml"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server.dev.enabled: false
+      server.ha.enabled: false
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.targetRefs[0].name
+          value: "release-name-openbao"
+
+  - it: "server/gateway/tlspolicy: uses regular service when not ha and activeService is true - yaml"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server.gateway.tlsPolicy.activeService: true
+      server.dev.enabled: false
+      server.ha.enabled: false
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.targetRefs[0].name
+          value: "release-name-openbao"
+
+  - it: "server/gateway/tlspolicy: validation hostname"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server.gateway.tlsPolicy.activeService: true
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.validation.hostname
+          value: "release-name-openbao"
+
+  - it: "server/gateway/tlspolicy: validation hostname can be overridden"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server.gateway.tlsPolicy.activeService: true
+      server.service.enabled: true
+      server.gateway.tlsPolicy.validation.hostname: "custom.example.com"
+    asserts:
+      - equal:
+          path: spec.validation.hostname
+          value: "custom.example.com"
+
+  - it: "server/gateway/tlspolicy: validation settings"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server.gateway.tlsPolicy.activeService: true
+      server.service.enabled: true
+      server.gateway.tlsPolicy.validation.caCertificateRefs.name: "ca-certs"
+    asserts:
+      - equal:
+          path: spec.validation.caCertificateRefs.name
+          value: "ca-certs"
+
+  - it: "server/gateway/tlspolicy: specify target ref"
+    set:
+      global.tlsDisable: false
+      server.gateway.tlsPolicy.enabled: true
+      server.gateway.tlsPolicy.activeService: true
+      server.service.enabled: true
+      server:
+        gateway:
+          tlsPolicy:
+            targetRefs:
+              - name: "some-target"
+    asserts:
+      - equal:
+          path: spec.targetRefs[0].name
+          value: "some-target"

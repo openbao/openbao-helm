@@ -1,0 +1,118 @@
+suite: OpenBao Server Headless Service Test
+templates:
+  - templates/server-headless-service.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/headless-Service: publishNotReadyAddresses cannot be changed (case 1)"
+    asserts:
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: true
+
+  - it: "server/headless-Service: publishNotReadyAddresses cannot be changed (case 2)"
+    set:
+      server.service.publishNotReadyAddresses: false
+    asserts:
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: true
+
+  - it: "server/headless-Service: instance selector cannot be disabled (case 1)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.selector["app.kubernetes.io/instance"]
+          value: "release-name"
+
+  - it: "server/headless-Service: instance selector cannot be disabled (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.instanceSelector.enabled: false
+    asserts:
+      - equal:
+          path: spec.selector["app.kubernetes.io/instance"]
+          value: "release-name"
+
+  - it: "server/headless-Service: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/headless-Service: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      server.ha.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/headless-Service: Assert ipFamilyPolicy set"
+    set:
+      server.service.ipFamilyPolicy: "PreferDualStack"
+    asserts:
+      - equal:
+          path: spec.ipFamilyPolicy
+          value: "PreferDualStack"
+
+  - it: "server/headless-Service: Assert ipFamilies set"
+    set:
+      server.service.ipFamilies: ["IPv4","IPv6"]
+    asserts:
+      - equal:
+          path: spec.ipFamilies
+          value: ["IPv4","IPv6"]
+
+  - it: "server/headless-Service: generic annotations string"
+    set:
+      server.service.annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/headless-Service: generic annotations yaml"
+    set:
+      server.service.annotations.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/headless-Service: with headless annotations string"
+    set:
+      server.service.headless.annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/headless-Service: with headless annotations yaml"
+    set:
+      server.service.headless.annotations.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/headless-Service: with both annotations set"
+    set:
+      server.service.headless.annotations: "openBaoIsAwesome: true"
+      server.service.annotations: "openbaoIsNotAwesome: false"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+      - equal:
+          path: metadata.annotations["openbaoIsNotAwesome"]
+          value: false

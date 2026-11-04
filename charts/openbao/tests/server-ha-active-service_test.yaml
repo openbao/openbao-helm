@@ -1,0 +1,283 @@
+suite: OpenBao Server Ha Active Service Test
+templates:
+  - templates/server-ha-active-service.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/ha-active-Service: generic extraLabels"
+    set:
+      server.ha.enabled: true
+      server.service.active.extraLabels.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: metadata.labels.openBaoIsAwesome
+          value: true
+
+  - it: "server/ha-active-Service: generic annotations"
+    set:
+      server.ha.enabled: true
+      server.service.annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/ha-active-Service: with active annotations"
+    set:
+      server.ha.enabled: true
+      server.service.active.annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/ha-active-Service: with both annotations set"
+    set:
+      server.ha.enabled: true
+      server.service.active.annotations: "openBaoIsAwesome: true"
+      server.service.annotations: "openbaoIsNotAwesome: false"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+      - equal:
+          path: metadata.annotations["openbaoIsNotAwesome"]
+          value: false
+
+  - it: "server/ha-active-Service: disable with ha.enabled false"
+    set:
+      server.ha.enabled: false
+      server.service.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ha-active-Service: disable with server.service.enabled false"
+    set:
+      server.ha.enabled: true
+      server.service.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ha-active-Service: disable with server.service.active.enabled false"
+    set:
+      server.ha.enabled: true
+      server.service.enabled: true
+      server.service.active.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ha-active-Service: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/ha-active-Service: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      server.ha.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/ha-active-Service: type empty by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNull:
+          path: spec.type
+
+  - it: "server/ha-active-Service: type can set"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+    asserts:
+      - equal:
+          path: spec.type
+          value: "NodePort"
+
+  - it: "server/ha-active-Service: clusterIP empty by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNull:
+          path: spec.clusterIP
+
+  - it: "server/ha-active-Service: clusterIP can set"
+    set:
+      server.ha.enabled: true
+      server.service.clusterIP: "None"
+    asserts:
+      - equal:
+          path: spec.clusterIP
+          value: "None"
+
+  - it: "server/ha-active-Service: port and targetPort will be 8200 by default (case 1)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 8200
+
+  - it: "server/ha-active-Service: port and targetPort will be 8200 by default (case 2)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: 8200
+
+  - it: "server/ha-active-Service: port and targetPort can be set (case 1)"
+    set:
+      server.ha.enabled: true
+      server.service.port: 8000
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 8000
+
+  - it: "server/ha-active-Service: port and targetPort can be set (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.targetPort: 80
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: 80
+
+  - it: "server/ha-active-Service: extraPorts assert is empty by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.ports
+          count: 2
+
+  - it: "server/ha-active-Service: adds extra ports"
+    set:
+      server.ha.enabled: true
+      server:
+        service:
+          extraPorts:
+            - port: 9101
+              targetPort: 9101
+              name: "metrics"
+    asserts:
+      - equal:
+          path: spec.ports[?(@.name == "metrics")].port
+          value: 9101
+      - equal:
+          path: spec.ports[?(@.name == "metrics")].targetPort
+          value: 9101
+      - equal:
+          path: spec.ports[?(@.name == "metrics")].name
+          value: "metrics"
+
+  - it: "server/ha-active-Service: nodeport can set"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+      server.service.activeNodePort: 30009
+    asserts:
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 30009
+
+  - it: "server/ha-active-Service: nodeport can't set when type isn't NodePort"
+    set:
+      server.ha.enabled: true
+      server.service.activeNodePort: 30009
+    asserts:
+      - isNull:
+          path: spec.ports[0].nodePort
+
+  - it: "server/ha-active-Service: openbao port name is http, when tlsDisable is true"
+    set:
+      server.ha.enabled: true
+      global.tlsDisable: true
+    asserts:
+      - equal:
+          path: spec.ports[?(@.port == 8200)].name
+          value: "http"
+
+  - it: "server/ha-active-Service: openbao port name is https, when tlsDisable is false"
+    set:
+      server.ha.enabled: true
+      global.tlsDisable: false
+    asserts:
+      - equal:
+          path: spec.ports[?(@.port == 8200)].name
+          value: "https"
+
+  - it: "server/ha-active-Service: NodePort assert externalTrafficPolicy"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+      server.service.externalTrafficPolicy: "Foo"
+    asserts:
+      - equal:
+          path: spec.externalTrafficPolicy
+          value: "Foo"
+
+  - it: "server/ha-active-Service: NodePort assert no externalTrafficPolicy"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+      server.service.externalTrafficPolicy: ""
+    asserts:
+      - isNull:
+          path: spec.externalTrafficPolicy
+
+  - it: "server/ha-active-Service: ClusterIP assert no externalTrafficPolicy"
+    set:
+      server.ha.enabled: true
+      server.service.type: "ClusterIP"
+      server.service.externalTrafficPolicy: "Foo"
+    asserts:
+      - isNull:
+          path: spec.externalTrafficPolicy
+
+  - it: "server/ha-active-Service: publishNotReadyAddresses can be changed (case 1)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: true
+
+  - it: "server/ha-active-Service: publishNotReadyAddresses can be changed (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.publishNotReadyAddresses: false
+    asserts:
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: false
+
+  - it: "server/ha-active-Service: instance selector can be disabled (case 1)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.selector["app.kubernetes.io/instance"]
+          value: "release-name"
+
+  - it: "server/ha-active-Service: instance selector can be disabled (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.instanceSelector.enabled: false
+    asserts:
+      - isNull:
+          path: spec.selector["app.kubernetes.io/instance"]
