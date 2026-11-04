@@ -1,0 +1,143 @@
+suite: OpenBao Server Tlsroute Test
+templates:
+  - templates/server-tlsroute.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/gateway/tlsroute: disabled by default"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/gateway/tlsroute: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      server.gateway.tlsRoute.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/gateway/tlsroute: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/gateway/tlsroute: disable by global.externalVaultAddr"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      global.externalVaultAddr: "http://openbao-outside"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/gateway/tlsroute: checking host entry gets added"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      server:
+        gateway:
+          tlsRoute:
+            hosts:
+              - "test.com"
+    asserts:
+      - equal:
+          path: spec.hostnames[0]
+          value: "test.com"
+
+  - it: "server/gateway/tlsroute: openbao backend should be added"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      server:
+        gateway:
+          tlsRoute:
+            hosts:
+              - host: "test.com"
+    asserts:
+      - isNotNull:
+          path: spec.rules[0].backendRefs[0].name
+
+  - it: "server/gateway/tlsroute: labels gets added to object"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      server.gateway.tlsRoute.labels.traffic: "external"
+      server.gateway.tlsRoute.labels.team: "dev"
+    asserts:
+      - equal:
+          path: metadata.labels.traffic
+          value: "external"
+
+  - it: "server/gateway/tlsroute: annotations added to object - string"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      server.gateway.tlsRoute.annotations: "kubernetes.io/ingress.class: nginx"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubernetes.io/ingress.class"]
+          value: "nginx"
+
+  - it: "server/gateway/tlsroute: annotations added to object - yaml"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      server:
+        gateway:
+          tlsRoute:
+            annotations:
+              "kubernetes.io/ingress.class": "nginx"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubernetes.io/ingress.class"]
+          value: "nginx"
+
+  - it: "server/gateway/tlsroute: uses active service when ha by default - yaml"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      server.dev.enabled: false
+      server.ha.enabled: true
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: "release-name-openbao-active"
+
+  - it: "server/gateway/tlsroute: uses regular service when configured with ha - yaml"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      server.gateway.tlsRoute.activeService: false
+      server.dev.enabled: false
+      server.ha.enabled: true
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: "release-name-openbao"
+
+  - it: "server/gateway/tlsroute: uses regular service when not ha - yaml"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      server.dev.enabled: false
+      server.ha.enabled: false
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: "release-name-openbao"
+
+  - it: "server/gateway/tlsroute: uses regular service when not ha and activeService is true - yaml"
+    set:
+      server.gateway.tlsRoute.enabled: true
+      server.gateway.tlsRoute.activeService: true
+      server.dev.enabled: false
+      server.ha.enabled: false
+      server.service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: "release-name-openbao"

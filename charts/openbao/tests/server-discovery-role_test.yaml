@@ -1,0 +1,55 @@
+suite: OpenBao Server Discovery Role Test
+templates:
+  - templates/server-discovery-role.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/DiscoveryRole: enabled by default with ha (case 1)"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/DiscoveryRole: enabled by default with ha (case 2)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/DiscoveryRole: can disable with server.enabled false"
+    set:
+      server.enabled: false
+      server.ha.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/DiscoveryRole: can disable with server.serviceAccount.serviceDiscovery.enabled false"
+    set:
+      server.ha.enabled: true
+      server.serviceAccount.serviceDiscovery.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/DiscoveryRole: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/DiscoveryRole: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      server.ha.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"

@@ -1,0 +1,81 @@
+suite: OpenBao Server Clusterrolebinding Test
+templates:
+  - templates/server-clusterrolebinding.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/ClusterRoleBinding: enabled by default (case 1)"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ClusterRoleBinding: enabled by default (case 2)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ClusterRoleBinding: enabled by default (case 3)"
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ClusterRoleBinding: disable with global.enabled"
+    set:
+      global.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ClusterRoleBinding: can disable with server.authDelegator (case 1)"
+    set:
+      server.authDelegator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ClusterRoleBinding: can disable with server.authDelegator (case 2)"
+    set:
+      server.authDelegator.enabled: false
+      server.ha.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ClusterRoleBinding: can disable with server.authDelegator (case 3)"
+    set:
+      server.authDelegator.enabled: false
+      server.dev.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ClusterRoleBinding: also deploy with injector.externalVaultAddr"
+    set:
+      server.enabled: false
+      injector.externalVaultAddr: "http://openbao-outside"
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ClusterRoleBinding: service account namespace (case 1)"
+    release:
+      namespace: "foo"
+    asserts:
+      - equal:
+          path: subjects[0].namespace
+          value: "foo"
+
+  - it: "server/ClusterRoleBinding: service account namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: subjects[0].namespace
+          value: "bar"

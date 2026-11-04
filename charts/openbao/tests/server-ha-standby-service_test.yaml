@@ -1,0 +1,301 @@
+suite: OpenBao Server Ha Standby Service Test
+templates:
+  - templates/server-ha-standby-service.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/ha-standby-Service: generic extraLabels"
+    set:
+      server.ha.enabled: true
+      server.service.standby.extraLabels.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: metadata.labels.openBaoIsAwesome
+          value: true
+
+  - it: "server/ha-standby-Service: generic annotations string"
+    set:
+      server.ha.enabled: true
+      server.service.annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/ha-standby-Service: generic annotations yaml"
+    set:
+      server.ha.enabled: true
+      server.service.annotations.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/ha-standby-Service: with standby annotations string"
+    set:
+      server.ha.enabled: true
+      server.service.standby.annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/ha-standby-Service: with standby annotations yaml"
+    set:
+      server.ha.enabled: true
+      server.service.standby.annotations.openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "server/ha-standby-Service: with both annotations set"
+    set:
+      server.ha.enabled: true
+      server.service.standby.annotations: "openBaoIsAwesome: true"
+      server.service.annotations: "openbaoIsNotAwesome: false"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+      - equal:
+          path: metadata.annotations["openbaoIsNotAwesome"]
+          value: false
+
+  - it: "server/ha-standby-Service: disable with ha.enabled false"
+    set:
+      server.ha.enabled: false
+      server.service.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ha-standby-Service: disable with server.service.enabled false"
+    set:
+      server.ha.enabled: true
+      server.service.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ha-standby-Service: disable with server.service.standby.enabled false"
+    set:
+      server.ha.enabled: true
+      server.service.enabled: true
+      server.service.standby.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ha-standby-Service: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/ha-standby-Service: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      server.ha.enabled: true
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/ha-standby-Service: type empty by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNull:
+          path: spec.type
+
+  - it: "server/ha-standby-Service: type can set"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+    asserts:
+      - equal:
+          path: spec.type
+          value: "NodePort"
+
+  - it: "server/ha-standby-Service: clusterIP empty by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNull:
+          path: spec.clusterIP
+
+  - it: "server/ha-standby-Service: clusterIP can set"
+    set:
+      server.ha.enabled: true
+      server.service.clusterIP: "None"
+    asserts:
+      - equal:
+          path: spec.clusterIP
+          value: "None"
+
+  - it: "server/ha-standby-Service: port and targetPort will be 8200 by default (case 1)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 8200
+
+  - it: "server/ha-standby-Service: port and targetPort will be 8200 by default (case 2)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: 8200
+
+  - it: "server/ha-standby-Service: port and targetPort can be set (case 1)"
+    set:
+      server.ha.enabled: true
+      server.service.port: 8000
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 8000
+
+  - it: "server/ha-standby-Service: port and targetPort can be set (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.targetPort: 80
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: 80
+
+  - it: "server/ha-standby-Service: extraPorts assert is empty by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.ports
+          count: 2
+
+  - it: "server/ha-standby-Service: adds extra ports"
+    set:
+      server.ha.enabled: true
+      server:
+        service:
+          extraPorts:
+            - port: 9101
+              targetPort: 9101
+              name: "metrics"
+    asserts:
+      - equal:
+          path: spec.ports[?(@.name == "metrics")].port
+          value: 9101
+      - equal:
+          path: spec.ports[?(@.name == "metrics")].targetPort
+          value: 9101
+      - equal:
+          path: spec.ports[?(@.name == "metrics")].name
+          value: "metrics"
+
+  - it: "server/ha-standby-Service: nodeport can set"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+      server.service.standbyNodePort: 30009
+    asserts:
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 30009
+
+  - it: "server/ha-standby-Service: nodeport can't set when type isn't NodePort"
+    set:
+      server.ha.enabled: true
+      server.service.standbyNodePort: 30009
+    asserts:
+      - isNull:
+          path: spec.ports[0].nodePort
+
+  - it: "server/ha-standby-Service: openbao port name is http, when tlsDisable is true"
+    set:
+      server.ha.enabled: true
+      global.tlsDisable: true
+    asserts:
+      - equal:
+          path: spec.ports[?(@.port == 8200)].name
+          value: "http"
+
+  - it: "server/ha-standby-Service: openbao port name is https, when tlsDisable is false"
+    set:
+      server.ha.enabled: true
+      global.tlsDisable: false
+    asserts:
+      - equal:
+          path: spec.ports[?(@.port == 8200)].name
+          value: "https"
+
+  - it: "server/ha-standby-Service: NodePort assert externalTrafficPolicy"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+      server.service.externalTrafficPolicy: "Foo"
+    asserts:
+      - equal:
+          path: spec.externalTrafficPolicy
+          value: "Foo"
+
+  - it: "server/ha-standby-Service: NodePort assert no externalTrafficPolicy"
+    set:
+      server.ha.enabled: true
+      server.service.type: "NodePort"
+      server.service.externalTrafficPolicy: ""
+    asserts:
+      - isNull:
+          path: spec.externalTrafficPolicy
+
+  - it: "server/ha-standby-Service: ClusterIP assert no externalTrafficPolicy"
+    set:
+      server.ha.enabled: true
+      server.service.type: "ClusterIP"
+      server.service.externalTrafficPolicy: "Foo"
+    asserts:
+      - isNull:
+          path: spec.externalTrafficPolicy
+
+  - it: "server/ha-standby-Service: publishNotReadyAddresses can be changed (case 1)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: true
+
+  - it: "server/ha-standby-Service: publishNotReadyAddresses can be changed (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.publishNotReadyAddresses: false
+    asserts:
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: false
+
+  - it: "server/ha-standby-Service: instance selector can be disabled (case 1)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.selector["app.kubernetes.io/instance"]
+          value: "release-name"
+
+  - it: "server/ha-standby-Service: instance selector can be disabled (case 2)"
+    set:
+      server.ha.enabled: true
+      server.service.instanceSelector.enabled: false
+    asserts:
+      - isNull:
+          path: spec.selector["app.kubernetes.io/instance"]

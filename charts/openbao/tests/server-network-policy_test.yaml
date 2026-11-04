@@ -1,0 +1,50 @@
+suite: OpenBao Server Network Policy Test
+templates:
+  - templates/server-network-policy.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/network-policy: disabled by default"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/network-policy: enabled by server.networkPolicy.enabled"
+    set:
+      server.networkPolicy.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/network-policy: ingress changed by server.networkPolicy.ingress"
+    set:
+      server.networkPolicy.enabled: true
+      server:
+        networkPolicy:
+          ingress:
+            - from:
+                - podSelector:
+                    matchLabels:
+                      foo: "bar"
+    asserts:
+      - equal:
+          path: spec.ingress[0].from[0].podSelector.matchLabels.foo
+          value: "bar"
+
+  - it: "server/network-policy: egress enabled by server.networkPolicy.egress"
+    set:
+      server.networkPolicy.enabled: true
+      server:
+        networkPolicy:
+          egress:
+            - to:
+                - ipBlock:
+                    cidr: "10.0.0.0/24"
+              ports:
+                - protocol: "TCP"
+                  port: 443
+    asserts:
+      - equal:
+          path: spec.egress[0].to[0].ipBlock.cidr
+          value: "10.0.0.0/24"

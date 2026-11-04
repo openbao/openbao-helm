@@ -1,0 +1,583 @@
+suite: OpenBao Server Ha Statefulset Test
+templates:
+  - templates/server-statefulset.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/ha-StatefulSet: enable with server.ha.enabled true"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ha-StatefulSet: disable with global.enabled"
+    set:
+      global.enabled: false
+      server.ha.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ha-StatefulSet: disable with global.externalVaultAddr"
+    set:
+      global.externalVaultAddr: "http://openbao-outside"
+      server.ha.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ha-StatefulSet: image defaults to server.image.repository:tag"
+    set:
+      server.image.repository: "foo"
+      server.image.tag: "1.2.3"
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "quay.io/foo:1.2.3"
+
+  - it: "server/ha-StatefulSet: image tag defaults to appVersion"
+    set:
+      server.image.repository: "foo"
+      server.image.tag: ""
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "quay.io/foo:2.7.2"
+
+  - it: "server/ha-StatefulSet: tls disabled"
+    set:
+      global.tlsDisable: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_ADDR")].value
+          value: "http://127.0.0.1:8200"
+
+  - it: "server/ha-StatefulSet: tls enabled"
+    set:
+      global.tlsDisable: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_ADDR")].value
+          value: "https://127.0.0.1:8200"
+
+  - it: "server/ha-StatefulSet: OnDelete updateStrategy"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: "OnDelete"
+
+  - it: "server/ha-StatefulSet: RollingUpdate updateStrategy"
+    set:
+      server.ha.enabled: true
+      server.updateStrategyType: "\"RollingUpdate\""
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: "RollingUpdate"
+
+  - it: "server/ha-StatefulSet: default affinity (case 1)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.affinity
+
+  - it: "server/ha-StatefulSet: default affinity (case 2)"
+    set:
+      server.ha.enabled: true
+      server.affinity: ""
+    asserts:
+      - isNull:
+          path: spec.template.spec.affinity
+
+  - it: "server/ha-StatefulSet: default replicas"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: "server/ha-StatefulSet: custom replicas"
+    set:
+      server.ha.enabled: true
+      server.ha.replicas: 10
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 10
+
+  - it: "server/ha-StatefulSet: zero replicas"
+    set:
+      server.ha.enabled: true
+      server.ha.replicas: 0
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 0
+
+  - it: "server/ha-StatefulSet: invalid value for replicas"
+    set:
+      server.ha.enabled: true
+      server.ha.replicas: null
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: "server/ha-StatefulSet: default resources"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].resources
+
+  - it: "server/ha-StatefulSet: custom resources (case 1)"
+    set:
+      server.ha.enabled: true
+      server.resources.requests.memory: "256Mi"
+      server.resources.requests.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: "256Mi"
+
+  - it: "server/ha-StatefulSet: custom resources (case 2)"
+    set:
+      server.ha.enabled: true
+      server.resources.limits.memory: "256Mi"
+      server.resources.limits.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: "256Mi"
+
+  - it: "server/ha-StatefulSet: custom resources (case 3)"
+    set:
+      server.ha.enabled: true
+      server.resources.requests.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: "250m"
+
+  - it: "server/ha-StatefulSet: custom resources (case 4)"
+    set:
+      server.ha.enabled: true
+      server.resources.limits.cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: "250m"
+
+  - it: "server/ha-StatefulSet: adds extra volume (case 1)"
+    set:
+      server.ha.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].configMap.name
+          value: "foo"
+      - isNull:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].configMap.secretName
+
+  - it: "server/ha-StatefulSet: adds extra volume (case 2)"
+    set:
+      server.ha.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].readOnly
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].mountPath
+          value: "/openbao/userconfig/foo"
+
+  - it: "server/ha-StatefulSet: adds extra volume custom mount path"
+    set:
+      server.ha.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+            path: "/custom/path"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].readOnly
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].mountPath
+          value: "/custom/path/foo"
+
+  - it: "server/ha-StatefulSet: adds extra secret volume custom mount path"
+    set:
+      server.ha.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+            path: "/custom/path"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].readOnly
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].mountPath
+          value: "/custom/path/foo"
+
+  - it: "server/ha-StatefulSet: adds extra secret volume (case 1)"
+    set:
+      server.ha.enabled: true
+      server:
+        extraVolumes:
+          - type: "secret"
+            name: "foo"
+    asserts:
+      - isNull:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].secret.name
+      - equal:
+          path: spec.template.spec.volumes[?(@.name == "userconfig-foo")].secret.secretName
+          value: "foo"
+
+  - it: "server/ha-StatefulSet: adds extra secret volume (case 2)"
+    set:
+      server.ha.enabled: true
+      server:
+        extraVolumes:
+          - type: "configMap"
+            name: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].readOnly
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "userconfig-foo")].mountPath
+          value: "/openbao/userconfig/foo"
+
+  - it: "server/ha-StatefulSet: set extraEnvironmentVars"
+    set:
+      server.ha.enabled: true
+      server.extraEnvironmentVars.FOO: "bar"
+      server.extraEnvironmentVars.FOOBAR: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "FOO")].value
+          value: "bar"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "FOOBAR")].value
+          value: "foobar"
+
+  - it: "server/ha-StatefulSet: set extraSecretEnvironmentVars"
+    set:
+      server.ha.enabled: true
+      server:
+        extraSecretEnvironmentVars:
+          - envName: "ENV_FOO_0"
+            secretName: "secret_name_0"
+            secretKey: "secret_key_0"
+          - envName: "ENV_FOO_1"
+            secretName: "secret_name_1"
+            secretKey: "secret_key_1"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENV_FOO_0")].valueFrom.secretKeyRef.name
+          value: "secret_name_0"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENV_FOO_0")].valueFrom.secretKeyRef.key
+          value: "secret_key_0"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENV_FOO_1")].valueFrom.secretKeyRef.name
+          value: "secret_name_1"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENV_FOO_1")].valueFrom.secretKeyRef.key
+          value: "secret_key_1"
+
+  - it: "server/ha-StatefulSet: api addr renders to Pod IP by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_API_ADDR")].value
+          value: "http://$(POD_IP):8200"
+
+  - it: "server/ha-StatefulSet: api addr is configurable"
+    set:
+      server.ha.enabled: true
+      server.ha.apiAddr: "\"https://example.com:8200\""
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_API_ADDR")].value
+          value: "https://example.com:8200"
+
+  - it: "server/ha-StatefulSet: clusterAddr not set"
+    set:
+      server.ha.enabled: true
+      server.ha.raft.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_CLUSTER_ADDR")].value
+          value: "https://$(HOSTNAME).release-name-openbao-internal:8201"
+
+  - it: "server/ha-StatefulSet: clusterAddr set to null"
+    set:
+      server.ha.enabled: true
+      server.ha.raft.enabled: true
+      server.ha.clusterAddr: null
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_CLUSTER_ADDR")].value
+          value: "https://$(HOSTNAME).release-name-openbao-internal:8201"
+
+  - it: "server/ha-StatefulSet: clusterAddr set to custom url"
+    set:
+      server.ha.enabled: true
+      server.ha.raft.enabled: true
+      server.ha.clusterAddr: "https://test.example.com:8201"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_CLUSTER_ADDR")].value
+          value: "https://test.example.com:8201"
+
+  - it: "server/ha-StatefulSet: clusterAddr set to custom url with environment variable"
+    set:
+      server.ha.enabled: true
+      server.ha.raft.enabled: true
+      server.ha.clusterAddr: "http://$(HOSTNAME).release-name-openbao-internal:8201"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_CLUSTER_ADDR")].value
+          value: "http://$(HOSTNAME).release-name-openbao-internal:8201"
+
+  - it: "server/ha-StatefulSet: clusterAddr gets quoted"
+    set:
+      server.ha.enabled: true
+      server.ha.raft.enabled: true
+      server.ha.clusterAddr: "http://$(HOSTNAME).release-name-openbao-internal:8201"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_CLUSTER_ADDR")].value
+          value: "http://$(HOSTNAME).release-name-openbao-internal:8201"
+
+  - it: "server/ha-StatefulSet: raft node ID renders"
+    set:
+      server.ha.enabled: true
+      server.ha.raft.enabled: true
+      server.ha.raft.setNodeId: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "BAO_RAFT_NODE_ID")].valueFrom.fieldRef.fieldPath
+          value: "metadata.name"
+
+  - it: "server/ha-StatefulSet: no storage by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 0
+
+  - it: "server/ha-StatefulSet: cant set data storage"
+    set:
+      server.ha.enabled: true
+      server.dataStorage.enabled: true
+      server.dataStorage.storageClass: "foo"
+    asserts:
+      - isEmpty:
+          path: spec.volumeClaimTemplates
+
+  - it: "server/ha-StatefulSet: can set storageClass"
+    set:
+      server.ha.enabled: true
+      server.dataStorage.enabled: false
+      server.auditStorage.enabled: true
+      server.auditStorage.storageClass: "foo"
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+          value: "foo"
+
+  - it: "server/ha-StatefulSet: can disable storage (case 1)"
+    set:
+      server.ha.enabled: true
+      server.auditStorage.enabled: false
+      server.dataStorage.enabled: false
+    asserts:
+      - notExists:
+          path: spec.volumeClaimTemplates
+
+  - it: "server/ha-StatefulSet: can disable storage (case 2)"
+    set:
+      server.ha.enabled: true
+      server.auditStorage.enabled: true
+      server.dataStorage.enabled: false
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 1
+
+  - it: "server/ha-StatefulSet: can mount audit"
+    set:
+      server.ha.enabled: true
+      server.auditStorage.enabled: true
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "audit")]
+
+  - it: "server/ha-StatefulSet: no data storage (case 1)"
+    set:
+      server.ha.enabled: true
+      server.auditStorage.enabled: false
+      server.dataStorage.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 0
+
+  - it: "server/ha-StatefulSet: no data storage (case 2)"
+    set:
+      server.ha.enabled: true
+      server.auditStorage.enabled: true
+      server.dataStorage.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 1
+
+  - it: "server/ha-StatefulSet: topologySpreadConstraints is null by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.topologySpreadConstraints
+
+  - it: "server/ha-StatefulSet: topologySpreadConstraints can be set as YAML"
+    set:
+      server.ha.enabled: true
+      server:
+        topologySpreadConstraints:
+          - foo: "bar"
+          - baz: "qux"
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints
+          value: [{"foo":"bar"},{"baz":"qux"}]
+
+  - it: "server/ha-StatefulSet: tolerations not set by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.tolerations
+
+  - it: "server/ha-StatefulSet: tolerations can be set"
+    set:
+      server.ha.enabled: true
+      server.tolerations: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations
+          value: "foobar"
+
+  - it: "server/ha-StatefulSet: nodeSelector is not set by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.nodeSelector
+
+  - it: "server/ha-StatefulSet: specified nodeSelector as string"
+    set:
+      server.ha.enabled: true
+      server.nodeSelector: "testing"
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value: "testing"
+
+  - it: "server/ha-StatefulSet: nodeSelector can be set as YAML"
+    set:
+      server.ha.enabled: true
+      server:
+        nodeSelector:
+          "beta.kubernetes.io/arch": "amd64"
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value: {"beta.kubernetes.io/arch":"amd64"}
+
+  - it: "server/ha-StatefulSet: uid default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 100
+
+  - it: "server/ha-StatefulSet: uid configurable"
+    set:
+      server.uid: 2000
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 2000
+
+  - it: "server/ha-StatefulSet: gid default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 1000
+
+  - it: "server/ha-StatefulSet: gid configurable"
+    set:
+      server.gid: 2000
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 2000
+
+  - it: "server/ha-StatefulSet: fsgroup default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 1000
+
+  - it: "server/ha-StatefulSet: fsgroup configurable"
+    set:
+      server.gid: 2000
+      server.ha.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 2000
+
+  - it: "server/ha-statefulset: OpenShift - runAsUser disabled"
+    set:
+      global.openshift: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.securityContext.runAsUser
+
+  - it: "server/ha-statefulset: OpenShift - runAsGroup disabled"
+    set:
+      global.openshift: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.securityContext.runAsGroup

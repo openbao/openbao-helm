@@ -1,0 +1,135 @@
+suite: OpenBao Server Configmap Test
+templates:
+  - templates/server-config-configmap.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "server/ConfigMap: enabled by default (case 1)"
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ConfigMap: enabled by default (case 2)"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ConfigMap: enabled by default (case 3)"
+    set:
+      server.ha.enabled: true
+      server.ha.raft.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ConfigMap: enabled by default (case 4)"
+    set:
+      server.standalone.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ConfigMap: raft config disabled by default"
+    set:
+      server.ha.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ConfigMap: raft config can be enabled"
+    set:
+      server.ha.enabled: true
+      server.ha.raft.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "server/ConfigMap: disabled by server.dev.enabled true"
+    set:
+      server.dev.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ConfigMap: disable with global.enabled"
+    set:
+      global.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ConfigMap: namespace (case 1)"
+    release:
+      namespace: "foo"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "server/ConfigMap: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      global.namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "server/ConfigMap: standalone extraConfig is set (case 1)"
+    set:
+      server.standalone.enabled: true
+      server.standalone.config: "\"{\\\"hello\\\": \\\"world\\\"}\""
+    asserts:
+      - matchRegex:
+          path: data["extraconfig-from-values.hcl"]
+          pattern: "world"
+
+  - it: "server/ConfigMap: standalone extraConfig is set (case 2)"
+    set:
+      server.standalone.enabled: true
+      server.standalone.config: "\"{\\\"foo\\\": \\\"bar\\\"}\""
+    asserts:
+      - matchRegex:
+          path: data["extraconfig-from-values.hcl"]
+          pattern: "bar"
+
+  - it: "server/ConfigMap: ha extraConfig is set (case 1)"
+    set:
+      server.ha.enabled: true
+      server.ha.config: "\"{\\\"hello\\\": \\\"world\\\"}\""
+    asserts:
+      - matchRegex:
+          path: data["extraconfig-from-values.hcl"]
+          pattern: "world"
+
+  - it: "server/ConfigMap: ha extraConfig is set (case 2)"
+    set:
+      server.ha.enabled: true
+      server.ha.config: "\"{\\\"foo\\\": \\\"bar\\\"}\""
+    asserts:
+      - matchRegex:
+          path: data["extraconfig-from-values.hcl"]
+          pattern: "bar"
+
+  - it: "server/ConfigMap: disabled by global.externalVaultAddr"
+    set:
+      global.externalVaultAddr: "http://openbao-outside"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "server/ConfigMap: config checksum annotation defaults to off"
+    asserts:
+      - isNull:
+          path: metadata.annotations["vault.hashicorp.com/config-checksum"]
+
+  - it: "server/ConfigMap: config checksum annotation can be enabled"
+    set:
+      server.configAnnotation: true
+    asserts:
+      - isNotNull:
+          path: metadata.annotations["vault.hashicorp.com/config-checksum"]
