@@ -1,0 +1,270 @@
+suite: OpenBao Injector Leader Elector Test
+templates:
+  - templates/injector-deployment.yaml
+  - templates/injector-certs-secret.yaml
+  - templates/injector-role.yaml
+  - templates/injector-rolebinding.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "injector/deployment: replica count"
+    template: templates/injector-deployment.yaml
+    set:
+      injector:
+        replicas: 2
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 2
+
+  - it: "injector/deployment: leader elector configuration for sidecar-injector (case 1)"
+    template: templates/injector-deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_USE_LEADER_ELECTOR")].value
+
+  - it: "injector/deployment: leader elector configuration for sidecar-injector (case 2)"
+    template: templates/injector-deployment.yaml
+    set:
+      injector:
+        replicas: 2
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_USE_LEADER_ELECTOR")].value
+          value: "true"
+
+  - it: "injector/deployment: leader elector configuration for sidecar-injector (case 3)"
+    template: templates/injector-deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name == "NAMESPACE")].valueFrom.fieldRef.fieldPath
+
+  - it: "injector/deployment: leader elector configuration for sidecar-injector (case 4)"
+    template: templates/injector-deployment.yaml
+    set:
+      injector:
+        replicas: 2
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "NAMESPACE")].valueFrom.fieldRef.fieldPath
+          value: "metadata.namespace"
+
+  - it: "injector/certs-secret: created/skipped as appropriate (case 1)"
+    template: templates/injector-certs-secret.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/certs-secret: created/skipped as appropriate (case 2)"
+    template: templates/injector-certs-secret.yaml
+    set:
+      injector:
+        replicas: 2
+      global:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/certs-secret: created/skipped as appropriate (case 3)"
+    template: templates/injector-certs-secret.yaml
+    set:
+      injector:
+        replicas: 2
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/certs-secret: created/skipped as appropriate (case 4)"
+    template: templates/injector-certs-secret.yaml
+    set:
+      injector:
+        replicas: 2
+        leaderElector:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/certs-secret: created/skipped as appropriate (case 5)"
+    template: templates/injector-certs-secret.yaml
+    set:
+      injector:
+        replicas: 2
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/certs-secret: namespace is set (case 1)"
+    template: templates/injector-certs-secret.yaml
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        replicas: 2
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "injector/certs-secret: namespace is set (case 2)"
+    template: templates/injector-certs-secret.yaml
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        replicas: 2
+      global:
+        namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "injector/role: created/skipped as appropriate (case 1)"
+    template: templates/injector-role.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/role: created/skipped as appropriate (case 2)"
+    template: templates/injector-role.yaml
+    set:
+      injector:
+        replicas: 2
+      global:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/role: created/skipped as appropriate (case 3)"
+    template: templates/injector-role.yaml
+    set:
+      injector:
+        replicas: 2
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/role: created/skipped as appropriate (case 4)"
+    template: templates/injector-role.yaml
+    set:
+      injector:
+        replicas: 2
+        leaderElector:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/role: created/skipped as appropriate (case 5)"
+    template: templates/injector-role.yaml
+    set:
+      injector:
+        replicas: 2
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/role: namespace is set (case 1)"
+    template: templates/injector-role.yaml
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        replicas: 2
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "injector/role: namespace is set (case 2)"
+    template: templates/injector-role.yaml
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        replicas: 2
+      global:
+        namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "injector/rolebinding: created/skipped as appropriate (case 1)"
+    template: templates/injector-rolebinding.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/rolebinding: created/skipped as appropriate (case 2)"
+    template: templates/injector-rolebinding.yaml
+    set:
+      injector:
+        replicas: 2
+      global:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/rolebinding: created/skipped as appropriate (case 3)"
+    template: templates/injector-rolebinding.yaml
+    set:
+      injector:
+        replicas: 2
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/rolebinding: created/skipped as appropriate (case 4)"
+    template: templates/injector-rolebinding.yaml
+    set:
+      injector:
+        replicas: 2
+        leaderElector:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/rolebinding: created/skipped as appropriate (case 5)"
+    template: templates/injector-rolebinding.yaml
+    set:
+      injector:
+        replicas: 2
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/rolebinding: namespace is set (case 1)"
+    template: templates/injector-rolebinding.yaml
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        replicas: 2
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "injector/rolebinding: namespace is set (case 2)"
+    template: templates/injector-rolebinding.yaml
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        replicas: 2
+      global:
+        namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"

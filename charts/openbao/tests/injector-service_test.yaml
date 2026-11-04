@@ -1,0 +1,92 @@
+suite: OpenBao Injector Service Test
+templates:
+  - templates/injector-service.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "injector/Service: service enabled by default (case 1)"
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/Service: service enabled by default (case 2)"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/Service: namespace (case 1)"
+    release:
+      namespace: "foo"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "injector/Service: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      global:
+        namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "injector/Service: service with default port"
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: 8080
+
+  - it: "injector/Service: service with custom port"
+    set:
+      injector:
+        port: 8443
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: 8443
+
+  - it: "injector/Service: disable with global.enabled false (case 1)"
+    set:
+      global:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/Service: disable with global.enabled false (case 2)"
+    set:
+      global:
+        enabled: false
+      injector:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/Service: generic annotations"
+    set:
+      injector:
+        service:
+          annotations: "openBaoIsAwesome: true"
+    asserts:
+      - equal:
+          path: metadata.annotations["openBaoIsAwesome"]
+          value: true
+
+  - it: "injector/Service: generic extraLabels"
+    set:
+      injector:
+        service:
+          extraLabels:
+            openBaoIsAwesome: true
+    asserts:
+      - equal:
+          path: metadata.labels.openBaoIsAwesome
+          value: true

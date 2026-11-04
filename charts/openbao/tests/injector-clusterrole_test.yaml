@@ -1,0 +1,49 @@
+suite: OpenBao Injector Clusterrole Test
+templates:
+  - templates/injector-clusterrole.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "injector/ClusterRole: enabled by default"
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/ClusterRole: disable with global.enabled"
+    set:
+      global:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/ClusterRole: no nodes permissions when replicas=1"
+    set:
+      injector:
+        replicas: 1
+    asserts:
+      - lengthEqual:
+          path: rules
+          count: 1
+      - lengthEqual:
+          path: rules[0].resources
+          count: 1
+      - equal:
+          path: rules[0].resources[0]
+          value: "mutatingwebhookconfigurations"
+
+  - it: "injector/ClusterRole: nodes permissions when replicas=2"
+    set:
+      injector:
+        replicas: 2
+    asserts:
+      - lengthEqual:
+          path: rules
+          count: 2
+      - lengthEqual:
+          path: rules[1].resources
+          count: 1
+      - equal:
+          path: rules[1].resources[0]
+          value: "nodes"

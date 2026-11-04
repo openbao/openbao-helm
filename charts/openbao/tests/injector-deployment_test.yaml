@@ -1,0 +1,958 @@
+suite: OpenBao Injector Deployment Test
+templates:
+  - templates/injector-deployment.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "injector/deployment: default injector.enabled"
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/deployment: enable with injector.enabled true"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/deployment: disable with global.enabled"
+    set:
+      global:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "injector/deployment: enable with injector.enabled true and global.enabled false"
+    set:
+      injector:
+        enabled: true
+      global:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "injector/deployment: namespace (case 1)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "foo"
+
+  - it: "injector/deployment: namespace (case 2)"
+    release:
+      namespace: "foo"
+    set:
+      injector:
+        enabled: true
+      global:
+        namespace: "bar"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "bar"
+
+  - it: "injector/deployment: image defaults to injector.image (case 1)"
+    set:
+      injector:
+        image:
+          repository: "foo"
+          tag: "1.2.3"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "docker.io/foo:1.2.3"
+
+  - it: "injector/deployment: image defaults to injector.image (case 2)"
+    set:
+      injector:
+        image:
+          repository: "foo"
+          tag: "1.2.3"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "docker.io/foo:1.2.3"
+
+  - it: "injector/deployment: default imagePullPolicy"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: "IfNotPresent"
+
+  - it: "injector/deployment: default resources"
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].resources
+
+  - it: "injector/deployment: custom resources (case 1)"
+    set:
+      injector:
+        enabled: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: "256Mi"
+
+  - it: "injector/deployment: custom resources (case 2)"
+    set:
+      injector:
+        enabled: true
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: "256Mi"
+
+  - it: "injector/deployment: custom resources (case 3)"
+    set:
+      injector:
+        enabled: true
+        resources:
+          requests:
+            cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: "250m"
+
+  - it: "injector/deployment: custom resources (case 4)"
+    set:
+      injector:
+        enabled: true
+        resources:
+          limits:
+            cpu: "250m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: "250m"
+
+  - it: "injector/deployment: enable metrics"
+    set:
+      injector:
+        metrics:
+          enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[9].name
+          value: "AGENT_INJECT_TELEMETRY_PATH"
+      - equal:
+          path: spec.template.spec.containers[0].env[9].value
+          value: "/metrics"
+
+  - it: "injector/deployment: manual TLS environment vars"
+    set:
+      injector:
+        certs:
+          secretName: "foobar"
+          certName: "test.crt"
+          keyName: "test.key"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_TLS_CERT_FILE")].value
+          value: "/etc/webhook/certs/test.crt"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_TLS_KEY_FILE")].value
+          value: "/etc/webhook/certs/test.key"
+
+  - it: "injector/deployment: auto TLS by default (case 1)"
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].volumeMounts
+
+  - it: "injector/deployment: auto TLS by default (case 2)"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_TLS_AUTO")].value
+          value: "release-name-openbao-agent-injector-cfg"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_TLS_AUTO_HOSTS")].value
+          value: "release-name-openbao-agent-injector-svc,release-name-openbao-agent-injector-svc.default,release-name-openbao-agent-injector-svc.default.svc"
+
+  - it: "injector/deployment: manual TLS adds volume mount"
+    set:
+      injector:
+        enabled: true
+        certs:
+          secretName: "openbao-tls"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "webhook-certs")].mountPath
+          value: "/etc/webhook/certs"
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "webhook-certs")].readOnly
+          value: true
+
+  - it: "injector/deployment: with externalVaultAddr"
+    set:
+      injector:
+        externalVaultAddr: "http://openbao-outside"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_ADDR")].value
+          value: "http://openbao-outside"
+
+  - it: "injector/deployment: with global.externalVaultAddr"
+    set:
+      global:
+        externalVaultAddr: "http://openbao-outside"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_ADDR")].value
+          value: "http://openbao-outside"
+
+  - it: "injector/deployment: with global.externalBaoAddr"
+    set:
+      global:
+        externalBaoAddr: "http://openbao-outside"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_ADDR")].value
+          value: "http://openbao-outside"
+
+  - it: "injector/deployment: global.externalBaoAddr takes precendence over global.externalVaultAddr"
+    set:
+      global:
+        externalBaoAddr: "http://global-openbao-outside"
+        externalVaultAddr: "http://global-vault-outside"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_ADDR")].value
+          value: "http://global-openbao-outside"
+
+  - it: "injector/deployment: injector.externalVaultAddr takes precendence over global.externalVaultAddr"
+    set:
+      global:
+        externalVaultAddr: "http://global-openbao-outside"
+      injector:
+        externalVaultAddr: "http://injector-openbao-outside"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_ADDR")].value
+          value: "http://injector-openbao-outside"
+
+  - it: "injector/deployment: injector.externalBaoAddr takes precendence over global.externalBaoAddr"
+    set:
+      global:
+        externalBaoAddr: "http://global-openbao-outside"
+      injector:
+        externalBaoAddr: "http://injector-openbao-outside"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_ADDR")].value
+          value: "http://injector-openbao-outside"
+
+  - it: "injector/deployment: injector.externalBaoAddr takes precendence over injector.externalVaultAddr"
+    set:
+      injector:
+        externalBaoAddr: "http://injector-openbao-outside"
+        externalVaultAddr: "http://injector-vault-outside"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_ADDR")].value
+          value: "http://injector-openbao-outside"
+
+  - it: "injector/deployment: without externalBaoAddr"
+    release:
+      name: "not-external-test"
+      namespace: "default"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_ADDR")].value
+          value: "http://not-external-test-openbao.default.svc:8200"
+
+  - it: "injector/deployment: default authPath"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_AUTH_PATH")].value
+          value: "auth/kubernetes"
+
+  - it: "injector/deployment: custom authPath"
+    set:
+      injector:
+        authPath: "auth/k8s"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_AUTH_PATH")].value
+          value: "auth/k8s"
+
+  - it: "injector/deployment: default livenessProbe settings"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.failureThreshold
+          value: 2
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 5
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.periodSeconds
+          value: 2
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.successThreshold
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.timeoutSeconds
+          value: 5
+
+  - it: "injector/deployment: can set livenessProbe settings"
+    set:
+      injector:
+        livenessProbe:
+          failureThreshold: 100
+          initialDelaySeconds: 100
+          periodSeconds: 100
+          successThreshold: 100
+          timeoutSeconds: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.failureThreshold
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.periodSeconds
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.successThreshold
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.timeoutSeconds
+          value: 100
+
+  - it: "injector/deployment: default readinessProbe settings"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.failureThreshold
+          value: 2
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+          value: 5
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+          value: 2
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.successThreshold
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.timeoutSeconds
+          value: 5
+
+  - it: "injector/deployment: can set readinessProbe settings"
+    set:
+      injector:
+        readinessProbe:
+          failureThreshold: 100
+          initialDelaySeconds: 100
+          periodSeconds: 100
+          successThreshold: 100
+          timeoutSeconds: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.failureThreshold
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.successThreshold
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.timeoutSeconds
+          value: 100
+
+  - it: "injector/deployment: default startupProbe settings"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.failureThreshold
+          value: 12
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.initialDelaySeconds
+          value: 5
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.periodSeconds
+          value: 5
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.successThreshold
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.timeoutSeconds
+          value: 5
+
+  - it: "injector/deployment: can set startupProbe settings"
+    set:
+      injector:
+        startupProbe:
+          failureThreshold: 100
+          initialDelaySeconds: 100
+          periodSeconds: 100
+          successThreshold: 100
+          timeoutSeconds: 100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.failureThreshold
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.initialDelaySeconds
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.periodSeconds
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.successThreshold
+          value: 100
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.timeoutSeconds
+          value: 100
+
+  - it: "injector/deployment: default logLevel"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_LOG_LEVEL")].value
+          value: "info"
+
+  - it: "injector/deployment: custom logLevel"
+    set:
+      injector:
+        logLevel: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_LOG_LEVEL")].value
+          value: "foo"
+
+  - it: "injector/deployment: default logFormat"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_LOG_FORMAT")].value
+          value: "standard"
+
+  - it: "injector/deployment: custom logFormat"
+    set:
+      injector:
+        logFormat: "json"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_LOG_FORMAT")].value
+          value: "json"
+
+  - it: "injector/deployment: default revoke on shutdown"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_REVOKE_ON_SHUTDOWN")].value
+          value: "false"
+
+  - it: "injector/deployment: custom revoke on shutdown"
+    set:
+      injector:
+        revokeOnShutdown: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_REVOKE_ON_SHUTDOWN")].value
+          value: "true"
+
+  - it: "injector/deployment: disable security context when openshift enabled"
+    set:
+      global:
+        openshift: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_SET_SECURITY_CONTEXT")].value
+          value: "false"
+
+  - it: "injector/deployment: backward pod securityContext"
+    set:
+      injector:
+        uid: 200
+        gid: 4000
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 200
+      - equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 4000
+
+  - it: "injector/deployment: default pod securityContext"
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.securityContext
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 1000
+      - equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 1000
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 100
+
+  - it: "injector/deployment: custom pod securityContext (case 1)"
+    set:
+      injector:
+        enabled: true
+        securityContext:
+          pod:
+            runAsNonRoot: true
+            runAsGroup: 1001
+            runAsUser: 1001
+            fsGroup: 1000
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 1001
+
+  - it: "injector/deployment: custom pod securityContext (case 2)"
+    set:
+      injector:
+        enabled: true
+        securityContext:
+          pod:
+            runAsNonRoot: false
+            runAsGroup: 1000
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: false
+
+  - it: "injector/deployment: custom pod securityContext (case 3)"
+    set:
+      injector:
+        enabled: true
+        securityContext:
+          pod:
+            runAsUser: 1001
+            fsGroup: 1000
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 1001
+
+  - it: "injector/deployment: custom pod securityContext (case 4)"
+    set:
+      injector:
+        enabled: true
+        securityContext:
+          pod:
+            runAsNonRoot: true
+            fsGroup: 1001
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 1001
+
+  - it: "injector/deployment: custom pod securityContext from string"
+    set:
+      injector:
+        enabled: true
+        securityContext:
+          pod: "foo: bar\nbar: foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.bar
+          value: "foo"
+
+  - it: "injector/deployment: custom container securityContext"
+    set:
+      injector:
+        enabled: true
+        securityContext:
+          container:
+            bar: "foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.bar
+          value: "foo"
+
+  - it: "injector/deployment: custom container securityContext from string"
+    set:
+      injector:
+        enabled: true
+        securityContext:
+          container: "foo: bar\nbar: foo"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.bar
+          value: "foo"
+
+  - it: "injector/deployment: default container securityContext sidecar-injector"
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.containers[0].securityContext
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.capabilities.drop[0]
+          value: "ALL"
+
+  - it: "injector/deployment: custom container securityContext sidecar-injector (case 1)"
+    set:
+      injector:
+        enabled: true
+        securityContext:
+          container:
+            privileged: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.privileged
+          value: true
+
+  - it: "injector/deployment: custom container securityContext sidecar-injector (case 2)"
+    set:
+      injector:
+        enabled: true
+        securityContext:
+          container:
+            readOnlyRootFilesystem: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: false
+
+  - it: "injector/deployment: set extraEnvironmentVars"
+    set:
+      injector:
+        extraEnvironmentVars:
+          FOO: "bar"
+          FOOBAR: "foobar"
+          "lower.case": "sanitized"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "FOO")].value
+          value: "bar"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "FOOBAR")].value
+          value: "foobar"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "LOWER_CASE")].value
+          value: "sanitized"
+
+  - it: "injector/deployment: default annotations"
+    asserts:
+      - isNull:
+          path: spec.template.metadata.annotations
+
+  - it: "injector/deployment: specify annotations yaml"
+    set:
+      injector:
+        annotations:
+          foo: "bar"
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.foo
+          value: "bar"
+
+  - it: "injector/deployment: specify annotations yaml string"
+    set:
+      injector:
+        annotations: "foo: bar"
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.foo
+          value: "bar"
+
+  - it: "injector/deployment: default agentPort"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: "AGENT_INJECT_LISTEN"
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: ":8080"
+
+  - it: "injector/deployment: custom agentPort"
+    set:
+      injector:
+        port: 8443
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: "AGENT_INJECT_LISTEN"
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: ":8443"
+
+  - it: "injector/deployment: affinity set by default"
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.affinity
+
+  - it: "injector/deployment: affinity can be set as string"
+    set:
+      injector:
+        affinity: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity
+          value: "foobar"
+
+  - it: "injector/deployment: affinity can be set as YAML"
+    set:
+      injector:
+        affinity:
+          podAntiAffinity: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity.podAntiAffinity
+          value: "foobar"
+
+  - it: "injector/deployment: topologySpreadConstraints is null by default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.topologySpreadConstraints
+
+  - it: "injector/deployment: topologySpreadConstraints can be set as YAML"
+    set:
+      injector:
+        topologySpreadConstraints:
+          - foo: "bar"
+          - baz: "qux"
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints
+          value: [{"foo":"bar"},{"baz":"qux"}]
+
+  - it: "injector/deployment: tolerations not set by default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.tolerations
+
+  - it: "injector/deployment: tolerations can be set as string"
+    set:
+      injector:
+        tolerations: "foobar"
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations
+          value: "foobar"
+
+  - it: "injector/deployment: tolerations can be set as YAML"
+    set:
+      injector:
+        tolerations:
+          - foo: "bar"
+          - baz: "qux"
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations
+          value: [{"foo":"bar"},{"baz":"qux"}]
+
+  - it: "injector/deployment: nodeSelector is not set by default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.nodeSelector
+
+  - it: "injector/deployment: nodeSelector can be set as string"
+    set:
+      injector:
+        nodeSelector: "testing"
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value: "testing"
+
+  - it: "injector/deployment: nodeSelector can be set as YAML"
+    set:
+      injector:
+        nodeSelector:
+          "beta.kubernetes.io/arch": "amd64"
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value: {"beta.kubernetes.io/arch":"amd64"}
+
+  - it: "injector/deployment: priorityClassName not set by default"
+    asserts:
+      - isNull:
+          path: spec.template.spec.priorityClassName
+
+  - it: "injector/deployment: priorityClassName can be set"
+    set:
+      injector:
+        priorityClassName: "armaggeddon"
+    asserts:
+      - equal:
+          path: spec.template.spec.priorityClassName
+          value: "armaggeddon"
+
+  - it: "injector/deployment: OpenShift - runAsUser disabled"
+    set:
+      global:
+        openshift: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.securityContext.runAsUser
+
+  - it: "injector/deployment: OpenShift - runAsGroup disabled"
+    set:
+      global:
+        openshift: true
+    asserts:
+      - isNull:
+          path: spec.template.spec.securityContext.runAsGroup
+
+  - it: "injector/deployment: specify extraLabels"
+    set:
+      injector:
+        extraLabels:
+          foo: "bar"
+    asserts:
+      - equal:
+          path: spec.template.metadata.labels.foo
+          value: "bar"
+
+  - it: "injector/deployment: injector.hostNetwork not set"
+    asserts:
+      - equal:
+          path: spec.template.spec.hostNetwork
+          value: false
+
+  - it: "injector/deployment: injector.hostNetwork is set"
+    set:
+      injector:
+        hostNetwork: true
+    asserts:
+      - equal:
+          path: spec.template.spec.hostNetwork
+          value: true
+
+  - it: "injector/deployment: agent default resources"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_CPU_LIMIT")].value
+          value: "500m"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_CPU_REQUEST")].value
+          value: "250m"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_MEM_LIMIT")].value
+          value: "128Mi"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_MEM_REQUEST")].value
+          value: "64Mi"
+
+  - it: "injector/deployment: can set agent default resources"
+    set:
+      injector:
+        agentDefaults:
+          cpuLimit: "cpuLimit"
+          cpuRequest: "cpuRequest"
+          memLimit: "memLimit"
+          memRequest: "memRequest"
+          ephemeralLimit: "ephemeralLimit"
+          ephemeralRequest: "ephemeralRequest"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_CPU_LIMIT")].value
+          value: "cpuLimit"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_CPU_REQUEST")].value
+          value: "cpuRequest"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_MEM_LIMIT")].value
+          value: "memLimit"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_MEM_REQUEST")].value
+          value: "memRequest"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_EPHEMERAL_LIMIT")].value
+          value: "ephemeralLimit"
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_EPHEMERAL_REQUEST")].value
+          value: "ephemeralRequest"
+
+  - it: "injector/deployment: agent default template"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_DEFAULT_TEMPLATE")].value
+          value: "map"
+
+  - it: "injector/deployment: can set agent default template"
+    set:
+      injector:
+        agentDefaults:
+          template: "json"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_DEFAULT_TEMPLATE")].value
+          value: "json"
+
+  - it: "injector/deployment: agent default template_config.exit_on_retry_failure"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE")].value
+          value: "true"
+
+  - it: "injector/deployment: can set agent template_config.exit_on_retry_failure"
+    set:
+      injector:
+        agentDefaults:
+          templateConfig:
+            exitOnRetryFailure: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE")].value
+          value: "false"
+
+  - it: "injector/deployment: agent default template_config.static_secret_render_interval"
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_TEMPLATE_STATIC_SECRET_RENDER_INTERVAL")].value
+
+  - it: "injector/deployment: can set agent template_config.static_secret_render_interval"
+    set:
+      injector:
+        agentDefaults:
+          templateConfig:
+            staticSecretRenderInterval: "1m"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_TEMPLATE_STATIC_SECRET_RENDER_INTERVAL")].value
+          value: "1m"
+
+  - it: "injector/deployment: strategy default"
+    asserts:
+      - isNull:
+          path: spec.strategy
+
+  - it: "injector/deployment: strategy set as string"
+    set:
+      injector:
+        strategy: "testing"
+    asserts:
+      - equal:
+          path: spec.strategy
+          value: "testing"
+
+  - it: "injector/deployment: strategy can be set as YAML"
+    set:
+      injector:
+        strategy:
+          rollingUpdate:
+            maxUnavailable: 1
+    asserts:
+      - equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 1
