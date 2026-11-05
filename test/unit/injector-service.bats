@@ -91,3 +91,14 @@ load _helpers
       yq -r '.metadata.labels.openBaoIsAwesome' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+@test "injector/Service: Assert trafficDistribution set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-service.yaml  \
+      --set 'injector.service.enabled=true' \
+      --set 'injector.service.trafficDistribution=PreferSameNode' \
+      . | tee /dev/stderr |
+      yq -r '.spec.trafficDistribution' | tee /dev/stderr)
+  [ "${actual}" = "PreferSameNode" ]
+}

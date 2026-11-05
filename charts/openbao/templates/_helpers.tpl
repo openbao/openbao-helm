@@ -1182,6 +1182,16 @@ Supported inputs are Values.ui
 {{- end -}}
 
 {{/*
+trafficDistribution configuration for the the UI service.
+Supported inputs are Values.ui
+*/}}
+{{- define "service.trafficDistribution" -}}
+{{- if .trafficDistribution }}
+  trafficDistribution: {{ .trafficDistribution }}
+{{- end }}
+{{- end -}}
+
+{{/*
 config file from values
 */}}
 {{- define "openbao.config" -}}

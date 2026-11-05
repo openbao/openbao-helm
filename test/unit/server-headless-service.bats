@@ -128,3 +128,13 @@ load _helpers
   actual=$(echo "$object" | yq '.annotations["openbaoIsNotAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+@test "server/headless-Service: Assert trafficDistribution set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-headless-service.yaml  \
+      --set 'server.service.headless.trafficDistribution=PreferSameNode' \
+      . | tee /dev/stderr |
+      yq -r '.spec.trafficDistribution' | tee /dev/stderr)
+  [ "${actual}" = "PreferSameNode" ]
+}
