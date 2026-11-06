@@ -3,6 +3,47 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: |
+            Add trafficDistribution support to all services
+        - kind: changed
+          description: |
+            Remove legacy GKE test infrastructure and fix Helm 4 CI compatibility
+        - kind: security
+          description: |
+            Update CI runtimes to address the eMudhra CA compromise
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.7.2
+    created: "2026-11-06T06:36:50.76795431Z"
+    description: Official OpenBao Chart
+    digest: fa4e6f3c1bbe936dc7ba079f1303ea56810af2f8600f046d8d5809860a4f980f
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.30.7/openbao-0.30.7.tgz
+    version: 0.30.7
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: |
             Bump OpenBao to 2.7.2
@@ -2869,4 +2910,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-10-27T10:34:13.821726262Z"
+generated: "2026-11-06T06:36:50.768207027Z"
