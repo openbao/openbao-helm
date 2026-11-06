@@ -1,6 +1,10 @@
 ## Unreleased
 
-- chore: Remove the legacy GKE acceptance test infrastructure
+## 0.30.7
+
+- feat: Add trafficDistribution support to all services
+- chore: Remove legacy GKE test infrastructure and fix Helm 4 CI compatibility
+- security: Update CI runtimes to address the eMudhra CA compromise
 
 ## 0.30.6
 

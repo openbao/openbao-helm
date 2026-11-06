@@ -3,7 +3,7 @@
 
 apiVersion: v2
 name: openbao
-version: 0.30.6
+version: 0.30.7
 appVersion: v2.7.2
 kubeVersion: ">= 1.30.0-0"
 description: Official OpenBao Chart
@@ -27,12 +27,15 @@ annotations:
   charts.openshift.io/provider: OpenBao
   artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |
+    - kind: added
+      description: |
+        Add trafficDistribution support to all services
     - kind: changed
       description: |
-        Bump OpenBao to 2.7.2
-    - kind: fixed
+        Remove legacy GKE test infrastructure and fix Helm 4 CI compatibility
+    - kind: security
       description: |
-        ArtifactHub changes annotation
+        Update CI runtimes to address the eMudhra CA compromise
 
 maintainers:
   - name: OpenBao
