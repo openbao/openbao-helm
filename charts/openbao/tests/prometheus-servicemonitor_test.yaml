@@ -1,0 +1,239 @@
+suite: OpenBao Prometheus Servicemonitor Test
+templates:
+  - templates/prometheus-servicemonitor.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "prometheus/ServiceMonitor-server: assertDisabled by default"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "prometheus/ServiceMonitor-server: assertEnabled global"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: false
+      global:
+        serverTelemetry:
+          prometheusOperator: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "prometheus/ServiceMonitor-server: assertEnabled"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: "prometheus/ServiceMonitor-server: assertScrapeTimeout default"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+    asserts:
+      - equal:
+          path: spec.endpoints[0].scrapeTimeout
+          value: "10s"
+
+  - it: "prometheus/ServiceMonitor-server: assertScrapeTimeout update"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+          scrapeTimeout: "60s"
+    asserts:
+      - equal:
+          path: spec.endpoints[0].scrapeTimeout
+          value: "60s"
+
+  - it: "prometheus/ServiceMonitor-server: assertInterval default"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+    asserts:
+      - equal:
+          path: spec.endpoints[0].interval
+          value: "30s"
+
+  - it: "prometheus/ServiceMonitor-server: assertInterval update"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+          interval: "60s"
+    asserts:
+      - equal:
+          path: spec.endpoints[0].interval
+          value: "60s"
+
+  - it: "prometheus/ServiceMonitor-server: assertSelectors default"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+    asserts:
+      - isNotEmpty:
+          path: metadata.labels
+      - equal:
+          path: metadata.labels.release
+          value: "prometheus"
+
+  - it: "prometheus/ServiceMonitor-server: assertSelectors override"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+          selectors:
+            baz: "qux"
+            bar: "foo"
+    asserts:
+      - isNotEmpty:
+          path: metadata.labels
+      - notExists:
+          path: metadata.labels["app"]
+      - equal:
+          path: metadata.labels.baz
+          value: "qux"
+      - equal:
+          path: metadata.labels.bar
+          value: "foo"
+
+  - it: "prometheus/ServiceMonitor-server: assertEndpoints noTLS"
+    set:
+      global:
+        tlsDisable: true
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+      - equal:
+          path: spec.endpoints[0].port
+          value: "http"
+      - equal:
+          path: spec.endpoints[0].scheme
+          value: "http"
+
+  - it: "prometheus/ServiceMonitor-server: assertEndpoints TLS"
+    set:
+      global:
+        tlsDisable: false
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+      - equal:
+          path: spec.endpoints[0].port
+          value: "https"
+      - equal:
+          path: spec.endpoints[0].scheme
+          value: "https"
+
+  - it: "prometheus/ServiceMonitor-server: assertEndpointsPort update"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+          port: "metrics-tls"
+    asserts:
+      - equal:
+          path: spec.endpoints[0].port
+          value: "metrics-tls"
+
+  - it: "prometheus/ServiceMonitor-server: assertEndpointsScheme update"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+          scheme: "http"
+      global:
+        tlsDisable: false
+    asserts:
+      - equal:
+          path: spec.endpoints[0].port
+          value: "https"
+      - equal:
+          path: spec.endpoints[0].scheme
+          value: "http"
+
+  - it: "prometheus/ServiceMonitor-server: tlsConfig default"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+    asserts:
+      - equal:
+          path: spec.endpoints[0].tlsConfig.insecureSkipVerify
+          value: true
+
+  - it: "prometheus/ServiceMonitor-server: tlsConfig override"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          tlsConfig:
+            ca: "ca.crt"
+          enabled: true
+    asserts:
+      - equal:
+          path: spec.endpoints[0].tlsConfig.ca
+          value: "ca.crt"
+
+  - it: "prometheus/ServiceMonitor-server: authorization default"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+    asserts:
+      - notExists:
+          path: spec.endpoints[0]["bearerTokenFile"]
+
+  - it: "prometheus/ServiceMonitor-server: authorization set"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+          authorization:
+            credentials:
+              key: "secretkey"
+              name: "secretname"
+    asserts:
+      - equal:
+          path: spec.endpoints[0].authorization.credentials.key
+          value: "secretkey"
+      - equal:
+          path: spec.endpoints[0].authorization.credentials.name
+          value: "secretname"
+
+  - it: "prometheus/ServiceMonitor-server: bearerTokenFile set"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+          bearerTokenFile: "secureToken"
+    asserts:
+      - equal:
+          path: spec.endpoints[0].bearerTokenFile
+          value: "secureToken"
+
+  - it: "prometheus/ServiceMonitor-server: scrapeClass set"
+    set:
+      serverTelemetry:
+        serviceMonitor:
+          enabled: true
+          scrapeClass: "foo"
+    asserts:
+      - equal:
+          path: spec.scrapeClass
+          value: "foo"

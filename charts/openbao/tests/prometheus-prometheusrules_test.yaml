@@ -1,0 +1,90 @@
+suite: OpenBao Prometheus Prometheusrules Test
+templates:
+  - templates/prometheus-prometheusrules.yaml
+release:
+  name: "release-name"
+  namespace: "default"
+tests:
+  - it: "prometheus/PrometheusRules-server: assertDisabled by default"
+    set:
+      serverTelemetry:
+        prometheusRules:
+          rules:
+            - foo: "bar"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "prometheus/PrometheusRules-server: assertDisabled with rules-defined=false"
+    set:
+      serverTelemetry:
+        prometheusRules:
+          enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: "prometheus/PrometheusRules-server: assertEnabled with rules-defined=true"
+    set:
+      serverTelemetry:
+        prometheusRules:
+          enabled: true
+          rules:
+            - foo: "bar"
+            - baz: "qux"
+    asserts:
+      - lengthEqual:
+          path: spec.groups
+          count: 1
+      - isNotEmpty:
+          path: spec.groups[0]
+      - equal:
+          path: spec.groups[0].name
+          value: "release-name-openbao"
+      - lengthEqual:
+          path: spec.groups[0].rules
+          count: 2
+      - equal:
+          path: spec.groups[0].rules[0].foo
+          value: "bar"
+      - equal:
+          path: spec.groups[0].rules[1].baz
+          value: "qux"
+
+  - it: "prometheus/PrometheusRules-server: assertSelectors default"
+    set:
+      serverTelemetry:
+        prometheusRules:
+          enabled: true
+          rules:
+            - foo: "bar"
+    asserts:
+      - isNotEmpty:
+          path: metadata.labels
+      - equal:
+          path: metadata.labels.release
+          value: "prometheus"
+
+  - it: "prometheus/PrometheusRules-server: assertSelectors overrides"
+    set:
+      serverTelemetry:
+        prometheusRules:
+          enabled: true
+          rules:
+            - foo: "bar"
+          selectors:
+            baz: "qux"
+            bar: "foo"
+    asserts:
+      - isNotEmpty:
+          path: metadata.labels
+      - notExists:
+          path: metadata.labels["app"]
+      - notExists:
+          path: metadata.labels["kube-prometheus-stack"]
+      - equal:
+          path: metadata.labels.baz
+          value: "qux"
+      - equal:
+          path: metadata.labels.bar
+          value: "foo"
