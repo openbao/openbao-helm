@@ -295,12 +295,12 @@ based on the mode configured.
 {{- end -}}
 
 {{/*
-Set's up the volumeClaimTemplates when data or audit storage is required.  HA
+Sets up volumeClaimTemplates for data, audit, and additional per-pod storage.  HA
 might not use data storage since Consul is likely it's backend, however, audit
 storage might be desired by the user.
 */}}
 {{- define "openbao.volumeclaims" -}}
-  {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled) }}
+  {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled .Values.server.extraVolumeClaimTemplates) }}
   volumeClaimTemplates:
       {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (eq (.Values.server.ha.raft.enabled | toString ) "true" )) }}
     - apiVersion: v1
@@ -336,6 +336,19 @@ storage might be desired by the user.
         storageClassName: {{ .Values.server.auditStorage.storageClass }}
           {{- end }}
       {{ end }}
+      {{- $names := dict "data" true "audit" true }}
+      {{- range .Values.server.extraVolumeClaimTemplates }}
+        {{- if hasKey $names .metadata.name }}
+          {{- fail (printf "server.extraVolumeClaimTemplates: duplicate or reserved name %q" .metadata.name) }}
+        {{- end }}
+        {{- $_ := set $names .metadata.name true }}
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        {{- toYaml .metadata | nindent 8 }}
+      spec:
+        {{- toYaml .spec | nindent 8 }}
+      {{- end }}
   {{ end }}
 {{- end -}}
 

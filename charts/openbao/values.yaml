@@ -950,6 +950,21 @@ server:
     # Labels to apply to the PVC
     labels: {}
 
+  # -- Additional per-pod persistent volume claims, mounted via server.volumeMounts.
+  # Entries contain metadata.name and spec. Names must be unique; data and audit are reserved.
+  # Claims are not created in dev or external mode. Do not mount them in those modes.
+  # StatefulSet claim templates are immutable: changing this list on an existing release
+  # requires recreating the StatefulSet (for example, orphaning its pods before upgrading).
+  # The StatefulSet retention policy also applies to these claims. The Helm test pod skips their mounts.
+  extraVolumeClaimTemplates: []
+  # - metadata:
+  #     name: audit-siem
+  #   spec:
+  #     accessModes: [ReadWriteOnce]
+  #     resources:
+  #       requests:
+  #         storage: 10Gi
+
   # Run OpenBao in "dev" mode. This requires no further setup, no state management,
   # and no initialization. This is useful for experimenting with OpenBao without
   # needing to unseal, store keys, et. al. All data is lost on restart - do not

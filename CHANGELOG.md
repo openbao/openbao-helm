@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat(server): support additional per-pod persistent volume claim templates.
+
 ## 0.30.8
 
 - chore: bump OpenBao to v2.7.3

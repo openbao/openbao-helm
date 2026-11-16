@@ -1,0 +1,56 @@
+{
+  "server": {
+    "extraVolumeClaimTemplates": [
+      {
+        "metadata": {
+          "name": "audit-siem",
+          "labels": {
+            "purpose": "siem"
+          }
+        },
+        "spec": {
+          "accessModes": [
+            "ReadWriteOnce"
+          ],
+          "resources": {
+            "requests": {
+              "storage": "1Gi"
+            }
+          },
+          "storageClassName": "standard"
+        }
+      },
+      {
+        "metadata": {
+          "name": "cache"
+        },
+        "spec": {
+          "accessModes": [
+            "ReadWriteOnce"
+          ],
+          "resources": {
+            "requests": {
+              "storage": "2Gi"
+            }
+          }
+        }
+      }
+    ],
+    "volumeMounts": [
+      {
+        "name": "audit-siem",
+        "mountPath": "/openbao/siem"
+      },
+      {
+        "name": "plugins",
+        "mountPath": "/plugins"
+      }
+    ],
+    "volumes": [
+      {
+        "name": "plugins",
+        "emptyDir": {}
+      }
+    ]
+  }
+}

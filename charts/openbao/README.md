@@ -183,6 +183,7 @@ Kubernetes: `>= 1.30.0-0`
 | server.extraLabels | object | `{}` |  |
 | server.extraPorts | list | `[]` | extraPorts is a list of extra ports. Specified as a YAML list. This is useful if you need to add additional ports to the statefulset in dynamic way. |
 | server.extraSecretEnvironmentVars | list | `[]` |  |
+| server.extraVolumeClaimTemplates | list | `[]` | Additional per-pod persistent volume claims, mounted via server.volumeMounts. Entries contain metadata.name and spec. Names must be unique; data and audit are reserved. Claims are not created in dev or external mode. Do not mount them in those modes. StatefulSet claim templates are immutable: changing this list on an existing release requires recreating the StatefulSet (for example, orphaning its pods before upgrading). The StatefulSet retention policy also applies to these claims. The Helm test pod skips their mounts. |
 | server.extraVolumes | list | `[]` |  |
 | server.gateway.httpRoute.activeService | bool | `true` |  |
 | server.gateway.httpRoute.annotations | object | `{}` |  |

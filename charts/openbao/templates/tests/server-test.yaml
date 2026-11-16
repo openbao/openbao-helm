@@ -46,8 +46,14 @@ spec:
 
           exit 0
       volumeMounts:
-        {{- if .Values.server.volumeMounts }}
-          {{- toYaml .Values.server.volumeMounts | nindent 8}}
+        {{- $claimNames := dict }}
+        {{- range .Values.server.extraVolumeClaimTemplates }}
+          {{- $_ := set $claimNames .metadata.name true }}
+        {{- end }}
+        {{- range .Values.server.volumeMounts }}
+          {{- if not (hasKey $claimNames .name) }}
+            {{- toYaml (list .) | nindent 8 }}
+          {{- end }}
         {{- end }}
   volumes:
     {{- if .Values.server.volumes }}
