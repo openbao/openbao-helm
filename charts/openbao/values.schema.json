@@ -713,6 +713,17 @@
                                         "null",
                                         "integer"
                                     ]
+                                },
+                                "unhealthyPodEvictionPolicy": {
+                                    "type": [
+                                        "null",
+                                        "string"
+                                    ],
+                                    "enum": [
+                                        null,
+                                        "IfHealthyBudget",
+                                        "AlwaysAllow"
+                                    ]
                                 }
                             }
                         },
