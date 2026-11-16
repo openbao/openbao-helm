@@ -1464,6 +1464,12 @@ serverTelemetry:
     # Interval at which Prometheus scrapes metrics
     interval: 30s
 
+    # -- Relabel target labels before scraping.
+    relabelings: []
+
+    # -- Relabel samples before ingestion.
+    metricRelabelings: []
+
     # Timeout for Prometheus scrapes
     scrapeTimeout: 10s
 

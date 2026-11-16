@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat(telemetry): expose ServiceMonitor target and metric relabeling lists.
+
 ## 0.30.8
 
 - chore: bump OpenBao to v2.7.3
