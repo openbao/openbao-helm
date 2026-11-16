@@ -1,10 +1,14 @@
-
+{{- if .Values.snapshotAgent.enabled -}}
+{{- range $name, $agent := (include "openbao.snapshotAgent.jobs" . | fromJson) -}}
+{{- $context := deepCopy $ -}}
+{{- $_ := set $context.Values "snapshotAgent" $agent -}}
+{{- $_ := set $context "snapshotJobName" $name -}}
+{{- with $context -}}
 ---
-{{- if .Values.snapshotAgent.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "openbao.fullname" . }}-snapshot
+  name: {{ template "openbao.fullname" . }}-snapshot{{ with .snapshotJobName }}-{{ . }}{{ end }}
   namespace: {{ include "openbao.namespace" . }}
   labels:
     helm.sh/chart: {{ include "openbao.chart" . }}
@@ -41,3 +45,5 @@ data:
   BAO_ADDR: {{ include "openbao.scheme" . }}://{{ template "openbao.fullname" . }}.{{ include "openbao.namespace" . }}.svc:{{ .Values.server.service.port }}
   {{- end }}
 {{ end }}
+{{- end }}
+{{- end }}

@@ -1188,6 +1188,50 @@
                     ]
                 }
             }
+        },
+        "snapshotAgent": {
+            "type": "object",
+            "properties": {
+                "jobs": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "schedule": {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            "concurrencyPolicy": {
+                                "type": "string",
+                                "enum": [
+                                    "Allow",
+                                    "Forbid",
+                                    "Replace"
+                                ]
+                            },
+                            "s3CredentialsSecret": {
+                                "type": "string"
+                            },
+                            "config": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "string"
+                                }
+                            },
+                            "extraEnvironmentVars": {
+                                "type": "object"
+                            },
+                            "extraSecretEnvironmentVars": {
+                                "type": "array"
+                            },
+                            "resources": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat(snapshot): support named snapshot jobs with separate schedules, credentials and disjoint S3 paths. Enabling named jobs replaces the existing unnamed CronJob.
+
 ## 0.30.8
 
 - chore: bump OpenBao to v2.7.3

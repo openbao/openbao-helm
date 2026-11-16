@@ -1,0 +1,35 @@
+{
+  "snapshotAgent": {
+    "enabled": true,
+    "resources": {
+      "requests": {
+        "cpu": "100m"
+      }
+    },
+    "extraEnvironmentVars": {
+      "BAO_CACERT": "/ca.crt"
+    },
+    "extraSecretEnvironmentVars": [
+      {
+        "envName": "TOKEN",
+        "secretName": "token",
+        "secretKey": "token"
+      }
+    ],
+    "jobs": {
+      "a": {
+        "resources": {},
+        "extraEnvironmentVars": {},
+        "extraSecretEnvironmentVars": [],
+        "config": {
+          "s3Uri": "s3://openbao-snapshots/a/"
+        }
+      },
+      "b": {
+        "config": {
+          "s3Uri": "s3://openbao-snapshots/b/"
+        }
+      }
+    }
+  }
+}
