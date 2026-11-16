@@ -76,6 +76,7 @@ Kubernetes: `>= 1.30.0-0`
 | global.externalBaoAddr | string | `""` | External openbao server address for the injector and CSI provider to use. Setting this will disable deployment of an OpenBao server. |
 | global.externalVaultAddr | string | `""` | Deprecated: Please use global.externalBaoAddr instead. |
 | global.imagePullSecrets | list | `[]` | Image pull secret to use for registry authentication. Alternatively, the value may be specified as an array of strings. |
+| global.imageRegistry | string | `""` | Registry prefix for chart-managed images, overriding per-image registries. May include a mirror project path. Does not rewrite user-provided sidecar/init images. |
 | global.namespace | string | `""` | The namespace to deploy to. Defaults to the `helm` installation namespace. |
 | global.openshift | bool | `false` | If deploying to OpenShift |
 | global.serverTelemetry.prometheusOperator | bool | `false` | Enable integration with the Prometheus Operator See the top level serverTelemetry section below before enabling this feature. |
@@ -351,6 +352,7 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.extraSecretEnvironmentVars | list | `[]` | List of extra environment variables to set in the snapshot-agent cronjob These variables take value from existing Secret objects. |
 | snapshotAgent.extraVolumeMounts | list | `[]` | List of additional volumeMounts for the snapshot cronjob container. |
 | snapshotAgent.extraVolumes | list | `[]` | List of extraVolumes made available to the snapshot cronjob container. |
+| snapshotAgent.image.registry | string | `""` | Optional registry override. Empty preserves the registry in repository. |
 | snapshotAgent.image.repository | string | `"ghcr.io/openbao/openbao-snapshot-agent"` |  |
 | snapshotAgent.image.tag | string | `"0.4.5"` |  |
 | snapshotAgent.job.annotations | object | `{}` |  |

@@ -1374,3 +1374,28 @@ affinity for the snapshotAgent cronjob pod
           {{- end }}
   {{- end }}
 {{- end -}}
+
+{{/*
+Build a chart-managed image reference. Legacy snapshot repositories can include a
+registry; preserve them unless an explicit registry override is provided.
+*/}}
+{{- define "openbao.image" -}}
+{{- $image := .image -}}
+{{- $repository := $image.repository -}}
+{{- $registry := default .defaultRegistry $image.registry -}}
+{{- if .legacyRepository -}}
+  {{- $parts := splitList "/" $repository -}}
+  {{- $first := first $parts -}}
+  {{- if and (gt (len $parts) 1) (or (contains "." $first) (contains ":" $first) (eq $first "localhost")) -}}
+    {{- $registry = default $first $registry -}}
+    {{- $repository = join "/" (rest $parts) -}}
+  {{- end -}}
+{{- end -}}
+{{- $registry = default $registry .root.Values.global.imageRegistry | trimSuffix "/" -}}
+{{- $reference := $repository -}}
+{{- if $registry -}}
+  {{- $reference = printf "%s/%s" $registry $repository -}}
+{{- end -}}
+{{- $tag := default .defaultTag $image.tag -}}
+{{- printf "%s:%s" $reference $tag -}}
+{{- end -}}

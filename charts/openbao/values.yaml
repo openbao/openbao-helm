@@ -4,6 +4,10 @@
 # Available parameters and their default values for the OpenBao chart.
 
 global:
+  # -- Registry prefix for chart-managed images, overriding per-image registries.
+  # May include a mirror project path. Does not rewrite user-provided sidecar/init images.
+  imageRegistry: ""
+
   # -- enabled is the master enabled switch. Setting this to true or false
   # will enable or disable all the components within this chart by default.
   enabled: true
@@ -1579,6 +1583,8 @@ snapshotAgent:
     annotations: {}
   # The image settings for the snapshot agent
   image:
+    # -- Optional registry override. Empty preserves the registry in repository.
+    registry: ""
     repository: ghcr.io/openbao/openbao-snapshot-agent
     tag: 0.4.5
 
