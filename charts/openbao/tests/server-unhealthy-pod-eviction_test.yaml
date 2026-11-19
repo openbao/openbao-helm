@@ -1,0 +1,50 @@
+suite: OpenBao Server Unhealthy Pod Eviction Test
+templates:
+  - templates/server-disruptionbudget.yaml
+set:
+  server.ha.enabled: true
+release:
+  name: review
+tests:
+  - it: omits the policy by default
+    asserts:
+      - isNull:
+          path: spec.unhealthyPodEvictionPolicy
+
+  - it: accepts IfHealthyBudget without changing the budget
+    set:
+      server.ha.disruptionBudget.unhealthyPodEvictionPolicy: IfHealthyBudget
+    asserts:
+      - equal:
+          path: spec.unhealthyPodEvictionPolicy
+          value: IfHealthyBudget
+      - equal:
+          path: spec.maxUnavailable
+          value: 1
+
+  - it: accepts AlwaysAllow without changing the budget
+    set:
+      server.ha.disruptionBudget.unhealthyPodEvictionPolicy: AlwaysAllow
+    asserts:
+      - equal:
+          path: spec.unhealthyPodEvictionPolicy
+          value: AlwaysAllow
+      - equal:
+          path: spec.maxUnavailable
+          value: 1
+
+  - it: keeps the budget at zero for a single healthy replica
+    set:
+      server.ha.replicas: 1
+      server.ha.disruptionBudget.unhealthyPodEvictionPolicy: AlwaysAllow
+    asserts:
+      - equal:
+          path: spec.maxUnavailable
+          value: 0
+
+  - it: rejects an invalid policy through the schema
+    set:
+      server.ha.disruptionBudget.unhealthyPodEvictionPolicy: bad
+    asserts:
+      - failedTemplate:
+          errorPattern: '(?s)unhealthyPodEvictionPolicy.*must be one of.*IfHealthyBudget.*AlwaysAllow'

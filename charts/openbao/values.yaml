@@ -1115,6 +1115,11 @@ server:
       # replicas. If you'd like a custom value, you can specify an override here.
       maxUnavailable: null
 
+      # -- Eviction policy for running unready pods: IfHealthyBudget or AlwaysAllow.
+      # Unset uses Kubernetes' IfHealthyBudget default. Healthy pods remain subject to
+      # maxUnavailable; a healthy single replica still blocks eviction.
+      unhealthyPodEvictionPolicy: null
+
   # Definition of the serviceAccount used to run Vault.
   # These options are also used when using an external OpenBao server to validate
   # Kubernetes tokens.

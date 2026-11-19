@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat(server): expose the optional PodDisruptionBudget unhealthyPodEvictionPolicy.
+
 ## 0.30.8
 
 - chore: bump OpenBao to v2.7.3
