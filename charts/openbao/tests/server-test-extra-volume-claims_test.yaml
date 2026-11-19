@@ -1,0 +1,27 @@
+suite: OpenBao Helm Test Extra Volume Claims Test
+templates:
+  - templates/tests/server-test.yaml
+values:
+  - fixtures/extra-volume-claims.yaml
+release:
+  name: review
+tests:
+  - it: excludes extra claim mounts and retains unrelated mounts
+    asserts:
+      - equal:
+          path: spec.containers[0].volumeMounts
+          value:
+            - name: plugins
+              mountPath: /plugins
+
+  - it: excludes all mounts when they refer to extra claims
+    set:
+      server.volumeMounts:
+        - name: audit-siem
+          mountPath: /openbao/siem
+        - name: cache
+          mountPath: /cache
+    asserts:
+      - equal:
+          path: spec.containers[0].volumeMounts
+          value: null
