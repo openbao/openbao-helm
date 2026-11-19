@@ -1,0 +1,169 @@
+suite: OpenBao Global Image Registry Test
+templates:
+  - templates/server-statefulset.yaml
+  - templates/tests/server-test.yaml
+  - templates/injector-deployment.yaml
+  - templates/csi-daemonset.yaml
+  - templates/snapshotagent-cronjob.yaml
+tests:
+  - it: server global override
+    template: templates/server-statefulset.yaml
+    set:
+      global.imageRegistry: mirror.example/project/
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "^mirror\\.example/project/"
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "//"
+  - it: test global override
+    template: templates/tests/server-test.yaml
+    set:
+      global.imageRegistry: mirror.example/project/
+    asserts:
+      - matchRegex:
+          path: spec.containers[0].image
+          pattern: "^mirror\\.example/project/"
+      - notMatchRegex:
+          path: spec.containers[0].image
+          pattern: "//"
+  - it: injector global override
+    template: templates/injector-deployment.yaml
+    set:
+      global.imageRegistry: mirror.example/project/
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "^mirror\\.example/project/"
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "//"
+  - it: CSI global override
+    template: templates/csi-daemonset.yaml
+    set:
+      csi.enabled: true
+      global.imageRegistry: mirror.example/project/
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "^mirror\\.example/project/"
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "//"
+  - it: snapshot global override
+    template: templates/snapshotagent-cronjob.yaml
+    set:
+      snapshotAgent.enabled: true
+      global.imageRegistry: mirror.example/project/
+    asserts:
+      - matchRegex:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          pattern: "^mirror\\.example/project/"
+      - notMatchRegex:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          pattern: "//"
+  - it: injector agent override
+    template: templates/injector-deployment.yaml
+    set:
+      global.imageRegistry: mirror.example/project
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[?(@.name == "AGENT_INJECT_VAULT_IMAGE")].value
+          pattern: "^mirror\\.example/project/"
+  - it: CSI agent override
+    template: templates/csi-daemonset.yaml
+    set:
+      csi.enabled: true
+      global.imageRegistry: mirror.example/project
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[1].image
+          pattern: "^mirror\\.example/project/"
+  - it: global beats component
+    template: templates/server-statefulset.yaml
+    set:
+      global.imageRegistry: mirror.example
+      server.image.registry: other.example
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "^mirror\\.example/"
+  - it: empty server registry fallback
+    template: templates/server-statefulset.yaml
+    set:
+      server.image.registry: ''
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "^docker\\.io/"
+  - it: snapshot preserves a legacy registry with a port
+    template: templates/snapshotagent-cronjob.yaml
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.image.repository: localhost:5000/a/snap
+      global.imageRegistry: ''
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: localhost:5000/a/snap:0.4.5
+  - it: snapshot replaces localhost with the global registry
+    template: templates/snapshotagent-cronjob.yaml
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.image.repository: localhost/a/snap
+      global.imageRegistry: mirror.example/project
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: mirror.example/project/a/snap:0.4.5
+  - it: snapshot preserves an unqualified legacy repository
+    template: templates/snapshotagent-cronjob.yaml
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.image.repository: my-repo
+      global.imageRegistry: ''
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: my-repo:0.4.5
+  - it: snapshot prefixes an unqualified repository
+    template: templates/snapshotagent-cronjob.yaml
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.image.repository: my-repo
+      global.imageRegistry: mirror.example
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: mirror.example/my-repo:0.4.5
+  - it: snapshot replaces a legacy registry host
+    template: templates/snapshotagent-cronjob.yaml
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.image.repository: harbor.example/a/snap
+      global.imageRegistry: mirror.example
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: mirror.example/a/snap:0.4.5
+  - it: snapshot per image override
+    template: templates/snapshotagent-cronjob.yaml
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.image.registry: mirror.example
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: mirror.example/openbao/openbao-snapshot-agent:0.4.5
+  - it: global beats snapshot registry and repository host
+    template: templates/snapshotagent-cronjob.yaml
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.image.repository: legacy.example/project/snapshot
+      snapshotAgent.image.registry: component.example
+      global.imageRegistry: global.example/mirror
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: global.example/mirror/project/snapshot:0.4.5
