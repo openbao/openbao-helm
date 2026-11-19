@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.30.8
+
+- chore: bump OpenBao to v2.7.3
+
 ## 0.30.7
 
 - feat: Add trafficDistribution support to all services
