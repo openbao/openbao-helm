@@ -3,6 +3,41 @@ entries:
   openbao:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: |
+            Bump OpenBao to 2.7.3
+      artifacthub.io/containsSecurityUpdates: "true"
+      charts.openshift.io/name: OpenBao
+      charts.openshift.io/provider: OpenBao
+    apiVersion: v2
+    appVersion: v2.7.3
+    created: "2026-11-19T19:57:42.337983117Z"
+    description: Official OpenBao Chart
+    digest: a1a202d6300de36b3be9d924d52ba7dd24c6a1c7cd5b660b9bbda975f725f02b
+    home: https://github.com/openbao/openbao-helm
+    icon: https://raw.githubusercontent.com/openbao/artwork/refs/heads/main/color/openbao-color.svg
+    keywords:
+    - vault
+    - openbao
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    kubeVersion: '>= 1.30.0-0'
+    maintainers:
+    - email: openbao-security@lists.openssf.org
+      name: OpenBao
+      url: https://openbao.org
+    name: openbao
+    sources:
+    - https://github.com/openbao/openbao-helm
+    urls:
+    - https://github.com/openbao/openbao-helm/releases/download/openbao-0.30.8/openbao-0.30.8.tgz
+    version: 0.30.8
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: |
             Add trafficDistribution support to all services
@@ -2910,4 +2945,4 @@ entries:
     urls:
     - https://github.com/openbao/openbao-helm/releases/download/openbao-0.2.0/openbao-0.2.0.tgz
     version: 0.2.0
-generated: "2026-11-06T06:36:50.768207027Z"
+generated: "2026-11-19T19:57:42.338280137Z"
