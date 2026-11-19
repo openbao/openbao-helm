@@ -1,0 +1,191 @@
+suite: OpenBao Server Extra Volume Claims Test
+templates:
+  - templates/server-statefulset.yaml
+values:
+  - fixtures/extra-volume-claims.yaml
+release:
+  name: review
+tests:
+  - it: renders extra claims after the standalone data claim
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 3
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: data
+      - equal:
+          path: spec.volumeClaimTemplates[1].metadata.name
+          value: audit-siem
+      - equal:
+          path: spec.volumeClaimTemplates[2].metadata.name
+          value: cache
+
+  - it: renders extras when data storage is disabled
+    set:
+      server.dataStorage.enabled: false
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 2
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: audit-siem
+      - equal:
+          path: spec.volumeClaimTemplates[1].metadata.name
+          value: cache
+
+  - it: renders extras after both built-in claims
+    set:
+      server.auditStorage.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 4
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: data
+      - equal:
+          path: spec.volumeClaimTemplates[1].metadata.name
+          value: audit
+      - equal:
+          path: spec.volumeClaimTemplates[2].metadata.name
+          value: audit-siem
+      - equal:
+          path: spec.volumeClaimTemplates[3].metadata.name
+          value: cache
+
+  - it: renders extra claims in HA Raft mode
+    set:
+      server.ha.enabled: true
+      server.ha.raft.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 3
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: data
+      - equal:
+          path: spec.volumeClaimTemplates[1].metadata.name
+          value: audit-siem
+      - equal:
+          path: spec.volumeClaimTemplates[2].metadata.name
+          value: cache
+
+  - it: renders only extra claims in HA non-Raft mode
+    set:
+      server.ha.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 2
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: audit-siem
+      - equal:
+          path: spec.volumeClaimTemplates[1].metadata.name
+          value: cache
+
+  - it: omits claims in dev mode
+    set:
+      server.dev.enabled: true
+    asserts:
+      - isNull:
+          path: spec.volumeClaimTemplates
+
+  - it: preserves claim metadata and spec
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[1]
+          value:
+            apiVersion: v1
+            kind: PersistentVolumeClaim
+            metadata:
+              name: audit-siem
+              labels:
+                purpose: siem
+            spec:
+              accessModes: [ReadWriteOnce]
+              resources:
+                requests:
+                  storage: 1Gi
+              storageClassName: standard
+
+  - it: preserves the StatefulSet retention policy
+    set:
+      server.persistentVolumeClaimRetentionPolicy.whenDeleted: Retain
+    asserts:
+      - equal:
+          path: spec.persistentVolumeClaimRetentionPolicy.whenDeleted
+          value: Retain
+
+  - it: rejects the reserved name data
+    set:
+      server.extraVolumeClaimTemplates:
+        - metadata:
+            name: data
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 1Gi
+        - metadata:
+            name: cache
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 2Gi
+    asserts:
+      - failedTemplate:
+          errorPattern: 'duplicate or reserved name "data"'
+
+  - it: rejects the reserved name audit
+    set:
+      server.extraVolumeClaimTemplates:
+        - metadata:
+            name: audit
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 1Gi
+        - metadata:
+            name: cache
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 2Gi
+    asserts:
+      - failedTemplate:
+          errorPattern: 'duplicate or reserved name "audit"'
+
+  - it: rejects the duplicate name cache
+    set:
+      server.extraVolumeClaimTemplates:
+        - metadata:
+            name: cache
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 1Gi
+        - metadata:
+            name: cache
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 2Gi
+    asserts:
+      - failedTemplate:
+          errorPattern: 'duplicate or reserved name "cache"'
+
+  - it: rejects a non-list value through the schema
+    set:
+      server.extraVolumeClaimTemplates: bad
+    asserts:
+      - failedTemplate:
+          errorPattern: '(?s)extraVolumeClaimTemplates.*(got string, want array|Expected: array)'
