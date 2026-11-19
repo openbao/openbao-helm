@@ -1376,8 +1376,7 @@ affinity for the snapshotAgent cronjob pod
 {{- end -}}
 
 {{/*
-Build a chart-managed image reference. Legacy snapshot repositories can include a
-registry; preserve them unless an explicit registry override is provided.
+Snapshot repositories may embed a registry host; it is kept unless a registry override is set.
 */}}
 {{- define "openbao.image" -}}
 {{- $image := .image -}}
@@ -1398,4 +1397,20 @@ registry; preserve them unless an explicit registry override is provided.
 {{- end -}}
 {{- $tag := default .defaultTag $image.tag -}}
 {{- printf "%s:%s" $reference $tag -}}
+{{- end -}}
+
+{{/*
+Map-valued images resolve like chart images so global.imageRegistry applies; strings pass through.
+*/}}
+{{- define "openbao.extraContainers" -}}
+{{- $containers := list -}}
+{{- range .containers -}}
+  {{- $container := deepCopy . -}}
+  {{- if kindIs "map" $container.image -}}
+    {{- $_ := required (printf "image.tag is required for extra container %s" $container.name) $container.image.tag -}}
+    {{- $_ = set $container "image" (include "openbao.image" (dict "root" $.root "image" $container.image "defaultRegistry" "" "defaultTag" "")) -}}
+  {{- end -}}
+  {{- $containers = append $containers $container -}}
+{{- end -}}
+{{- tpl (toYaml $containers) .root -}}
 {{- end -}}

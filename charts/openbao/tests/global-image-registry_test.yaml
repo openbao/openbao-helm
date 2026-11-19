@@ -167,3 +167,76 @@ tests:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].image
           value: global.example/mirror/project/snapshot:0.4.5
+  - it: global override applies to map-valued extra container images
+    template: templates/server-statefulset.yaml
+    set:
+      global.imageRegistry: mirror.example/project/
+      server.extraInitContainers:
+        - name: "{{ .Release.Name }}-init"
+          image:
+            repository: library/busybox
+            tag: "1.37"
+      server.extraContainers:
+        - name: sidecar
+          image:
+            registry: component.example
+            repository: library/busybox
+            tag: "1.37"
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: mirror.example/project/library/busybox:1.37
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: RELEASE-NAME-init
+      - equal:
+          path: spec.template.spec.containers[1].image
+          value: mirror.example/project/library/busybox:1.37
+  - it: map-valued extra container images without a global override
+    template: templates/server-statefulset.yaml
+    set:
+      server.extraInitContainers:
+        - name: init
+          image:
+            repository: busybox
+            tag: "1.37"
+      server.extraContainers:
+        - name: sidecar
+          image:
+            registry: component.example
+            repository: library/busybox
+            tag: "1.37"
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: busybox:1.37
+      - equal:
+          path: spec.template.spec.containers[1].image
+          value: component.example/library/busybox:1.37
+  - it: global override leaves string extra container images unchanged
+    template: templates/server-statefulset.yaml
+    set:
+      global.imageRegistry: mirror.example/project
+      server.extraInitContainers:
+        - name: init
+          image: docker.io/library/busybox:1.37
+      server.extraContainers:
+        - name: sidecar
+          image: busybox:1.37
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: docker.io/library/busybox:1.37
+      - equal:
+          path: spec.template.spec.containers[1].image
+          value: busybox:1.37
+  - it: map-valued extra container image requires a tag
+    template: templates/server-statefulset.yaml
+    set:
+      server.extraContainers:
+        - name: sidecar
+          image:
+            repository: busybox
+    asserts:
+      - failedTemplate:
+          errorMessage: image.tag is required for extra container sidecar

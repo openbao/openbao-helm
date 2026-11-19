@@ -4,8 +4,8 @@
 # Available parameters and their default values for the OpenBao chart.
 
 global:
-  # -- Registry prefix for chart-managed images, overriding per-image registries.
-  # May include a mirror project path. Does not rewrite user-provided sidecar/init images.
+  # -- Registry prefix for chart images and map-valued extra container images, overriding
+  # per-image registries. May include a mirror project path.
   imageRegistry: ""
 
   # -- enabled is the master enabled switch. Setting this to true or false

@@ -70,7 +70,7 @@ spec:
       {{- end }}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
-        {{ tpl (toYaml .Values.server.extraInitContainers) . | nindent 8}}
+        {{ include "openbao.extraContainers" (dict "root" . "containers" .Values.server.extraInitContainers) | nindent 8}}
       {{- end }}
       containers:
         - name: openbao
@@ -219,7 +219,7 @@ spec:
                 {{- end }}
             {{- end }}
         {{- if .Values.server.extraContainers }}
-          {{ tpl (toYaml .Values.server.extraContainers) . | nindent 8}}
+          {{ include "openbao.extraContainers" (dict "root" . "containers" .Values.server.extraContainers) | nindent 8}}
         {{- end }}
       {{- include "imagePullSecrets" . | nindent 6 }}
   {{ template "openbao.volumeclaims" . }}

@@ -76,7 +76,7 @@ Kubernetes: `>= 1.30.0-0`
 | global.externalBaoAddr | string | `""` | External openbao server address for the injector and CSI provider to use. Setting this will disable deployment of an OpenBao server. |
 | global.externalVaultAddr | string | `""` | Deprecated: Please use global.externalBaoAddr instead. |
 | global.imagePullSecrets | list | `[]` | Image pull secret to use for registry authentication. Alternatively, the value may be specified as an array of strings. |
-| global.imageRegistry | string | `""` | Registry prefix for chart-managed images, overriding per-image registries. May include a mirror project path. Does not rewrite user-provided sidecar/init images. |
+| global.imageRegistry | string | `""` | Registry prefix for chart images and map-valued extra container images, overriding per-image registries. May include a mirror project path. |
 | global.namespace | string | `""` | The namespace to deploy to. Defaults to the `helm` installation namespace. |
 | global.openshift | bool | `false` | If deploying to OpenShift |
 | global.serverTelemetry.prometheusOperator | bool | `false` | Enable integration with the Prometheus Operator See the top level serverTelemetry section below before enabling this feature. |
