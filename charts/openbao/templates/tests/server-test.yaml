@@ -18,7 +18,7 @@ spec:
   {{- template "serverTest.statefulSet.securityContext.pod" .}}
   containers:
     - name: {{ .Release.Name }}-server-test
-      image: {{ .Values.server.image.registry | default "docker.io" }}/{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default (trimPrefix "v" .Chart.AppVersion) }}
+      image: {{ include "openbao.image" (dict "root" . "image" .Values.server.image "defaultRegistry" "docker.io" "defaultTag" (trimPrefix "v" .Chart.AppVersion)) }}
       {{- template "serverTest.statefulSet.securityContext.container" .}}
       imagePullPolicy: {{ .Values.server.image.pullPolicy }}
       env:

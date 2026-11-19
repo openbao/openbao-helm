@@ -1374,3 +1374,43 @@ affinity for the snapshotAgent cronjob pod
           {{- end }}
   {{- end }}
 {{- end -}}
+
+{{/*
+Snapshot repositories may embed a registry host; it is kept unless a registry override is set.
+*/}}
+{{- define "openbao.image" -}}
+{{- $image := .image -}}
+{{- $repository := $image.repository -}}
+{{- $registry := default .defaultRegistry $image.registry -}}
+{{- if .legacyRepository -}}
+  {{- $parts := splitList "/" $repository -}}
+  {{- $first := first $parts -}}
+  {{- if and (gt (len $parts) 1) (or (contains "." $first) (contains ":" $first) (eq $first "localhost")) -}}
+    {{- $registry = default $first $registry -}}
+    {{- $repository = join "/" (rest $parts) -}}
+  {{- end -}}
+{{- end -}}
+{{- $registry = default $registry .root.Values.global.imageRegistry | trimSuffix "/" -}}
+{{- $reference := $repository -}}
+{{- if $registry -}}
+  {{- $reference = printf "%s/%s" $registry $repository -}}
+{{- end -}}
+{{- $tag := default .defaultTag $image.tag -}}
+{{- printf "%s:%s" $reference $tag -}}
+{{- end -}}
+
+{{/*
+Map-valued images resolve like chart images so global.imageRegistry applies; strings pass through.
+*/}}
+{{- define "openbao.extraContainers" -}}
+{{- $containers := list -}}
+{{- range .containers -}}
+  {{- $container := deepCopy . -}}
+  {{- if kindIs "map" $container.image -}}
+    {{- $_ := required (printf "image.tag is required for extra container %s" $container.name) $container.image.tag -}}
+    {{- $_ = set $container "image" (include "openbao.image" (dict "root" $.root "image" $container.image "defaultRegistry" "" "defaultTag" "")) -}}
+  {{- end -}}
+  {{- $containers = append $containers $container -}}
+{{- end -}}
+{{- tpl (toYaml $containers) .root -}}
+{{- end -}}

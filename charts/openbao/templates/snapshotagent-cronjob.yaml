@@ -64,7 +64,7 @@ spec:
             {{- end }}
             {{- include "openbao.extraSecretEnvironmentVars" .Values.snapshotAgent | nindent 12 }}
             {{- include "openbao.extraEnvironmentVars" .Values.snapshotAgent | nindent 12 }}
-            image: {{ .Values.snapshotAgent.image.repository }}:{{ .Values.snapshotAgent.image.tag }}
+            image: {{ include "openbao.image" (dict "root" . "image" .Values.snapshotAgent.image "defaultRegistry" "" "defaultTag" "" "legacyRepository" true) }}
             {{ template "openbao.snapshotAgent.resources". }}
             {{ template "snapshotAgent.securityContext.container" .}}
             volumeMounts:

@@ -70,12 +70,12 @@ spec:
       {{- end }}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
-        {{ tpl (toYaml .Values.server.extraInitContainers) . | nindent 8}}
+        {{ include "openbao.extraContainers" (dict "root" . "containers" .Values.server.extraInitContainers) | nindent 8}}
       {{- end }}
       containers:
         - name: openbao
           {{ template "openbao.resources" . }}
-          image: "{{ .Values.server.image.registry | default "docker.io" }}/{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default (trimPrefix "v" .Chart.AppVersion) }}"
+          image: "{{ include "openbao.image" (dict "root" . "image" .Values.server.image "defaultRegistry" "docker.io" "defaultTag" (trimPrefix "v" .Chart.AppVersion)) }}"
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           command:
           - "/bin/sh"
@@ -219,7 +219,7 @@ spec:
                 {{- end }}
             {{- end }}
         {{- if .Values.server.extraContainers }}
-          {{ tpl (toYaml .Values.server.extraContainers) . | nindent 8}}
+          {{ include "openbao.extraContainers" (dict "root" . "containers" .Values.server.extraContainers) | nindent 8}}
         {{- end }}
       {{- include "imagePullSecrets" . | nindent 6 }}
   {{ template "openbao.volumeclaims" . }}

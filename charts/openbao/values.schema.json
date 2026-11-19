@@ -245,6 +245,9 @@
                 },
                 "tlsDisable": {
                     "type": "boolean"
+                },
+                "imageRegistry": {
+                    "type": "string"
                 }
             }
         },
@@ -1186,6 +1189,19 @@
                     "type": [
                         "array"
                     ]
+                }
+            }
+        },
+        "snapshotAgent": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         }

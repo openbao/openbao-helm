@@ -1,5 +1,7 @@
 ## Unreleased
 
+- feat(images): add a global registry override and snapshot-agent registry option, preserving existing references when unset. Extra init and sidecar containers opt in with a map-valued image.
+
 ## 0.30.8
 
 - chore: bump OpenBao to v2.7.3
