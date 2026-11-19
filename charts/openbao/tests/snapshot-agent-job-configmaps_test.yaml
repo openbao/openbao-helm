@@ -1,0 +1,64 @@
+suite: OpenBao Named Snapshot Job ConfigMaps Test
+templates:
+  - templates/snapshotagent-configmap.yaml
+release:
+  name: review
+  namespace: foo
+tests:
+
+  - it: keeps the unnamed ConfigMap by default
+    set:
+      snapshotAgent.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: review-openbao-snapshot
+
+  - it: merges per-job config keys while inheriting the snapshot role
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs:
+        a:
+          config:
+            s3Uri: s3://openbao-snapshots/a/
+        b:
+          config:
+            s3Uri: s3://openbao-snapshots/b/
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: review-openbao-snapshot-a
+        documentIndex: 0
+      - equal:
+          path: data.BAO_ROLE
+          value: snapshot
+        documentIndex: 0
+      - equal:
+          path: data.S3_URI
+          value: s3://openbao-snapshots/a/
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: review-openbao-snapshot-b
+        documentIndex: 1
+      - equal:
+          path: data.BAO_ROLE
+          value: snapshot
+        documentIndex: 1
+      - equal:
+          path: data.S3_URI
+          value: s3://openbao-snapshots/b/
+        documentIndex: 1
+
+  - it: clears an explicitly empty scalar config value
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs.cold.config.s3ExpireDays: ''
+    asserts:
+      - equal:
+          path: data.S3_EXPIRE_DAYS
+          value: ''

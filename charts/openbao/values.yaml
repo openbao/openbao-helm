@@ -1621,6 +1621,31 @@ snapshotAgent:
     # The path of the Kubernetes service account token. If unset defaults to `/var/run/secrets/kubernetes.io/serviceaccount/token`.
     tokenPath: ""
 
+  # -- Named snapshot jobs. Empty keeps the existing single CronJob.
+  # Each job may override schedule, concurrencyPolicy, config, s3CredentialsSecret,
+  # extraEnvironmentVars, extraSecretEnvironmentVars, and resources. Missing fields
+  # inherit defaults. Config keys merge; other supplied maps/lists replace defaults,
+  # including empty values. Set config.s3ExpireDays to "" to disable pruning for a job.
+  # All jobs share the image, service account and pod placement settings.
+  # Use disjoint S3 paths; host aliases and environment overrides cannot be detected.
+  # Stagger schedules: concurrencyPolicy applies per CronJob, not across jobs.
+  # Enabling named jobs removes the old unnamed CronJob and can remove its Job history.
+  jobs: {}
+  # jobs:
+  #   zone-a:
+  #     schedule: "0 * * * *"
+  #     s3CredentialsSecret: snapshot-zone-a
+  #     config:
+  #       s3Host: s3.zone-a.example
+  #       s3Bucket: backups-a
+  #       s3Uri: s3://backups-a/
+  #   cold:
+  #     schedule: "15 2 * * *"
+  #     config:
+  #       s3Bucket: backups-cold
+  #       s3Uri: s3://backups-cold/
+  #       s3ExpireDays: "365"
+
   # configuration of the CronJobs resources
   resources: {}
 

@@ -1,4 +1,9 @@
-{{- if .Values.snapshotAgent.enabled }}
+{{- if .Values.snapshotAgent.enabled -}}
+{{- range $name, $agent := (include "openbao.snapshotAgent.jobs" . | fromJson) -}}
+{{- $context := deepCopy $ -}}
+{{- $_ := set $context.Values "snapshotAgent" $agent -}}
+{{- $_ := set $context "snapshotJobName" $name -}}
+{{- with $context -}}
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -11,7 +16,7 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
   {{- template "openbao.snapshotAgent.annotations" . }}
-  name: {{ template "openbao.fullname" . }}-snapshot
+  name: {{ template "openbao.fullname" . }}-snapshot{{ with .snapshotJobName }}-{{ . }}{{ end }}
   namespace: {{ include "openbao.namespace" . }}
 spec:
   concurrencyPolicy: {{ .Values.snapshotAgent.concurrencyPolicy }}
@@ -22,6 +27,9 @@ spec:
         app.kubernetes.io/name: {{ include "openbao.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: snapshot-agent
+        {{- with .snapshotJobName }}
+        openbao.org/snapshot-job: {{ . | quote }}
+        {{- end }}
         {{- with .Values.snapshotAgent.job.extraLabels }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -33,6 +41,9 @@ spec:
             app.kubernetes.io/name: {{ include "openbao.name" . }}
             app.kubernetes.io/instance: {{ .Release.Name }}
             app.kubernetes.io/component: snapshot-agent
+            {{- with .snapshotJobName }}
+            openbao.org/snapshot-job: {{ . | quote }}
+            {{- end }}
             {{- with .Values.snapshotAgent.pod.extraLabels }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -48,7 +59,7 @@ spec:
           - name: bao-snapshot
             envFrom:
             - configMapRef:
-                name: {{ template "openbao.fullname" . }}-snapshot
+                name: {{ template "openbao.fullname" . }}-snapshot{{ with .snapshotJobName }}-{{ . }}{{ end }}
             env:
             {{- with .Values.snapshotAgent.s3CredentialsSecret }}
             - name: AWS_SECRET_ACCESS_KEY
@@ -82,3 +93,5 @@ spec:
           {{- end }}
           {{- include "imagePullSecrets" . | nindent 10 }}
 {{ end }}
+{{- end }}
+{{- end }}

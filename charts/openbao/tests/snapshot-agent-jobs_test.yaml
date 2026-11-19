@@ -1,0 +1,222 @@
+suite: OpenBao Named Snapshot Jobs Test
+templates:
+  - templates/snapshotagent-cronjob.yaml
+release:
+  name: review
+  namespace: foo
+tests:
+
+  - it: keeps the unnamed CronJob by default
+    set:
+      snapshotAgent.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: review-openbao-snapshot
+
+  - it: pairs each named CronJob with its own ConfigMap
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs:
+        a:
+          config:
+            s3Uri: s3://openbao-snapshots/a/
+        b:
+          config:
+            s3Uri: s3://openbao-snapshots/b/
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: review-openbao-snapshot-a
+        documentIndex: 0
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom[0].configMapRef.name
+          value: review-openbao-snapshot-a
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: review-openbao-snapshot-b
+        documentIndex: 1
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom[0].configMapRef.name
+          value: review-openbao-snapshot-b
+        documentIndex: 1
+
+  - it: overrides schedule and concurrency policy
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs.cold.schedule: 0 2 * * *
+      snapshotAgent.jobs.cold.concurrencyPolicy: Replace
+    asserts:
+      - equal:
+          path: spec.schedule
+          value: 0 2 * * *
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Replace
+
+  - it: overrides inherited S3 credentials
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.s3CredentialsSecret: shared
+      snapshotAgent.jobs.cold.s3CredentialsSecret: cold
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: cold
+                key: AWS_ACCESS_KEY_ID
+
+  - it: rejects duplicate S3 paths
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs:
+        a:
+          schedule: 0 * * * *
+        b:
+          schedule: 5 * * * *
+    asserts:
+      - failedTemplate:
+          errorPattern: overlapping S3 paths
+
+  - it: rejects nested S3 paths
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs:
+        a:
+          config:
+            s3Uri: s3://openbao-snapshots/a
+        b:
+          config:
+            s3Uri: s3://openbao-snapshots/a/cold
+    asserts:
+      - failedTemplate:
+          errorPattern: overlapping S3 paths
+
+  - it: rejects invalid DNS labels
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs:
+        Bad:
+          schedule: 0 * * * *
+    asserts:
+      - failedTemplate:
+          errorPattern: invalid DNS label
+
+  - it: rejects CronJob names exceeding the length limit
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs:
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:
+          schedule: 0 * * * *
+    asserts:
+      - failedTemplate:
+          errorPattern: exceeds 52
+
+  - it: rejects a URI that does not match the bucket
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs:
+        a:
+          config:
+            s3Bucket: other
+    asserts:
+      - failedTemplate:
+          errorPattern: matching s3Uri
+
+  - it: rejects unsupported per-job overrides
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs:
+        a:
+          image:
+            tag: bad
+    asserts:
+      - failedTemplate:
+          errorPattern: "additional properties 'image' not allowed"
+
+  - it: allows the same URI on different hosts
+    set:
+      snapshotAgent.enabled: true
+      snapshotAgent.jobs:
+        a:
+          config:
+            s3Host: a.example
+        b:
+          config:
+            s3Host: b.example
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: kind
+          value: CronJob
+        documentIndex: 0
+      - equal:
+          path: kind
+          value: CronJob
+        documentIndex: 1
+
+  - it: clears explicit empty overrides without changing inherited values in the next job
+    set:
+      snapshotAgent:
+        enabled: true
+        resources:
+          requests:
+            cpu: 100m
+        extraEnvironmentVars:
+          BAO_CACERT: /ca.crt
+        extraSecretEnvironmentVars:
+          - envName: TOKEN
+            secretName: token
+            secretKey: token
+        jobs:
+          a:
+            resources: {}
+            extraEnvironmentVars: {}
+            extraSecretEnvironmentVars: []
+            config:
+              s3Uri: s3://openbao-snapshots/a/
+          b:
+            config:
+              s3Uri: s3://openbao-snapshots/b/
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: review-openbao-snapshot-a
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: review-openbao-snapshot-b
+        documentIndex: 1
+      - isNull:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources
+        documentIndex: 0
+      - isEmpty:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+        documentIndex: 0
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 100m
+        documentIndex: 1
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          count: 2
+        documentIndex: 1
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.serviceAccountName
+          value: review-openbao-snapshot
+        documentIndex: 0
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.serviceAccountName
+          value: review-openbao-snapshot
+        documentIndex: 1

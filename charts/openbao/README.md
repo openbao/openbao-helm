@@ -355,6 +355,7 @@ Kubernetes: `>= 1.30.0-0`
 | snapshotAgent.image.tag | string | `"0.4.5"` |  |
 | snapshotAgent.job.annotations | object | `{}` |  |
 | snapshotAgent.job.extraLabels | object | `{}` |  |
+| snapshotAgent.jobs | object | `{}` | Named snapshot jobs. Empty keeps the existing single CronJob. Each job may override schedule, concurrencyPolicy, config, s3CredentialsSecret, extraEnvironmentVars, extraSecretEnvironmentVars, and resources. Missing fields inherit defaults. Config keys merge; other supplied maps/lists replace defaults, including empty values. Set config.s3ExpireDays to "" to disable pruning for a job. All jobs share the image, service account and pod placement settings. Use disjoint S3 paths; host aliases and environment overrides cannot be detected. Stagger schedules: concurrencyPolicy applies per CronJob, not across jobs. Enabling named jobs removes the old unnamed CronJob and can remove its Job history. |
 | snapshotAgent.nodeSelector | object | `{}` |  |
 | snapshotAgent.pod.annotations | object | `{}` |  |
 | snapshotAgent.pod.extraLabels | object | `{}` |  |

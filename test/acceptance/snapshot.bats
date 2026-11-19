@@ -11,16 +11,38 @@ load _helpers
 
   # deploy s3mock
   kubectl create ns s3mock
-  kubectl -n s3mock run --image=adobe/s3mock:4.11.0 --port=9191 s3mock
+  kubectl -n s3mock apply -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: s3mock
+  labels:
+    run: s3mock
+spec:
+  containers:
+    - name: s3mock
+      image: adobe/s3mock:4.11.0
+      ports:
+        - containerPort: 9191
+      readinessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 9191
+          scheme: HTTPS
+          httpHeaders:
+            - name: Accept
+              value: application/json
+        periodSeconds: 2
+EOF
   kubectl -n s3mock expose pod s3mock
-  kubectl -n s3mock wait --for=condition=Ready pod/s3mock
+  kubectl -n s3mock wait --for=condition=Ready pod/s3mock --timeout=180s
 
   # create s3 bucket for testing
   kubectl run -n s3mock aws-cli --image=amazon/aws-cli --restart=Never \
     --env="AWS_ACCESS_KEY_ID=test" --env="AWS_SECRET_ACCESS_KEY=test" \
     --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=https://s3mock:9191" \
     -- --no-verify-ssl s3 mb s3://openbao-snapshots
-  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n s3mock --timeout=60s || true
+  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n s3mock --timeout=180s
   kubectl delete po aws-cli -n s3mock
 
   # create secret to be used by cronjob
@@ -33,23 +55,21 @@ load _helpers
   local root_token=$(cat root.json | jq -r '.root_token')
   [ "${root_token}" != "" ]
 
-  echo "ROOT: $root_token"
-
   # enable kv v2 secrets engine
-  kubectl exec -ti "$(name_prefix)-0" -- \
+  kubectl exec -i "$(name_prefix)-0" -- \
     sh -c "BAO_TOKEN=${root_token} bao secrets enable -path=secret -version=2 kv"
 
   # Create sample secret
-  kubectl exec -ti "$(name_prefix)-0" -- \
+  kubectl exec -i "$(name_prefix)-0" -- \
     sh -c "BAO_TOKEN=${root_token} bao kv put secret/data/acceptance foo=bar"
 
   # configure kubernetes auth & role
   # enable kubernetes auth
-  kubectl exec -ti "$(name_prefix)-0" -- \
+  kubectl exec -i "$(name_prefix)-0" -- \
     sh -c "BAO_TOKEN=${root_token} bao auth enable kubernetes"
 
   # write kubernetes auth configuration
-  kubectl exec -ti "$(name_prefix)-0" -- \
+  kubectl exec -i "$(name_prefix)-0" -- \
     sh -c "BAO_TOKEN=${root_token} bao write auth/kubernetes/config \
   kubernetes_host="https://kubernetes.default.svc" \
   kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
@@ -63,11 +83,11 @@ path "sys/storage/raft/snapshot" {
 EOF
   )
   echo "${policy}" | kubectl \
-    exec -ti "$(name_prefix)-0" -- \
+    exec -i "$(name_prefix)-0" -- \
     sh -c "BAO_TOKEN=${root_token} bao policy write snapshot -"
 
   # write role for snapshot agent
-  kubectl exec -ti "$(name_prefix)-0" -- \
+  kubectl exec -i "$(name_prefix)-0" -- \
     sh -c "BAO_TOKEN=${root_token} bao write auth/kubernetes/role/snapshot \
   bound_service_account_names=$(name_prefix)-snapshot \
   bound_service_account_namespaces=acceptance policies=snapshot \
@@ -77,6 +97,7 @@ EOF
   helm upgrade --install "$(name_prefix)" . --set injector.enabled=false \
     --set server.ha.enabled=true \
     --set server.ha.replicas=3 \
+    --set server.podManagementPolicy=Parallel --set server.affinity= \
     --set server.ha.raft.enabled=true \
     --set snapshotAgent.enabled=true \
     --set snapshotAgent.config.s3Bucket=openbao-snapshots \
@@ -88,7 +109,7 @@ EOF
 
   # run the cronjob, and check if it completed succesfully
   kubectl create job acceptance --from=cronjob/$(name_prefix)-snapshot
-  kubectl wait --for=condition=complete job/acceptance --timeout=60s || true
+  kubectl wait --for=condition=complete job/acceptance --timeout=180s
 
   # check for job status == completed
   local cronjob_status=$(kubectl get job acceptance -o json | jq -r '.status.succeeded')
@@ -99,7 +120,7 @@ EOF
     --env="AWS_ACCESS_KEY_ID=test" --env="AWS_SECRET_ACCESS_KEY=test" \
     --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=https://s3mock:9191" \
     -- --no-verify-ssl s3 ls s3://openbao-snapshots
-  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n s3mock --timeout=60s || true
+  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/aws-cli -n s3mock --timeout=180s
 
   # check if snapshot is there
   local s3_ls=$(kubectl logs -n s3mock aws-cli | grep -c snapshot)
@@ -112,6 +133,40 @@ EOF
   # delete aws-cli pod
   kubectl delete po aws-cli -n s3mock
 
+  # Upgrade the existing release to two independent targets.
+  for target in a b; do
+    kubectl create secret generic "s3-creds-$target" \
+      --from-literal=AWS_ACCESS_KEY_ID=test --from-literal=AWS_SECRET_ACCESS_KEY=test
+    kubectl run -n s3mock "create-$target" --image=amazon/aws-cli --restart=Never \
+      --env="AWS_ACCESS_KEY_ID=test" --env="AWS_SECRET_ACCESS_KEY=test" \
+      --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=https://s3mock:9191" \
+      -- --no-verify-ssl s3 mb "s3://openbao-snapshots-$target"
+    kubectl wait -n s3mock --for=jsonpath='{.status.phase}'=Succeeded "pod/create-$target" --timeout=120s
+  done
+  helm upgrade "$(name_prefix)" . --reuse-values \
+    --set snapshotAgent.jobs.a.config.s3Bucket=openbao-snapshots-a \
+    --set snapshotAgent.jobs.a.config.s3Uri=s3://openbao-snapshots-a/ \
+    --set snapshotAgent.jobs.a.s3CredentialsSecret=s3-creds-a \
+    --set 'snapshotAgent.jobs.a.schedule=0 * * * *' \
+    --set snapshotAgent.jobs.b.config.s3Bucket=openbao-snapshots-b \
+    --set snapshotAgent.jobs.b.config.s3Uri=s3://openbao-snapshots-b/ \
+    --set snapshotAgent.jobs.b.s3CredentialsSecret=s3-creds-b \
+    --set 'snapshotAgent.jobs.b.schedule=15 2 * * *' \
+    --set-string snapshotAgent.jobs.b.config.s3ExpireDays=
+  run kubectl get cronjob "$(name_prefix)-snapshot"
+  [ "$status" -ne 0 ]
+  for target in a b; do
+    kubectl create job "acceptance-$target" --from="cronjob/$(name_prefix)-snapshot-$target"
+    kubectl wait --for=condition=complete "job/acceptance-$target" --timeout=180s
+    kubectl run -n s3mock "list-$target" --image=amazon/aws-cli --restart=Never \
+      --env="AWS_ACCESS_KEY_ID=test" --env="AWS_SECRET_ACCESS_KEY=test" \
+      --env="AWS_DEFAULT_REGION=us-east-1" --env="AWS_ENDPOINT_URL=https://s3mock:9191" \
+      -- --no-verify-ssl s3 ls "s3://openbao-snapshots-$target/"
+    kubectl wait -n s3mock --for=jsonpath='{.status.phase}'=Succeeded "pod/list-$target" --timeout=120s
+    local snapshot_size=$(kubectl logs -n s3mock "list-$target" | awk '/snapshot/ {print $3; exit}')
+    [ "${snapshot_size:-0}" -gt 0 ]
+  done
+
 }
 
 # initialize
@@ -120,8 +175,15 @@ initialize() {
   helm install "$(name_prefix)" . --set injector.enabled=false \
     --set server.ha.enabled=true \
     --set server.ha.replicas=3 \
+    --set server.podManagementPolicy=Parallel --set server.affinity= \
     --set server.ha.raft.enabled=true
-  wait_for_running $(name_prefix)-0
+  for ordinal in 0 1 2; do
+    for attempt in $(seq 60); do
+      kubectl get pod/$(name_prefix)-$ordinal >/dev/null 2>&1 && break
+      sleep 2
+    done
+    wait_for_running $(name_prefix)-$ordinal
+  done
 
   # Sealed, not initialized
   wait_for_sealed_vault $(name_prefix)-0
@@ -131,7 +193,8 @@ initialize() {
   [ "${init_status}" == "false" ]
 
   # OpenBao Init
-  local init=$(kubectl exec -ti "$(name_prefix)-0" -- \
+  umask 077
+  local init=$(kubectl exec -i "$(name_prefix)-0" -- \
     bao operator init -format=json -n 1 -t 1 | tee root.json)
   [ "${init}" != "" ]
 
@@ -140,9 +203,13 @@ initialize() {
   [ "${unseal_token}" != "" ]
 
   # OpenBao Unseal
-  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=openbao' -o json | jq -r '.items[].metadata.name'))
-  for pod in "${pods[@]}"; do
-    kubectl exec -ti ${pod} -- bao operator unseal ${unseal_token}
+  for ordinal in 0 1 2; do
+    local pod="$(name_prefix)-$ordinal"
+    if [ "$ordinal" -ne 0 ]; then
+      kubectl exec "$pod" -- bao operator raft join "http://$(name_prefix)-0.$(name_prefix)-internal:8200"
+    fi
+    kubectl exec -i "$pod" -- bao operator unseal "$unseal_token"
+    wait_for_ready "$pod"
   done
 
   wait_for_ready "$(name_prefix)-0"
@@ -164,6 +231,6 @@ teardown() {
     helm delete openbao
     kubectl delete --all pvc
     kubectl delete namespace acceptance s3mock --ignore-not-found=true
-    rm root.json
+    rm -f root.json
   fi
 }

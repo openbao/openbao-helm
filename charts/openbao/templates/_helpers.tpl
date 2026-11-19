@@ -1374,3 +1374,50 @@ affinity for the snapshotAgent cronjob pod
           {{- end }}
   {{- end }}
 {{- end -}}
+
+{{/*
+Resolve named snapshot jobs without mutating defaults or neighbouring jobs.
+Config is a flat environment-variable map; supplied keys replace inherited keys.
+Other supported job fields replace their inherited value, including empty maps/lists.
+*/}}
+{{- define "openbao.snapshotAgent.jobs" -}}
+{{- $defaults := omit .Values.snapshotAgent "jobs" -}}
+{{- $jobs := dict -}}
+{{- $targets := list -}}
+{{- if not .Values.snapshotAgent.jobs -}}
+  {{- $_ := set $jobs "" $defaults -}}
+{{- end -}}
+{{- range $name, $overrides := .Values.snapshotAgent.jobs -}}
+  {{- if not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" $name) -}}
+    {{- fail (printf "snapshotAgent.jobs: invalid DNS label %q" $name) -}}
+  {{- end -}}
+  {{- $fullName := printf "%s-snapshot-%s" (include "openbao.fullname" $) $name -}}
+  {{- if gt (len $fullName) 52 -}}
+    {{- fail (printf "snapshotAgent.jobs: CronJob name %q exceeds 52 characters" $fullName) -}}
+  {{- end -}}
+  {{- $job := deepCopy $defaults -}}
+  {{- range $key, $value := $overrides -}}
+    {{- if eq $key "config" -}}
+      {{- range $configKey, $configValue := $value -}}
+        {{- $_ := set $job.config $configKey $configValue -}}
+      {{- end -}}
+    {{- else -}}
+      {{- $_ := set $job $key $value -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $host := lower (trimSuffix "/" $job.config.s3Host) -}}
+  {{- $uri := trimSuffix "/" $job.config.s3Uri -}}
+  {{- $bucketUri := printf "s3://%s" $job.config.s3Bucket -}}
+  {{- if or (empty $host) (empty $job.config.s3Bucket) (not (or (eq $uri $bucketUri) (hasPrefix (printf "%s/" $bucketUri) $uri))) -}}
+    {{- fail (printf "snapshotAgent.jobs.%s: set s3Host, s3Bucket and a matching s3Uri" $name) -}}
+  {{- end -}}
+  {{- range $target := $targets -}}
+    {{- if and (eq $host $target.host) (or (eq $uri $target.uri) (hasPrefix (printf "%s/" $uri) $target.uri) (hasPrefix (printf "%s/" $target.uri) $uri)) -}}
+      {{- fail (printf "snapshotAgent.jobs: overlapping S3 paths for %s and %s" $target.name $name) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $targets = append $targets (dict "name" $name "host" $host "uri" $uri) -}}
+  {{- $_ := set $jobs $name $job -}}
+{{- end -}}
+{{- toJson $jobs -}}
+{{- end -}}
