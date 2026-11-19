@@ -325,7 +325,9 @@ Kubernetes: `>= 1.30.0-0`
 | serverTelemetry.serviceMonitor.bearerTokenFile | string | `nil` | bearerTokenFile defines the file to read bearer token for scraping the target. Deprecated: Use 'serverTelemetry.serviceMonitor.authorization' |
 | serverTelemetry.serviceMonitor.enabled | bool | `false` |  |
 | serverTelemetry.serviceMonitor.interval | string | `"30s"` |  |
+| serverTelemetry.serviceMonitor.metricRelabelings | list | `[]` | Relabel samples before ingestion. |
 | serverTelemetry.serviceMonitor.port | string | `""` | Port which Prometheus uses when scraping metrics. If empty will use `openbao.scheme` helper for its value |
+| serverTelemetry.serviceMonitor.relabelings | list | `[]` | Relabel target labels before scraping. |
 | serverTelemetry.serviceMonitor.scheme | string | `""` | scheme to use when Prometheus scrapes metrics. If empty will use `openbao.scheme` helper for its value |
 | serverTelemetry.serviceMonitor.scrapeClass | string | `""` |  |
 | serverTelemetry.serviceMonitor.scrapeTimeout | string | `"10s"` |  |

@@ -1,0 +1,102 @@
+suite: OpenBao ServiceMonitor Relabelings Test
+templates:
+  - templates/prometheus-servicemonitor.yaml
+release:
+  name: review
+  namespace: foo
+tests:
+
+  - it: omits empty relabeling lists by default
+    set:
+      serverTelemetry.serviceMonitor.enabled: true
+    asserts:
+      - isNull:
+          path: spec.endpoints[0].relabelings
+      - isNull:
+          path: spec.endpoints[0].metricRelabelings
+
+  - it: passes target relabelings without metric relabelings
+    set:
+      serverTelemetry.serviceMonitor.enabled: true
+      serverTelemetry.serviceMonitor.relabelings:
+        - sourceLabels:
+            - __meta_kubernetes_pod_name
+          targetLabel: node_id
+    asserts:
+      - equal:
+          path: spec.endpoints[0].relabelings
+          value:
+            - sourceLabels:
+                - __meta_kubernetes_pod_name
+              targetLabel: node_id
+      - isNull:
+          path: spec.endpoints[0].metricRelabelings
+
+  - it: passes metric relabelings without target relabelings
+    set:
+      serverTelemetry.serviceMonitor.enabled: true
+      serverTelemetry.serviceMonitor.metricRelabelings:
+        - action: labeldrop
+          regex: cluster
+    asserts:
+      - equal:
+          path: spec.endpoints[0].metricRelabelings
+          value:
+            - action: labeldrop
+              regex: cluster
+      - isNull:
+          path: spec.endpoints[0].relabelings
+
+  - it: passes both lists and preserves default TLS configuration
+    set:
+      serverTelemetry.serviceMonitor.enabled: true
+      serverTelemetry.serviceMonitor.relabelings:
+        - sourceLabels:
+            - __meta_kubernetes_pod_name
+          targetLabel: node_id
+      serverTelemetry.serviceMonitor.metricRelabelings:
+        - action: labeldrop
+          regex: cluster
+    asserts:
+      - equal:
+          path: spec.endpoints[0].relabelings
+          value:
+            - sourceLabels:
+                - __meta_kubernetes_pod_name
+              targetLabel: node_id
+      - equal:
+          path: spec.endpoints[0].metricRelabelings
+          value:
+            - action: labeldrop
+              regex: cluster
+      - equal:
+          path: spec.endpoints[0].tlsConfig.insecureSkipVerify
+          value: true
+
+  - it: supports the global enable path
+    set:
+      global.serverTelemetry.prometheusOperator: true
+      serverTelemetry.serviceMonitor.relabelings:
+        - sourceLabels:
+            - __meta_kubernetes_pod_name
+          targetLabel: node_id
+    asserts:
+      - equal:
+          path: spec.endpoints[0].relabelings
+          value:
+            - sourceLabels:
+                - __meta_kubernetes_pod_name
+              targetLabel: node_id
+
+  - it: preserves the HA active-service selector
+    set:
+      serverTelemetry.serviceMonitor.enabled: true
+      server.ha.enabled: true
+      serverTelemetry.serviceMonitor.relabelings:
+        - sourceLabels:
+            - __meta_kubernetes_pod_name
+          targetLabel: node_id
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels["openbao-active"]
+          value: 'true'

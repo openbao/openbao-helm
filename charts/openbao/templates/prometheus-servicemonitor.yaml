@@ -42,6 +42,14 @@ spec:
     scrapeTimeout: {{ .Values.serverTelemetry.serviceMonitor.scrapeTimeout }}
     scheme: {{ .Values.serverTelemetry.serviceMonitor.scheme | default (include "openbao.scheme" .) | lower }}
     path: /v1/sys/metrics
+    {{- with .Values.serverTelemetry.serviceMonitor.relabelings }}
+    relabelings:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.serverTelemetry.serviceMonitor.metricRelabelings }}
+    metricRelabelings:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
     params:
       format:
       - prometheus
